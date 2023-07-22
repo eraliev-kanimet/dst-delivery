@@ -15,8 +15,9 @@ class StoreInfo extends Model
     ];
 
     protected $casts = [
-        'images',
-        'contact',
+        'images' => 'array',
+        'description' => 'array',
+        'contact' => 'array',
     ];
 
     public function store(): BelongsTo

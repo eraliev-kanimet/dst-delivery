@@ -3,10 +3,12 @@
 namespace App\Helpers;
 
 use Filament\Forms\Components\Builder;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -101,8 +103,31 @@ class FilamentFormHelper
         return Grid::make($columns)->schema($schema);
     }
 
-    public function markdown(string $model)
+    public function markdown(string $model): MarkdownEditor
     {
         return MarkdownEditor::make($model);
+    }
+
+    public function radio(string $model, array|callable $options = []): Radio
+    {
+        return Radio::make($model)->options($options);
+    }
+
+    public function checkbox(string $model, array $options = []): CheckboxList
+    {
+        return CheckboxList::make($model)->options($options);
+    }
+
+    public function tabsTextarea(string $model, array $locales): Tabs
+    {
+        $tabs = [];
+
+        foreach (filterAvailableLocales($locales) as $locale => $name) {
+            $tabs[] = $this->tab($name, [
+                $this->textarea("$model.$locale")->label(ucfirst($model))
+            ]);
+        }
+
+        return $this->tabs($tabs);
     }
 }

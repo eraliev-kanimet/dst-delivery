@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->json('images')->nullable();
-            $table->text('description')->nullable();
+            $table->json('description')->nullable();
             $table->json('contact')->nullable();
         });
     }
