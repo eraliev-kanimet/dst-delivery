@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements FilamentUser
@@ -23,6 +24,11 @@ class User extends Authenticatable implements FilamentUser
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function stores(): HasMany
+    {
+        return $this->hasMany(Store::class);
     }
 
     public function canAccessFilament(): bool
