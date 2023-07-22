@@ -14,9 +14,9 @@ return [
 
     'timezone' => 'UTC',
 
-    'locale' => env('APP_LOCALE', 'de'),
+    'locale' => env('APP_LOCALE', 'en'),
 
-    'fallback_locale' => env('APP_LOCALE', 'de'),
+    'fallback_locale' => env('APP_LOCALE', 'en'),
 
     'faker_locale' => 'en_US',
 
