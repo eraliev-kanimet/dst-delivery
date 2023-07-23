@@ -72,12 +72,8 @@ class EditStore extends EditRecord
      */
     protected function getActions(): array
     {
-        if ($this->user->hasRole('admin')) {
-            return [
-                Actions\DeleteAction::make(),
-            ];
-        }
-
-        return [];
+        return [
+            Actions\DeleteAction::make()
+        ];
     }
 }

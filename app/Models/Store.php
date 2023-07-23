@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
@@ -31,6 +32,11 @@ class Store extends Model
     public function info(): HasOne
     {
         return $this->hasOne(StoreInfo::class);
+    }
+
+    public function clients(): HasMany
+    {
+        return $this->hasMany(Customer::class);
     }
 
     public static function setCurrent($store): void

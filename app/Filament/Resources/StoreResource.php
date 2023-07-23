@@ -72,6 +72,11 @@ class StoreResource extends Resource
         return $user->hasRole('admin') || $user->id == $record->user_id;
     }
 
+    public static function canDelete(Model $record): bool
+    {
+        return Auth::user()->hasRole('admin');
+    }
+
     /**
      * @throws Exception
      */
