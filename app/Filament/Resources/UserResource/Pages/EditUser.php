@@ -38,7 +38,7 @@ class EditUser extends EditRecord
     {
         $user = Auth::user();
 
-        if ($user->role->slug != 'admin' || $user->id == $this->record->id) {
+        if (!$user->hasRole('admin') || $user->id == $this->record->id) {
             return [];
         }
 

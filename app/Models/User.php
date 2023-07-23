@@ -26,6 +26,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsTo(Role::class);
     }
 
+    public function hasRole(string $slug): bool
+    {
+        return $this->role->slug == $slug;
+    }
+
     public function stores(): HasMany
     {
         return $this->hasMany(Store::class);
