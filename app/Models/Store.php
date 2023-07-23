@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 
 class Store extends Model
 {
+    private static self $current;
+
     protected $fillable = [
         'user_id',
         'uuid',
@@ -29,6 +31,16 @@ class Store extends Model
     public function info(): HasOne
     {
         return $this->hasOne(StoreInfo::class);
+    }
+
+    public static function setCurrent($store): void
+    {
+        self::$current = $store;
+    }
+
+    public static function current(): Store
+    {
+        return self::$current;
     }
 
     protected static function boot(): void
