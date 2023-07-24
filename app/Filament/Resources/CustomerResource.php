@@ -90,7 +90,7 @@ class CustomerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('store.name'),
                 Tables\Columns\TextColumn::make('Client phone number')
-                    ->formatStateUsing(fn (Model $record) => '+' . $record->phone),
+                    ->formatStateUsing(fn (Model $record) => $record->phone),
                 Tables\Columns\IconColumn::make('active')->boolean(),
                 Tables\Columns\TextColumn::make('updated_at'),
             ])

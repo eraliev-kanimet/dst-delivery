@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\AcceptLanguageMiddleware;
+use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\CurrentStoreMiddleware;
 use App\Http\Middleware\EncryptCookies;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
@@ -51,6 +52,7 @@ class Kernel extends HttpKernel
     ];
 
     protected $middlewareAliases = [
+        'auth' => Authenticate::class,
         'cache.headers' => SetCacheHeaders::class,
         'precognitive' => HandlePrecognitiveRequests::class,
         'signed' => ValidateSignature::class,
