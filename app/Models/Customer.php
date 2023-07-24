@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
 class Customer extends Model
@@ -13,7 +14,6 @@ class Customer extends Model
     protected $fillable = [
         'store_id',
         'name',
-        'code',
         'phone',
         'active'
     ];
@@ -21,5 +21,14 @@ class Customer extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        self::creating(function (self $customer) {
+            $customer->name = Str::uuid();
+        });
     }
 }

@@ -46,17 +46,13 @@ class CustomerResource extends Resource
                     ->required(),
                 $helper->textInput('name')
                     ->required(),
-                $helper->textInput('code')
-                    ->maxLength(5)
-                    ->label('Phone code')
-                    ->required(),
-                $helper->numericInput('phone')
-                    ->minValue(0)
+                $helper->textInput('phone')
                     ->label('Phone number')
+                    ->regex('/^\+\d{1,}$/')
                     ->required(),
                 $helper->toggle('active')
                     ->default(true)
-            ]);
+            ])->columns(1);
     }
 
     protected static function getStores(): Collection
@@ -94,7 +90,7 @@ class CustomerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('store.name'),
                 Tables\Columns\TextColumn::make('Client phone number')
-                    ->formatStateUsing(fn (Model $record) => '+' . $record->code . $record->phone),
+                    ->formatStateUsing(fn (Model $record) => '+' . $record->phone),
                 Tables\Columns\IconColumn::make('active')->boolean(),
                 Tables\Columns\TextColumn::make('updated_at'),
             ])

@@ -17,7 +17,7 @@ class CurrentStoreMiddleware
             return response()->json(errors('Store-UUID header is missing!'), 422);
         }
 
-        $store = Store::where('uuid', $storeUuid);
+        $store = Store::where('uuid', $storeUuid)->first();
 
         if (!$store) {
             return response()->json(errors('Store not found!'), 422);
