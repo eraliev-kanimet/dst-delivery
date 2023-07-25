@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
@@ -10,7 +9,6 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\TagsInput;
@@ -50,16 +48,6 @@ class FilamentFormHelper
         return Fieldset::make($header)->schema($schema)->columns($columns);
     }
 
-    public function richEditor(string $model): RichEditor
-    {
-        return RichEditor::make($model)
-            ->disableToolbarButtons([
-                'attachFiles',
-                'codeBlock',
-            ])
-            ->notRegex('/.(<script|<style>).+/i');
-    }
-
     public function tags(string $model): TagsInput
     {
         return TagsInput::make($model);
@@ -84,18 +72,6 @@ class FilamentFormHelper
     public function image(string $model): FileUpload
     {
         return FileUpload::make($model)->image();
-    }
-
-    public function builder(string $model, array $blocks): Builder
-    {
-        return Builder::make($model)
-            ->label('')
-            ->blocks($blocks);
-    }
-
-    public function builderBlock(string $model, array $schema): Builder\Block
-    {
-        return Builder\Block::make($model)->schema($schema);
     }
 
     public function grid(array $schema, array|int $columns = 2): Grid

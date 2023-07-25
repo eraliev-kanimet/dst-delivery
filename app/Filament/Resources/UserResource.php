@@ -49,7 +49,7 @@ class UserResource extends Resource
                     return $state;
                 }),
             $helper->select('role_id')
-                ->options(Role::all()->pluck('name', 'id'))
+                ->options(Role::pluck('name', 'id'))
                 ->label('Role')
                 ->default(2)
         ])->columns(2);
@@ -57,7 +57,7 @@ class UserResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->role->slug == 'admin';
+        return Auth::user()->hasRole('admin');
     }
 
     /**

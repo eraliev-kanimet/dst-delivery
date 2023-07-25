@@ -26,11 +26,11 @@ class StoreResource extends Resource
     {
         $user = Auth::user();
 
-        if ($user->role->slug != 'admin') {
-            return parent::getEloquentQuery()->where('user_id', $user->id);
+        if ($user->hasRole('admin')) {
+            return parent::getEloquentQuery();
         }
 
-        return parent::getEloquentQuery();
+        return parent::getEloquentQuery()->where('user_id', $user->id);
     }
 
     public static function form(Form $form): Form
@@ -41,7 +41,7 @@ class StoreResource extends Resource
         return $form
             ->schema([
                 $helper->select('user_id')
-                    ->options(User::all()->pluck('name', 'id'))
+                    ->options(User::pluck('name', 'id'))
                     ->label('Store Owner')
                     ->required(),
                 $helper->textInput('name'),
@@ -62,14 +62,19 @@ class StoreResource extends Resource
 
     public static function canCreate(): bool
     {
-        return Auth::user()->role->slug == 'admin';
+        return Auth::user()->hasRole('admin');
     }
 
     public static function canEdit(Model $record): bool
     {
         $user = Auth::user();
 
-        return $user->role->slug == 'admin' || $user->id == $record->user_id;
+        return $user->hasRole('admin') || $user->id == $record->user_id;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return Auth::user()->hasRole('admin');
     }
 
     /**
@@ -81,7 +86,7 @@ class StoreResource extends Resource
             Tables\Columns\TextColumn::make('name'),
         ];
 
-        if (Auth::user()->role->slug == 'admin') {
+        if (Auth::user()->hasRole('admin')) {
             $columns[] = Tables\Columns\TextColumn::make('uuid')
                 ->copyable();
             $columns[] = Tables\Columns\TextColumn::make('user.name');

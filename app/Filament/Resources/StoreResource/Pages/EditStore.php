@@ -32,7 +32,7 @@ class EditStore extends EditRecord
 
     protected function form(Form $form): Form
     {
-        return $this->user->role->slug == 'admin' ? StoreResource::form($form) : $this->getFormForm($form);
+        return $this->user->hasRole('admin') ? StoreResource::form($form) : $this->getFormForm($form);
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -72,12 +72,8 @@ class EditStore extends EditRecord
      */
     protected function getActions(): array
     {
-        if ($this->user->role->slug == 'admin') {
-            return [
-                Actions\DeleteAction::make(),
-            ];
-        }
-
-        return [];
+        return [
+            Actions\DeleteAction::make()
+        ];
     }
 }
