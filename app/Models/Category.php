@@ -29,12 +29,23 @@ class Category extends Model
 
     public function categories(): HasMany
     {
-        return $this->hasMany(self::class);
+        return $this->hasMany(self::class)->with(['category', 'categories']);
     }
 
     public function _images(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
+    }
+
+    public function images(): array
+    {
+        $images = [];
+
+        foreach ($this->_images->values ?? [] as $image) {
+            $images[] = asset('storage/' . $image);
+        }
+
+        return $images;
     }
 
     public $timestamps = false;
