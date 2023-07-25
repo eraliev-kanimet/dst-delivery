@@ -12,3 +12,22 @@ function errors(string $message, array $errors = []): array
         'errors' => $errors
     ];
 }
+
+function ttt(string $value): array
+{
+    $array = [];
+
+    foreach (array_keys(config('app.locales')) as $key) {
+        $array[$key] = $value;
+    }
+
+    return $array;
+}
+
+function truncateStr($string, $maxLength = 13) {
+    if (mb_strlen($string) > $maxLength) {
+        $string = mb_substr($string, 0, $maxLength) . '...';
+    }
+
+    return $string;
+}

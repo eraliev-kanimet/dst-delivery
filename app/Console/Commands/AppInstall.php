@@ -25,15 +25,6 @@ class AppInstall extends Command
                 'password' => Hash::make('password')
             ]);
 
-            User::updateOrCreate([
-                'email' => 'store@owner.com',
-            ], [
-                'email' => 'store@owner.com',
-                'role_id' => 2,
-                'name' => 'Store Owner',
-                'password' => Hash::make('password')
-            ]);
-
             $this->info('The command has successfully worked, the base roles and admin user have been created');
         } else {
             $this->error('This command has been run before! Please check the database!');
