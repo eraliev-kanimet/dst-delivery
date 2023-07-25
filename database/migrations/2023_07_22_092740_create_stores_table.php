@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('fallback_locale');
             $table->json('locales');
+            $table->json('categories')->nullable();
             $table->timestamps();
         });
     }

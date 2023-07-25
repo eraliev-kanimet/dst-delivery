@@ -10,8 +10,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         if (Role::count()) {
-            $this->call(StoreSeeder::class);
             $this->call(CategorySeeder::class);
+            $this->call(StoreSeeder::class);
         } else {
             print "Run the app:install command first!\n";
         }

@@ -15,6 +15,7 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Illuminate\Support\Collection;
 
 class FilamentFormHelper
 {
@@ -89,7 +90,7 @@ class FilamentFormHelper
         return Radio::make($model)->options($options);
     }
 
-    public function checkbox(string $model, array $options = []): CheckboxList
+    public function checkbox(string $model, array|Collection $options = []): CheckboxList
     {
         return CheckboxList::make($model)->options($options);
     }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\StoreResource\Pages;
 use App\Helpers\FilamentFormHelper;
+use App\Models\Category;
 use App\Models\Store;
 use App\Models\User;
 use Closure;
@@ -36,7 +37,9 @@ class StoreResource extends Resource
     public static function form(Form $form): Form
     {
         $helper = new FilamentFormHelper;
+        $locale = config('app.locale');
         $locales = config('app.locales');
+        $categories = Category::whereNull('category_id')->get()->pluck("name.$locale", 'id');
 
         return $form
             ->schema([
@@ -55,7 +58,10 @@ class StoreResource extends Resource
                         fn(Closure $get) => filterAvailableLocales($get('locales'))
                     )->hidden(fn(Closure $get) => !count($get('locales')))
                         ->required(fn(Closure $get) => count($get('locales')))
-                        ->inline()
+                        ->inline(),
+                    $helper->checkbox('categories', $categories)
+                        ->required()
+                        ->columns()
                 ], 1),
             ])->columns(2);
     }
