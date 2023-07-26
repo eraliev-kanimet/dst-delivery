@@ -31,3 +31,25 @@ function truncateStr($string, $maxLength = 13) {
 
     return $string;
 }
+
+function removeEmptyElements($array): array
+{
+    $keysToRemove = [];
+
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            $keysToRemove = array_merge($keysToRemove, array_keys($value, null, true));
+            $keysToRemove = array_merge($keysToRemove, array_keys($value, ''));
+        }
+
+        if ($value === null || $value === '' || $key === null || $key === '') {
+            $keysToRemove[] = $key;
+        }
+    }
+
+    foreach ($keysToRemove as $key) {
+        unset($array[$key]);
+    }
+
+    return $array;
+}

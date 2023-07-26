@@ -32,7 +32,8 @@ class EditCategory extends EditRecord
                 $helper->select('category_id')
                     ->options($categories)
                     ->label('Category')
-                    ->required(!is_null($this->record->category_id)),
+                    ->required(!is_null($this->record->category_id))
+                    ->visible(!is_null($this->record->category_id)),
                 $helper->tabsTextInput('name', $locales),
                 $helper->tabsTextarea('description', $locales),
                 $helper->image('images')->multiple()
