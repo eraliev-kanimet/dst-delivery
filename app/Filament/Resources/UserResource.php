@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Helpers\FilamentFormHelper;
+use App\Helpers\FilamentHelper;
 use App\Models\Role;
 use App\Models\User;
 use Exception;
@@ -23,7 +23,7 @@ class UserResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $helper = new FilamentFormHelper();
+        $helper = new FilamentHelper();
 
         return $form->schema([
             $helper->textInput('name')

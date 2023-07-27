@@ -3,10 +3,11 @@
 namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
-use App\Helpers\FilamentFormHelper;
+use App\Helpers\FilamentHelper;
 use App\Models\Category;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Collection;
 
 class EditCategory extends EditRecord
 {
@@ -17,23 +18,39 @@ class EditCategory extends EditRecord
      */
     public $record;
 
-    protected function form(Form $form): Form
+    public array|Collection $categories = [];
+
+    public function mount($record): void
     {
-        $helper = new FilamentFormHelper;
+        $this->record = $this->resolveRecord($record);
+
         $locale = config('app.locale');
-        $locales = array_keys(config('app.locales'));
-        $categories = Category::whereCategoryId($this->record->category?->category_id)
+
+        $this->categories = Category::whereCategoryId($this->record->category?->category_id)
             ->whereNot('id', $this->record->id)
             ->get()
             ->pluck("name.$locale", 'id');
 
+        $this->authorizeAccess();
+
+        $this->fillForm();
+
+        $this->previousUrl = url()->previous();
+    }
+
+    protected function form(Form $form): Form
+    {
+        $helper = new FilamentHelper;
+
+        $locales = array_keys(config('app.locales'));
+
         return $form
             ->schema([
                 $helper->select('category_id')
-                    ->options($categories)
+                    ->options($this->categories)
                     ->label('Category')
-                    ->required(!is_null($this->record->category_id))
-                    ->visible(!is_null($this->record->category_id)),
+                    ->nullable(is_null($this->record->category_id))
+                    ->hidden(is_null($this->record->category_id)),
                 $helper->tabsTextInput('name', $locales),
                 $helper->tabsTextarea('description', $locales),
                 $helper->image('images')->multiple()
@@ -42,7 +59,7 @@ class EditCategory extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['images'] = $this->record->_images->values;
+        $data['images'] = $this->record->images->values;
 
         return $data;
     }
@@ -50,7 +67,7 @@ class EditCategory extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         if (isset($data['images'])) {
-            $this->record->_images()->update([
+            $this->record->images()->update([
                 'values' => $data['images']
             ]);
         }

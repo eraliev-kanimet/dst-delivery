@@ -18,7 +18,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Support\Collection;
 
-class FilamentFormHelper
+class FilamentHelper
 {
     public function tabs(array $tabs): Tabs
     {

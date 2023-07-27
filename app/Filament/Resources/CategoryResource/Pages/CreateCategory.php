@@ -3,26 +3,30 @@
 namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
-use App\Helpers\FilamentFormHelper;
+use App\Helpers\FilamentHelper;
 use App\Models\Category;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Collection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 class CreateCategory extends CreateRecord
 {
-    protected ?Category $category = null;
-
-    protected string $locale;
-
     protected static string $resource = CategoryResource::class;
 
-    public function __construct($id = null)
-    {
-        parent::__construct($id);
+    protected int $category_id = 0;
+    protected string $category_name = '';
+    protected array|Collection $categories = [];
 
-        $this->locale = config('app.locale');
+    protected function getTitle(): string
+    {
+        return $this->category_id ? 'Create a child category "' . truncateStr($this->category_name) . '"' : 'Create main category';
+    }
+
+    public function mount(): void
+    {
+        $locale = config('app.locale');
 
         try {
             $category_id = request()->get('category_id');
@@ -34,39 +38,36 @@ class CreateCategory extends CreateRecord
                     abort(404);
                 }
 
-                $this->category = $category;
-            }
-        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {
-        }
-    }
+                $name = $category->name[$locale];
 
-    protected function getTitle(): string
-    {
-        return $this->category ? 'Create a child category "' . truncateStr($this->category->name[$this->locale]) . '"' : 'Create main category';
+                $this->categories = [$category_id => $name];
+
+                $this->category_id = $category_id;
+                $this->category_name = $name;
+            }
+        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {}
+
+        if (!$this->category_id) {
+            $this->categories = Category::whereCategoryId(null)->get()->pluck("name.$locale", 'id');
+        }
+
+        parent::mount();
     }
 
     protected function form(Form $form): Form
     {
-        $helper = new FilamentFormHelper;
+        $helper = new FilamentHelper;
 
         $locales = array_keys(config('app.locales'));
-
-        if ($this->category) {
-            $categories = [
-                $this->category->id => $this->category->name[$this->locale]
-            ];
-        } else {
-            $categories = Category::whereCategoryId(null)->get()->pluck('name.' . $this->locale, 'id');
-        }
 
         return $form
             ->schema([
                 $helper->select('category_id')
-                    ->options($categories)
-                    ->default($this->category?->id)
-                    ->disabled(!is_null($this->category))
+                    ->options($this->categories)
+                    ->default($this->category_id)
+                    ->disabled($this->category_id)
                     ->label('Category'),
-                $helper->tabsTextInput('name', $locales),
+                $helper->tabsTextInput('name', $locales, true),
                 $helper->tabsTextarea('description', $locales),
             ])->columns(1);
     }

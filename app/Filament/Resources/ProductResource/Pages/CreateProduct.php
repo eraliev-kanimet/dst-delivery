@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource\ProductResourceForm;
 use App\Filament\Resources\StoreResource;
+use App\Helpers\CategoryHelper;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\Store;
@@ -22,6 +23,22 @@ class CreateProduct extends EditRecord
      */
     public $record;
 
+    public array $categories = [];
+
+    public function mount($record): void
+    {
+        $this->record = $this->resolveRecord($record);
+
+        $this->categories = CategoryHelper::new()
+            ->getCategories($this->record->categories, config('app.locale'));
+
+        $this->authorizeAccess();
+
+        $this->fillForm();
+
+        $this->previousUrl = url()->previous();
+    }
+
     protected function mutateFormDataBeforeFill(array $data): array
     {
         return [
@@ -31,7 +48,9 @@ class CreateProduct extends EditRecord
 
     protected function form(Form $form): Form
     {
-        return $form->schema(ProductResourceForm::getForm($this->record, false))->columns(1);
+        return $form->schema(
+            ProductResourceForm::getForm($this->record->locales, $this->categories, false)
+        )->columns(1);
     }
 
     protected function getActions(): array

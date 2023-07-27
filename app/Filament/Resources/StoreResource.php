@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StoreResource\Pages;
-use App\Helpers\FilamentFormHelper;
+use App\Helpers\FilamentHelper;
 use App\Models\Category;
 use App\Models\Store;
 use App\Models\User;
@@ -36,7 +36,7 @@ class StoreResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $helper = new FilamentFormHelper;
+        $helper = new FilamentHelper;
         $locale = config('app.locale');
         $locales = config('app.locales');
         $categories = Category::whereNull('category_id')->get()->pluck("name.$locale", 'id');

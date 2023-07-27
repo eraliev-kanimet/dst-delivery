@@ -16,7 +16,7 @@ class CategoryController extends Controller
         CategoryResource::$locale = config('app.locale');
         CategoryResource::$fallback_locale = $store->fallback_locale;
 
-        $categories = Category::with(['category', 'categories', '_images'])
+        $categories = Category::with(['category', 'categories', 'images'])
             ->whereIn('id',$store->categories ?? [])
             ->get();
 

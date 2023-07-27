@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\ProductResourceForm;
+use App\Helpers\CategoryHelper;
 use App\Models\Product;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\EditRecord;
@@ -16,6 +17,22 @@ class EditProduct extends EditRecord
      * @var Product
      */
     public $record;
+
+    public array $categories = [];
+
+    public function mount($record): void
+    {
+        $this->record = $this->resolveRecord($record);
+
+        $this->categories = CategoryHelper::new()
+            ->getCategories($this->record->store->categories, config('app.locale'));
+
+        $this->authorizeAccess();
+
+        $this->fillForm();
+
+        $this->previousUrl = url()->previous();
+    }
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
@@ -37,6 +54,8 @@ class EditProduct extends EditRecord
 
     protected function form(Form $form): Form
     {
-        return $form->schema(ProductResourceForm::getForm($this->record->store))->columns(1);
+        return $form->schema(
+            ProductResourceForm::getForm($this->record->store->locales, $this->categories)
+        )->columns(1);
     }
 }

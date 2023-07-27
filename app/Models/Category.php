@@ -32,16 +32,16 @@ class Category extends Model
         return $this->hasMany(self::class)->with(['category', 'categories']);
     }
 
-    public function _images(): MorphOne
+    public function images(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function images(): array
+    public function getImages(): array
     {
         $images = [];
 
-        foreach ($this->_images->values ?? [] as $image) {
+        foreach ($this->images->values ?? [] as $image) {
             $images[] = asset('storage/' . $image);
         }
 
@@ -55,7 +55,7 @@ class Category extends Model
         parent::boot();
 
         self::created(function (self $category) {
-            $category->_images()->save(new Image);
+            $category->images()->save(new Image);
         });
     }
 }

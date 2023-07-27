@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\StoreResource\Pages;
 
 use App\Filament\Resources\StoreResource;
-use App\Helpers\FilamentFormHelper;
+use App\Helpers\FilamentHelper;
 use App\Models\Category;
 use App\Models\Store;
 use App\Models\User;
@@ -46,7 +46,7 @@ class EditStore extends EditRecord
 
     protected function getFormForm(Form $form): Form
     {
-        $helper = new FilamentFormHelper;
+        $helper = new FilamentHelper;
         $locale = config('app.locale');
         $categories = Category::whereNull('category_id')->get()->pluck("name.$locale", 'id');
 

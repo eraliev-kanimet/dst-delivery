@@ -35,7 +35,7 @@ class CategoryResource extends JsonResource
             'id' => $resource->id,
             'name' => $resource->name[$locale] ?? $resource->name[$fallback_locale],
             'description' => $resource->description[$locale] ?? $resource->description[$fallback_locale],
-            'images' => $resource->images(),
+            'images' => $resource->getImages(),
             'parent' => $parent,
             'children' => self::collection($resource->categories)
         ];

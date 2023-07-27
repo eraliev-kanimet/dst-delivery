@@ -2,29 +2,27 @@
 
 namespace App\Filament\Resources\ProductResource;
 
-use App\Helpers\FilamentFormHelper;
-use App\Models\Category;
-use App\Models\Store;
+use App\Helpers\FilamentHelper;
 use Filament\Forms\Components\Tabs;
 use Nuhel\FilamentCroppie\Components\Croppie;
 
 final class ProductResourceForm
 {
     public function __construct(
-        protected FilamentFormHelper $helper,
-        protected array              $locales,
+        protected FilamentHelper $helper,
+        protected array          $locales,
     )
     {
     }
 
-    public static function getForm(Store $store, bool $edit = true): array
+    public static function getForm(array $locales, array $categories, bool $edit = true): array
     {
-        $self = new self(new FilamentFormHelper, $store->locales);
+        $self = new self(new FilamentHelper, $locales);
 
-        return $self->form($store, $edit);
+        return $self->form($edit, $categories);
     }
 
-    protected function form(Store $store, bool $edit = true): array
+    protected function form(bool $edit, array $categories): array
     {
         $tabs = [
             $this->helper->tab('Basic', [
@@ -32,7 +30,7 @@ final class ProductResourceForm
                     $this->helper->select('category_id')
                         ->label('Category')
                         ->required()
-                        ->options($this->categories($store->categories))
+                        ->options($categories)
                         ->searchable()
                         ->columnSpan(2),
                     $this->helper->numericInput('sorted')
@@ -105,34 +103,6 @@ final class ProductResourceForm
         }
 
         return $this->helper->tabs($tabs);
-    }
-
-    protected function categories(array $categories): array
-    {
-        $locale = config('app.locale');
-
-        $categories = Category::whereIn('id', $categories)
-            ->with(['categories'])
-            ->get();
-
-        $array = [];
-
-        foreach ($categories as $category) {
-            $array = array_replace_recursive($array, $this->getCategoryArray($category, $locale));
-        }
-
-        return $array;
-    }
-
-    protected function getCategoryArray(Category $category, string $locale): array
-    {
-        $array[$category->id] = $category->name[$locale];
-
-        foreach ($category->categories as $childCategory) {
-            $array = array_replace_recursive($array, $this->getCategoryArray($childCategory, $locale));
-        }
-
-        return $array;
     }
 }
 
