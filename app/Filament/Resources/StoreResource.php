@@ -39,7 +39,7 @@ class StoreResource extends Resource
         $helper = new FilamentHelper;
         $locale = config('app.locale');
         $locales = config('app.locales');
-        $categories = Category::whereNull('category_id')->get()->pluck("name.$locale", 'id');
+        $categories = Category::all()->pluck("name.$locale", 'id');
 
         return $form
             ->schema([
@@ -62,6 +62,17 @@ class StoreResource extends Resource
                     $helper->checkbox('categories', $categories)
                         ->required()
                         ->columns()
+                        ->dehydrateStateUsing(function ($state) {
+                            $array = [];
+
+                            foreach ($state as $value) {
+                                $array[] = (int)$value;
+                            }
+
+                            return Category::whereIn('id', $array)
+                                ->pluck('id')
+                                ->toArray();
+                        })
                 ], 1),
             ])->columns(2);
     }

@@ -48,6 +48,7 @@ final class ProductResourceForm
                 ])
                     ->label('')
                     ->required()
+                    ->createItemButtonLabel('Add attribute')
             ]),
         ];
 
@@ -69,6 +70,7 @@ final class ProductResourceForm
                     ->relationship('selections')
                     ->required()
                     ->label('')
+                    ->createItemButtonLabel('Add selection')
                     ->mutateRelationshipDataBeforeSaveUsing(function ($data) {
                         $data['properties'] = removeEmptyElements($data['properties']);
 

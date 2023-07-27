@@ -43,6 +43,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make("name.$locale"),
                 Tables\Columns\TextColumn::make("category.name.$locale")
                     ->label('Category'),
+                Tables\Columns\IconColumn::make('is_available')->boolean(),
                 Tables\Columns\TextColumn::make('store.name'),
             ])
             ->actions([

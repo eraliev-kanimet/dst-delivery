@@ -4,7 +4,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource\ProductResourceForm;
 use App\Filament\Resources\StoreResource;
-use App\Helpers\CategoryHelper;
+use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\Store;
@@ -29,8 +29,12 @@ class CreateProduct extends EditRecord
     {
         $this->record = $this->resolveRecord($record);
 
-        $this->categories = CategoryHelper::new()
-            ->getCategories($this->record->categories, config('app.locale'));
+        $locale = config('app.locale');
+
+        $this->categories = Category::whereIn('id', $this->record->categories)
+            ->get()
+            ->pluck("name.$locale", 'id')
+            ->toArray();
 
         $this->authorizeAccess();
 

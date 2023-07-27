@@ -4,7 +4,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\ProductResourceForm;
-use App\Helpers\CategoryHelper;
+use App\Models\Category;
 use App\Models\Product;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\EditRecord;
@@ -24,8 +24,12 @@ class EditProduct extends EditRecord
     {
         $this->record = $this->resolveRecord($record);
 
-        $this->categories = CategoryHelper::new()
-            ->getCategories($this->record->store->categories, config('app.locale'));
+        $locale = config('app.locale');
+
+        $this->categories = Category::whereIn('id', $this->record->store->categories)
+            ->get()
+            ->pluck("name.$locale", 'id')
+            ->toArray();
 
         $this->authorizeAccess();
 
@@ -37,6 +41,10 @@ class EditProduct extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['images'] = $this->record->images->values;
+
+        if (!in_array($data['category_id'], array_keys($this->categories))) {
+            $data['category_id'] = null;
+        }
 
         return $data;
     }
