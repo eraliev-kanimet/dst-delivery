@@ -7,7 +7,6 @@ use App\Helpers\FilamentHelper;
 use App\Models\Category;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Collection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -17,7 +16,7 @@ class CreateCategory extends CreateRecord
 
     protected int $category_id = 0;
     protected string $category_name = '';
-    protected array|Collection $categories = [];
+    protected array $categories = [];
 
     protected function getTitle(): string
     {
@@ -44,12 +43,10 @@ class CreateCategory extends CreateRecord
 
                 $this->category_id = $category_id;
                 $this->category_name = $name;
+            } else {
+                $this->category_id = 0;
             }
         } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {}
-
-        if (!$this->category_id) {
-            $this->categories = Category::whereCategoryId(null)->get()->pluck("name.$locale", 'id');
-        }
 
         parent::mount();
     }
@@ -64,6 +61,7 @@ class CreateCategory extends CreateRecord
             ->schema([
                 $helper->select('category_id')
                     ->options($this->categories)
+                    ->visible($this->category_id)
                     ->default($this->category_id)
                     ->disabled($this->category_id)
                     ->label('Category'),

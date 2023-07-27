@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->json('name')->index();
             $table->json('description')->index();
-            $table->json('attributes')->nullable();
+            $table->json('properties')->nullable();
             $table->integer('sorted')->nullable();
             $table->boolean('is_available')->default(true);
             $table->timestamps();

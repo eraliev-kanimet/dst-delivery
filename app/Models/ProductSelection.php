@@ -9,14 +9,14 @@ class ProductSelection extends Model
 {
     protected $fillable = [
         'product_id',
-        'attributes',
+        'properties',
         'quantity',
         'price',
         'is_available',
     ];
 
     protected $casts = [
-        'attributes' => 'array'
+        'properties' => 'array'
     ];
 
     public function product(): BelongsTo

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('product_selections', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->json('attributes')->nullable();
+            $table->json('properties')->nullable();
             $table->integer('quantity')->default(0);
             $table->double('price')->default(0);
             $table->boolean('is_available')->default(true);

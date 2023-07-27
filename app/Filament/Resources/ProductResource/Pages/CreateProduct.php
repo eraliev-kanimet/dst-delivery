@@ -69,7 +69,7 @@ class CreateProduct extends EditRecord
             'category_id' => $data['category_id'],
             'name' => $data['name'],
             'description' => $data['description'],
-            'attributes' => $data['attributes'],
+            'properties' => $data['properties'],
             'sorted' => $data['sorted'],
             'is_available' => $data['is_available'],
         ]);

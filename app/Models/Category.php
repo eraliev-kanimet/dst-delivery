@@ -29,7 +29,7 @@ class Category extends Model
 
     public function categories(): HasMany
     {
-        return $this->hasMany(self::class)->with(['category', 'categories']);
+        return $this->hasMany(self::class);
     }
 
     public function images(): MorphOne

@@ -42,7 +42,7 @@ final class ProductResourceForm
                     ->default(true),
             ]),
             $this->helper->tab('Attributes', [
-                $this->helper->repeater('attributes', [
+                $this->helper->repeater('properties', [
                     $this->helper->tabsTextInput('name', $this->locales, true),
                     $this->attributesTab(true),
                 ])
@@ -70,7 +70,7 @@ final class ProductResourceForm
                     ->required()
                     ->label('')
                     ->mutateRelationshipDataBeforeSaveUsing(function ($data) {
-                        $data['attributes'] = removeEmptyElements($data['attributes']);
+                        $data['properties'] = removeEmptyElements($data['properties']);
 
                         return $data;
                     })
@@ -94,7 +94,7 @@ final class ProductResourceForm
 
         foreach (filterAvailableLocales($this->locales) as $locale => $name) {
             $tabs[] = $this->helper->tab($name, [
-                $this->helper->keyValue("attributes.$locale")
+                $this->helper->keyValue("properties.$locale")
                     ->label('')
                     ->keyLabel('Attribute')
                     ->valueLabel('Value')

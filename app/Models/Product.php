@@ -14,7 +14,7 @@ class Product extends Model
         'category_id',
         'name',
         'description',
-        'attributes',
+        'properties',
         'sorted',
         'is_available',
     ];
@@ -22,7 +22,7 @@ class Product extends Model
     protected $casts = [
         'name' => 'array',
         'description' => 'array',
-        'attributes' => 'array',
+        'properties' => 'array',
     ];
 
     public function store(): BelongsTo
