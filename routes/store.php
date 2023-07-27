@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Auth\CustomerAuthController;
 use App\Http\Controllers\Api\Store\CategoryController;
+use App\Http\Controllers\Api\Store\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('customers')->name('customers.')->group(function () {
@@ -14,3 +15,4 @@ Route::prefix('customers')->name('customers.')->group(function () {
 });
 
 Route::apiResource('categories', CategoryController::class)->only('index', 'show');
+Route::apiResource('products', ProductController::class)->only('index', 'show');
