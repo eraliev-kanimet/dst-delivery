@@ -19,7 +19,7 @@ class StoreSeeder extends Seeder
         ], [
             'email' => $email,
             'role_id' => Role::whereSlug('store_owner')->first()->id,
-            'name' => fake()->name,
+            'name' => fake()->userName,
             'password' => Hash::make('password')
         ]);
 
@@ -32,8 +32,8 @@ class StoreSeeder extends Seeder
             'name' => $store,
             'user_id' => $owner->id,
             'fallback_locale' => 'en',
-            'locales' => ['en'],
-            'categories' => [1, 2, 3, 4]
+            'locales' => ['en', 'ru'],
+            'categories' => [1, 2, 3]
         ]);
     }
 }
