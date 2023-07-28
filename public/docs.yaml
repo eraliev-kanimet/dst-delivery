@@ -1,0 +1,383 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: DST Delivery API
+  description: Api documentation for the "DST Delivery" project
+
+paths:
+  /api/verification/phone/sms:
+    post:
+      tags:
+        - Verification
+      summary: Receive a verification SMS code on your phone
+      description: Receive a verification SMS code on your phone
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+      requestBody:
+        $ref: '#/components/requestBodies/PhoneRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+  /api/store/customers/register:
+    post:
+      tags:
+        - Customer
+      summary: Register a customer by phone number
+      description: Register a new customer using SMS code verification
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+      requestBody:
+        $ref: '#/components/requestBodies/AuthCustomerRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthCustomerResponse'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+  /api/store/customers/login:
+    post:
+      tags:
+        - Customer
+      summary: Customer authorization by phone number
+      description: Authorization of a new customer by SMS with code verification
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+      requestBody:
+        $ref: '#/components/requestBodies/AuthCustomerRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthCustomerResponse'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityResponse'
+        '401':
+          $ref: '#/components/responses/IncorrectlyEnteredDataResponse'
+  /api/store/customers/logout:
+    get:
+      tags:
+        - Customer
+      summary: Customer logout
+      description: Customer logout from the system
+      parameters:
+        - $ref: '#/components/parameters/StoreUuid'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+  /api/store/categories:
+    get:
+      tags:
+        - Categories
+      summary: Get Categories
+      description: Get all categories of the current store
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+      responses:
+        '200':
+          $ref: '#/components/responses/CategoryIndexResponse'
+  /api/store/categories/{id}:
+    get:
+      tags:
+        - Categories
+      summary: Get Category
+      description: Get a category by ID
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          $ref: '#/components/responses/CategoryShowResponse'
+  /api/store/products:
+    get:
+      tags:
+        - Products
+      summary: Get Products
+      description: Get all products of the current store
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProductIndexResponse'
+  /api/store/products/{id}:
+    get:
+      tags:
+        - Products
+      summary: Get Product
+      description: Get a product by ID
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProductShowResponse'
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: number
+        store_id:
+          type: number
+        phone:
+          type: string
+        name:
+          type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: number
+        category:
+          type: object
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+            category:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+                category:
+                    type: object
+                    nullable: true
+        name:
+          type: string
+        description:
+          type: string
+        is_available:
+          type: boolean
+        images:
+          type: array
+          items:
+            type: string
+        properties:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              properties:
+                type: array
+                items:
+                  type: object
+                  default: {PropertyKey: PropertyValue}
+        selections:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              quantity:
+                type: number
+              price:
+                type: number
+              is_available:
+                type: boolean
+              properties:
+                type: array
+                items:
+                  type: object
+                  default: {PropertyKey: PropertyValue}
+    Category:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        description:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+        parent:
+          type: object
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+        children:
+          type: array
+          items:
+            default: 'Category'
+  requestBodies:
+    AuthCustomerRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              sms_code:
+                type: string
+                description: SMS code received by the client
+              phone_code:
+                type: string
+                description: Country code of the phone number (e.g., +1 for USA)
+                pattern: ^\+\d{1,5}$
+                default: '+996'
+              phone_number:
+                type: number
+                description: Phone number without the country code
+                default: '700303042'
+            required:
+              - sms_code
+              - phone_code
+              - phone_number
+    PhoneRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              phone_code:
+                type: string
+                description: Country code of the phone number (e.g., +1 for USA)
+                pattern: ^\+\d{1,5}$
+                default: '+996'
+              phone_number:
+                type: number
+                description: Phone number without the country code
+                default: '700303042'
+            required:
+              - phone_code
+              - phone_number
+  responses:
+    BlankResponse:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            type: array
+            default: []
+    UnauthorizedResponse:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    UnprocessableEntityResponse:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    propertyInRequest:
+                      type: array
+                      items:
+                        type: string
+                        default: Error message
+                        description: Error message
+    IncorrectlyEnteredDataResponse:
+      description: Incorrectly entered information
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    AuthCustomerResponse:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Customer'
+              token:
+                type: string
+    CategoryIndexResponse:
+      description: Categories
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+    CategoryShowResponse:
+      description: Category
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Category'
+    ProductIndexResponse:
+      description: Products
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    ProductShowResponse:
+      description: Product
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Product'
+  parameters:
+    AcceptLanguage:
+      name: Accept-Language
+      in: header
+      description: Localization language code (e.g., en, ru)
+      required: false
+      schema:
+        type: string
+    StoreUuid:
+      name: store-uuid
+      in: header
+      description: UUID obtained from the admin panel
+      required: true
+      schema:
+        type: string
+    ID:
+      name: id
+      in: path
+      required: true
+      description: ID of the entity to be retrieved
+      schema:
+        type: integer
