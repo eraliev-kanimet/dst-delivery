@@ -17,11 +17,13 @@ class Store extends Model
         'uuid',
         'name',
         'fallback_locale',
-        'locales'
+        'locales',
+        'categories',
     ];
 
     protected $casts = [
-        'locales' => 'array'
+        'locales' => 'array',
+        'categories' => 'array',
     ];
 
     public function user(): BelongsTo

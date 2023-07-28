@@ -3,7 +3,8 @@
 namespace App\Filament\Resources\StoreResource\Pages;
 
 use App\Filament\Resources\StoreResource;
-use App\Helpers\FilamentFormHelper;
+use App\Helpers\FilamentHelper;
+use App\Models\Category;
 use App\Models\Store;
 use App\Models\User;
 use Exception;
@@ -45,13 +46,18 @@ class EditStore extends EditRecord
 
     protected function getFormForm(Form $form): Form
     {
-        $helper = new FilamentFormHelper;
+        $helper = new FilamentHelper;
+        $locale = config('app.locale');
+        $categories = Category::whereNull('category_id')->get()->pluck("name.$locale", 'id');
 
         return $form->schema([
             $helper->textInput('name'),
             $helper->tabsTextarea('description', $this->record->locales),
             $helper->image('images')
                 ->multiple(),
+            $helper->checkbox('categories', $categories)
+                ->required()
+                ->columns()
         ])->columns(1);
     }
 

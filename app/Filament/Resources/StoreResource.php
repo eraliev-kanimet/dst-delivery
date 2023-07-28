@@ -3,7 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StoreResource\Pages;
-use App\Helpers\FilamentFormHelper;
+use App\Helpers\FilamentHelper;
+use App\Models\Category;
 use App\Models\Store;
 use App\Models\User;
 use Closure;
@@ -35,8 +36,10 @@ class StoreResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $helper = new FilamentFormHelper;
+        $helper = new FilamentHelper;
+        $locale = config('app.locale');
         $locales = config('app.locales');
+        $categories = Category::all()->pluck("name.$locale", 'id');
 
         return $form
             ->schema([
@@ -55,7 +58,21 @@ class StoreResource extends Resource
                         fn(Closure $get) => filterAvailableLocales($get('locales'))
                     )->hidden(fn(Closure $get) => !count($get('locales')))
                         ->required(fn(Closure $get) => count($get('locales')))
-                        ->inline()
+                        ->inline(),
+                    $helper->checkbox('categories', $categories)
+                        ->required()
+                        ->columns()
+                        ->dehydrateStateUsing(function ($state) {
+                            $array = [];
+
+                            foreach ($state as $value) {
+                                $array[] = (int)$value;
+                            }
+
+                            return Category::whereIn('id', $array)
+                                ->pluck('id')
+                                ->toArray();
+                        })
                 ], 1),
             ])->columns(2);
     }
@@ -97,6 +114,8 @@ class StoreResource extends Resource
         return $table
             ->columns($columns)
             ->actions([
+                Tables\Actions\Action::make('Add product')
+                    ->url(fn(Model $record) => route('filament.resources.stores.product', $record)),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([]);
@@ -107,6 +126,7 @@ class StoreResource extends Resource
         return [
             'index' => Pages\ListStores::route('/'),
             'create' => Pages\CreateStore::route('/create'),
+            'product' => ProductResource\Pages\CreateProduct::route('/{record}/product'),
             'edit' => Pages\EditStore::route('/{record}/edit'),
         ];
     }

@@ -6,6 +6,7 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
@@ -15,8 +16,9 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Illuminate\Support\Collection;
 
-class FilamentFormHelper
+class FilamentHelper
 {
     public function tabs(array $tabs): Tabs
     {
@@ -89,21 +91,43 @@ class FilamentFormHelper
         return Radio::make($model)->options($options);
     }
 
-    public function checkbox(string $model, array $options = []): CheckboxList
+    public function checkbox(string $model, array|Collection $options = []): CheckboxList
     {
         return CheckboxList::make($model)->options($options);
     }
 
-    public function tabsTextarea(string $model, array $locales): Tabs
+    public function tabsTextInput(string $model, array $locales, bool $required = false): Tabs
     {
         $tabs = [];
 
         foreach (filterAvailableLocales($locales) as $locale => $name) {
             $tabs[] = $this->tab($name, [
-                $this->textarea("$model.$locale")->label(ucfirst($model))
+                $this->textInput("$model.$locale")
+                    ->label(ucfirst($model))
+                    ->required($required)
             ]);
         }
 
         return $this->tabs($tabs);
+    }
+
+    public function tabsTextarea(string $model, array $locales, bool $required = false): Tabs
+    {
+        $tabs = [];
+
+        foreach (filterAvailableLocales($locales) as $locale => $name) {
+            $tabs[] = $this->tab($name, [
+                $this->textarea("$model.$locale")
+                    ->label(ucfirst($model))
+                    ->required($required)
+            ]);
+        }
+
+        return $this->tabs($tabs);
+    }
+
+    public function keyValue(string $model): KeyValue
+    {
+        return KeyValue::make($model);
     }
 }

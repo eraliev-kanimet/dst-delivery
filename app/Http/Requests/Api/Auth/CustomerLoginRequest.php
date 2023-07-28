@@ -21,8 +21,7 @@ class CustomerLoginRequest extends FormRequest
     protected function passedValidation(): void
     {
         $this->replace([
-            'phone' => $this->get('phone_code') . $this->get('phone_number'),
-            'sms_code' => $this->get('sms_code'),
+            'phone' => $this->get('phone_code') . $this->get('phone_number')
         ]);
     }
 }

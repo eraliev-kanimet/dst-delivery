@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
-use App\Helpers\FilamentFormHelper;
+use App\Helpers\FilamentHelper;
 use App\Models\Customer;
 use App\Models\Store;
 use Exception;
@@ -36,7 +36,7 @@ class CustomerResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $helper = new FilamentFormHelper;
+        $helper = new FilamentHelper;
 
         return $form
             ->schema([
