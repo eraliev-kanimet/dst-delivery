@@ -20,6 +20,8 @@ class EditProduct extends EditRecord
 
     public array $categories = [];
 
+    public bool $category_disabled = false;
+
     public function mount($record): void
     {
         $this->record = $this->resolveRecord($record);
@@ -31,6 +33,14 @@ class EditProduct extends EditRecord
             ->pluck("name.$locale", 'id')
             ->toArray();
 
+        if (!in_array($this->record->category->id, array_keys($this->categories))) {
+            $this->category_disabled = true;
+
+            $this->categories = [
+                $this->record->category->id => $this->record->category->name[$locale],
+            ];
+        }
+
         $this->authorizeAccess();
 
         $this->fillForm();
@@ -41,10 +51,6 @@ class EditProduct extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['images'] = $this->record->images->values;
-
-        if (!in_array($data['category_id'], array_keys($this->categories))) {
-            $data['category_id'] = null;
-        }
 
         return $data;
     }
@@ -62,8 +68,12 @@ class EditProduct extends EditRecord
 
     protected function form(Form $form): Form
     {
-        return $form->schema(
-            ProductResourceForm::getForm($this->record->store->locales, $this->categories)
-        )->columns(1);
+        $productForm = ProductResourceForm::create();
+
+        $productForm->setCategories($this->categories);
+        $productForm->setLocales($this->record->store->locales);
+        $productForm->setCategoryDisabled($this->category_disabled);
+
+        return $form->schema($productForm->form())->columns(1);
     }
 }

@@ -114,7 +114,7 @@ class StoreResource extends Resource
         return $table
             ->columns($columns)
             ->actions([
-                Tables\Actions\Action::make('Add products')
+                Tables\Actions\Action::make('Add product')
                     ->url(fn(Model $record) => route('filament.resources.stores.product', $record)),
                 Tables\Actions\EditAction::make(),
             ])

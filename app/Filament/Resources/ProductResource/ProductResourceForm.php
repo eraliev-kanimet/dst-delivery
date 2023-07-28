@@ -8,21 +8,22 @@ use Nuhel\FilamentCroppie\Components\Croppie;
 
 final class ProductResourceForm
 {
-    public function __construct(
-        protected FilamentHelper $helper,
-        protected array          $locales,
-    )
+    protected array $categories = [];
+    protected array $locales = [];
+
+    protected bool $edit = true;
+    protected bool $category_disabled = false;
+
+    public function __construct(protected FilamentHelper $helper)
     {
     }
 
-    public static function getForm(array $locales, array $categories, bool $edit = true): array
+    public static function create(): ProductResourceForm
     {
-        $self = new self(new FilamentHelper, $locales);
-
-        return $self->form($edit, $categories);
+        return new self(new FilamentHelper);
     }
 
-    protected function form(bool $edit, array $categories): array
+    public function form(): array
     {
         $tabs = [
             $this->helper->tab('Basic', [
@@ -30,11 +31,13 @@ final class ProductResourceForm
                     $this->helper->select('category_id')
                         ->label('Category')
                         ->required()
-                        ->options($categories)
+                        ->disabled($this->category_disabled)
+                        ->options($this->categories)
                         ->searchable()
                         ->columnSpan(2),
                     $this->helper->numericInput('sorted')
-                        ->minValue(0),
+                        ->minValue(0)
+                        ->maxValue(10000),
                 ], 3),
                 $this->helper->tabsTextInput('name', $this->locales, true),
                 $this->helper->tabsTextarea('description', $this->locales, true),
@@ -52,7 +55,7 @@ final class ProductResourceForm
             ]),
         ];
 
-        if ($edit) {
+        if ($this->edit) {
             $tabs[] = $this->helper->tab('Selections', [
                 $this->helper->repeater('selections', [
                     $this->helper->grid([
@@ -81,8 +84,9 @@ final class ProductResourceForm
 
         $tabs[] = $this->helper->tab('Images', [
             Croppie::make('images')
-                ->imageResizeTargetHeight(600)
-                ->imageResizeTargetWidth(600)
+                ->imageResizeTargetHeight(500)
+                ->imageResizeTargetWidth(500)
+                ->modalSize('xl')
                 ->multiple()
                 ->required()
         ]);
@@ -105,6 +109,26 @@ final class ProductResourceForm
         }
 
         return $this->helper->tabs($tabs);
+    }
+
+    public function setCategories(array $categories): void
+    {
+        $this->categories = $categories;
+    }
+
+    public function setLocales(array $locales): void
+    {
+        $this->locales = $locales;
+    }
+
+    public function setCategoryDisabled(bool $category_disabled): void
+    {
+        $this->category_disabled = $category_disabled;
+    }
+
+    public function setEdit(bool $edit): void
+    {
+        $this->edit = $edit;
     }
 }
 

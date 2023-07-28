@@ -52,9 +52,13 @@ class CreateProduct extends EditRecord
 
     protected function form(Form $form): Form
     {
-        return $form->schema(
-            ProductResourceForm::getForm($this->record->locales, $this->categories, false)
-        )->columns(1);
+        $productForm = ProductResourceForm::create();
+
+        $productForm->setEdit(false);
+        $productForm->setCategories($this->categories);
+        $productForm->setLocales($this->record->locales);
+
+        return $form->schema($productForm->form())->columns(1);
     }
 
     protected function getActions(): array
