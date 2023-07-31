@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
-            $table->string('phone');
+            $table->string('phone')->index();
             $table->boolean('active')->default(true);
             $table->timestamps();
         });
