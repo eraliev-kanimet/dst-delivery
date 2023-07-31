@@ -14,9 +14,9 @@ class CreateCategory extends CreateRecord
 {
     protected static string $resource = CategoryResource::class;
 
-    protected int $category_id = 0;
-    protected string $category_name = '';
-    protected array $categories = [];
+    public int $category_id = 0;
+    public string $category_name = '';
+    public array $categories = [];
 
     protected function getTitle(): string
     {
