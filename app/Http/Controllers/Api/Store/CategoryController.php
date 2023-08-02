@@ -15,7 +15,6 @@ class CategoryController extends Controller
         $store = Store::current();
 
         CategoryResource::$locale = config('app.locale');
-        CategoryResource::$fallback_locale = $store->fallback_locale;
 
         $categories = Category::with([
             'category',
@@ -32,7 +31,6 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         CategoryResource::$locale = config('app.locale');
-        CategoryResource::$fallback_locale = Store::current()->fallback_locale;
 
         return new CategoryResource($category);
     }
