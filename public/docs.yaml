@@ -63,6 +63,7 @@ paths:
       description: Customer logout from the system
       parameters:
         - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/BearerToken'
       responses:
         '200':
           $ref: '#/components/responses/BlankResponse'
@@ -102,6 +103,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/AcceptLanguage'
         - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           $ref: '#/components/responses/ProductIndexResponse'
@@ -215,6 +217,8 @@ components:
               type: number
             name:
               type: string
+        products:
+          type: number
         children:
           type: array
           items:
@@ -350,6 +354,52 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Product'
+              links:
+                type: object
+                properties:
+                  first:
+                    type: string
+                    description: URL of the first page
+                  last:
+                    type: string
+                    description: URL of the last page
+                  prev:
+                    type: string
+                    nullable: true
+                    description: URL of the previous page
+                  next:
+                    type: string
+                    nullable: true
+                    description: URL of the next page
+              meta:
+                type: object
+                properties:
+                  current_page:
+                    type: integer
+                  from:
+                    type: integer
+                  last_page:
+                    type: integer
+                  links:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          nullable: true
+                        label:
+                          type: string
+                        active:
+                          type: boolean
+                  path:
+                    type: string
+                  per_page:
+                    type: integer
+                  to:
+                    type: integer
+                  total:
+                    type: integer
     ProductShowResponse:
       description: Product
       content:
@@ -374,10 +424,25 @@ components:
       required: true
       schema:
         type: string
+    BearerToken:
+      name: Authorization
+      in: header
+      description: Authorization Bearer token
+      required: true
+      schema:
+        type: string
+        default: 'Bearer TOKEN'
     ID:
       name: id
       in: path
       required: true
       description: ID of the entity to be retrieved
+      schema:
+        type: integer
+    Limit:
+      name: limit
+      in: path
+      required: false
+      description: Per page in a query with pagination
       schema:
         type: integer
