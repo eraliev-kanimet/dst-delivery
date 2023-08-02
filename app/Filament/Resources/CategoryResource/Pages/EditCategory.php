@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
-use App\Helpers\FilamentHelper;
 use App\Models\Category;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\EditRecord;
@@ -44,21 +43,12 @@ class EditCategory extends EditRecord
 
     protected function form(Form $form): Form
     {
-        $helper = new FilamentHelper;
-
-        $locales = array_keys(config('app.locales'));
-
-        return $form
-            ->schema([
-                $helper->select('category_id')
-                    ->options($this->categories)
-                    ->label('Category')
-                    ->nullable(is_null($this->record->category_id))
-                    ->hidden(is_null($this->record->category_id)),
-                $helper->tabsTextInput('name', $locales),
-                $helper->tabsTextarea('description', $locales),
-                $helper->image('images')->multiple()
-            ])->columns(1);
+        return CategoryResource\CategoryResourceForm::form(
+            $form,
+            $this->categories,
+            $this->record->category_id,
+            false
+        );
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

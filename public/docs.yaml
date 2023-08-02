@@ -197,6 +197,8 @@ components:
                 items:
                   type: object
                   default: {PropertyKey: PropertyValue}
+        preview:
+          type: integer
     Category:
       type: object
       properties:
@@ -223,6 +225,8 @@ components:
           type: array
           items:
             default: 'Category'
+        preview:
+          type: integer
   requestBodies:
     AuthCustomerRequest:
       required: true

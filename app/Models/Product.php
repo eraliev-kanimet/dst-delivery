@@ -17,6 +17,7 @@ class Product extends Model
         'properties',
         'sorted',
         'is_available',
+        'preview',
     ];
 
     protected $casts = [

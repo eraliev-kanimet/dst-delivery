@@ -20,6 +20,7 @@ return new class extends Migration
             $table->json('properties')->nullable();
             $table->integer('sorted')->nullable();
             $table->boolean('is_available')->default(true);
+            $table->integer('preview');
             $table->timestamps();
         });
     }

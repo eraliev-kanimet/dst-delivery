@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
-use App\Helpers\FilamentHelper;
 use App\Models\Category;
 use App\Models\Image;
 use Filament\Resources\Form;
@@ -15,7 +14,7 @@ class CreateCategory extends CreateRecord
 {
     protected static string $resource = CategoryResource::class;
 
-    public int $category_id = 0;
+    public ?int $category_id = null;
     public string $category_name = '';
     public array $categories = [];
 
@@ -49,8 +48,6 @@ class CreateCategory extends CreateRecord
 
                 $this->category_id = $category_id;
                 $this->category_name = $name;
-            } else {
-                $this->category_id = 0;
             }
         } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {}
 
@@ -59,22 +56,7 @@ class CreateCategory extends CreateRecord
 
     protected function form(Form $form): Form
     {
-        $helper = new FilamentHelper;
-
-        $locales = array_keys(config('app.locales'));
-
-        return $form
-            ->schema([
-                $helper->select('category_id')
-                    ->options($this->categories)
-                    ->visible($this->category_id)
-                    ->default($this->category_id)
-                    ->disabled($this->category_id)
-                    ->label('Category'),
-                $helper->tabsTextInput('name', $locales, true),
-                $helper->tabsTextarea('description', $locales),
-                $helper->image('images')->multiple()
-            ])->columns(1);
+        return CategoryResource\CategoryResourceForm::form($form, $this->categories, $this->category_id);
     }
 
     public function create(bool $another = false): void

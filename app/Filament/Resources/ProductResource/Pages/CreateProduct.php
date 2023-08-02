@@ -46,7 +46,8 @@ class CreateProduct extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         return [
-            'is_available' => true
+            'is_available' => true,
+            'preview' => 1
         ];
     }
 
@@ -80,6 +81,7 @@ class CreateProduct extends EditRecord
             'properties' => $data['properties'],
             'sorted' => $data['sorted'],
             'is_available' => $data['is_available'],
+            'preview' => $data['preview'],
         ]);
 
         $product->images()->save(new Image(['values' => $data['images']]));

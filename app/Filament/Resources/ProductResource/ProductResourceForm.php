@@ -41,8 +41,14 @@ final class ProductResourceForm
                 ], 3),
                 $this->helper->tabsTextInput('name', $this->locales, true),
                 $this->helper->tabsTextarea('description', $this->locales, true),
-                $this->helper->toggle('is_available')
-                    ->default(true),
+                $this->helper->grid([
+                    $this->helper->toggle('is_available')
+                        ->default(true),
+                    $this->helper->radio('preview', [
+                        1 => 'Normal',
+                        2 => 'Large'
+                    ])->inline()->default(1),
+                ])
             ]),
             $this->helper->tab('Attributes', [
                 $this->helper->repeater('properties', [

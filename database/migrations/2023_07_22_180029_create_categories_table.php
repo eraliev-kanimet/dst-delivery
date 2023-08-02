@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('name');
             $table->json('description')->nullable();
             $table->json('children')->nullable();
+            $table->integer('preview');
         });
     }
 

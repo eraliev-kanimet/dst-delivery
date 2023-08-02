@@ -34,7 +34,8 @@ class CategoryResource extends BaseResource
             'images' => $resource->getImages(),
             'parent' => $parent,
             'children' => self::collection($resource->categories),
-            'products' => $this->getProductsCount($resource)
+            'products' => $this->getProductsCount($resource),
+            'preview' => $resource->preview,
         ];
     }
 

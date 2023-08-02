@@ -29,6 +29,7 @@ class ProductResource extends BaseResource
             'images' => $this->resource->getImages(),
             'properties' => $this->getProperties($this->resource->properties),
             'selections' => $this->getSelections($this->resource->selections),
+            'preview' => $this->resource->preview,
         ];
     }
 

@@ -38,7 +38,8 @@ class ProductSeeder extends Seeder
         }
 
         $category = Category::updateOrCreate($categoryData, array_merge($categoryData, [
-            'description' => $data['description']
+            'description' => $data['description'],
+            'preview' => 1
         ]));
 
         if (!$category->images) {
@@ -67,6 +68,7 @@ class ProductSeeder extends Seeder
         ], [
             'category_id' => $category_id,
             'store_id' => $this->store_id,
+            'preview' => 1,
             'name' => $data['name'],
             'description' => $data['description'],
             'properties' => $data['properties'],
