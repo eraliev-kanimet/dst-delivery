@@ -33,7 +33,19 @@ class CategoryResource extends BaseResource
             'description' => $resource->description[$locale] ?? $resource->description[$fallback_locale],
             'images' => $resource->getImages(),
             'parent' => $parent,
-            'children' => self::collection($resource->categories)
+            'children' => self::collection($resource->categories),
+            'products' => $this->getProductsCount($resource)
         ];
+    }
+
+    protected function getProductsCount(Category $category): int
+    {
+        $count = $category->products->count();
+
+        foreach ($category->categories as $category) {
+            $count += $this->getProductsCount($category);
+        }
+
+        return $count;
     }
 }
