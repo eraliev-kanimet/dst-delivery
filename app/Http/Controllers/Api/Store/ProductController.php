@@ -16,26 +16,41 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $request->validate([
+            'q' => ['nullable', 'string'],
             'category_id' => ['nullable', 'numeric'],
             'limit' => ['nullable', 'numeric'],
         ]);
 
         $store = Store::current();
+        $locale = config('app.locale');
 
-        ProductResource::$locale = config('app.locale');
-        ProductResource::$fallback_locale = $store->fallback_locale;
+        ProductResource::$locale = $locale;
 
         $query = Product::query()
             ->with([
                 'category:id,name,category_id',
                 'selections',
                 'store:id',
-                'images'
+                'images',
+                'content_' . $locale
             ])->whereHas('selections', function (Builder $query) {
                 $query->where('is_available', true);
             })->whereStoreId($store->id);
 
         $categories = $store->categories;
+
+        if ($request->has('q')) {
+            $words = explode(' ', $request->get('q'));
+
+            $query->whereHas('content_' . $locale, function (Builder $query) use ($words) {
+                foreach ($words as $word) {
+                    $query->where('name', 'like', "%$word%")
+                        ->orWhere('description', 'like', "%$word%");
+                }
+            });
+        } else {
+            $query->whereHas('content_' . $locale);
+        }
 
         if ($request->has('category_id')) {
             $category = Category::find($request->get('category_id'));
@@ -63,7 +78,6 @@ class ProductController extends Controller
         $store = Store::current();
 
         ProductResource::$locale = config('app.locale');
-        ProductResource::$fallback_locale = $store->fallback_locale;
 
         if ($product->store_id == $store->id && $product->selections->count()) {
             return new ProductResource($product);

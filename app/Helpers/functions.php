@@ -53,3 +53,18 @@ function removeEmptyElements($array): array
 
     return $array;
 }
+
+function getSupportedLocale($acceptLanguage, $supportedLocales): bool|string|null
+{
+    $acceptLanguage = explode(',', $acceptLanguage);
+
+    foreach ($acceptLanguage as $language) {
+        $locale = strtok($language, ';');
+
+        if (in_array($locale, $supportedLocales)) {
+            return $locale;
+        }
+    }
+
+    return null;
+}
