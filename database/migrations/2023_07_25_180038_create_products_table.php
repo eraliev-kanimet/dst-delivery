@@ -15,12 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained()->cascadeOnDelete();
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->json('name');
-            $table->json('description');
             $table->json('properties')->nullable();
             $table->integer('sorted')->nullable();
-            $table->boolean('is_available')->default(true);
             $table->integer('preview');
+            $table->boolean('is_available')->default(true);
             $table->timestamps();
         });
     }

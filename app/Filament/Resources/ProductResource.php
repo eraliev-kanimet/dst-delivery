@@ -21,13 +21,14 @@ class ProductResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = Auth::user();
+        $locale = config('app.locale');
 
         if ($user->hasRole('admin')) {
-            return parent::getEloquentQuery()->with(['store', 'category']);
+            return parent::getEloquentQuery()->with(['store', 'category', 'content_' . $locale]);
         }
 
         return parent::getEloquentQuery()
-            ->with(['store', 'category'])
+            ->with(['store', 'category', 'content_' . $locale])
             ->whereRelation('store', 'user_id', $user->id);
     }
 
@@ -40,7 +41,8 @@ class ProductResource extends Resource
 
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make("name.$locale"),
+                Tables\Columns\TextColumn::make("content_$locale.name")
+                    ->label('Name'),
                 Tables\Columns\TextColumn::make("category.name.$locale")
                     ->label('Category'),
                 Tables\Columns\IconColumn::make('is_available')->boolean(),
@@ -72,6 +74,7 @@ class ProductResource extends Resource
     {
         return [
             'index' => Pages\ListProducts::route('/'),
+            'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
     }

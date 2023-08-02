@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Product extends Model
@@ -12,8 +13,6 @@ class Product extends Model
     protected $fillable = [
         'store_id',
         'category_id',
-        'name',
-        'description',
         'properties',
         'sorted',
         'is_available',
@@ -21,8 +20,6 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'name' => 'array',
-        'description' => 'array',
         'properties' => 'array',
     ];
 
@@ -44,6 +41,16 @@ class Product extends Model
     public function images(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
+    }
+
+    public function content_en(): HasOne
+    {
+        return $this->hasOne(ProductContent::class)->where('locale', 'en');
+    }
+
+    public function content_ru(): HasOne
+    {
+        return $this->hasOne(ProductContent::class)->where('locale', 'ru');
     }
 
     public function getImages(): array

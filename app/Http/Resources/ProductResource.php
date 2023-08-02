@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductContent;
 use App\Models\ProductSelection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -18,13 +19,15 @@ class ProductResource extends BaseResource
     public function toArray(Request $request): array
     {
         $locale = self::$locale;
-        $fallback_locale = self::$fallback_locale;
+
+        /** @var ProductContent $content */
+        $content = $this->resource->{"content_$locale"};
 
         return [
             'id' => $this->resource->id,
             'category' => $this->category($this->resource->category),
-            'name' => $this->resource->name[$locale] ?? $this->resource->name[$fallback_locale],
-            'description' => $this->resource->description[$locale] ?? $this->resource->description[$fallback_locale],
+            'name' => $content->name,
+            'description' => $content->description,
             'is_available' => (bool) $this->resource->is_available,
             'images' => $this->resource->getImages(),
             'properties' => $this->getProperties($this->resource->properties),
@@ -38,7 +41,7 @@ class ProductResource extends BaseResource
         if ($category) {
             return [
                 'id' => $category->id,
-                'name' => $category->name[self::$locale] ?? $category->name[self::$fallback_locale],
+                'name' => $category->name[self::$locale],
                 'category' => $this->category($category->category),
             ];
         }
@@ -49,14 +52,13 @@ class ProductResource extends BaseResource
     protected function getProperties(array $properties): array
     {
         $locale = self::$locale;
-        $fallback_locale = self::$fallback_locale;
 
         $array = [];
 
         foreach ($properties as $property) {
             $array[] = [
-                'name' => $property['name'][$locale] ?? $property['name'][$fallback_locale],
-                'properties' => $property['properties'][$locale] ?? $property['properties'][$fallback_locale],
+                'name' => $property['name'][$locale],
+                'properties' => $property['properties'][$locale],
             ];
         }
 
@@ -66,7 +68,6 @@ class ProductResource extends BaseResource
     protected function getSelections(Collection $selections): array
     {
         $locale = self::$locale;
-        $fallback_locale = self::$fallback_locale;
 
         $array = [];
 
@@ -77,7 +78,7 @@ class ProductResource extends BaseResource
                 'quantity' => $selection->quantity,
                 'price' => $selection->price,
                 'is_available' => $selection->is_available,
-                'properties' => $selection->properties[$locale] ?? $selection->properties[$fallback_locale],
+                'properties' => $selection->properties[$locale],
             ];
         }
 
