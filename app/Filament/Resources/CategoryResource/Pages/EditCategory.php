@@ -18,6 +18,8 @@ class EditCategory extends EditRecord
      */
     public $record;
 
+    public int $category_id = 0;
+
     public array|Collection $categories = [];
 
     public function mount($record): void
@@ -30,6 +32,8 @@ class EditCategory extends EditRecord
             ->whereNot('id', $this->record->id)
             ->get()
             ->pluck("name.$locale", 'id');
+
+        $this->category_id = (int)$this->record->category_id ?? 0;
 
         $this->authorizeAccess();
 
@@ -73,5 +77,18 @@ class EditCategory extends EditRecord
         }
 
         return $data;
+    }
+
+    public function afterSave(): void
+    {
+        if ($this->record->category) {
+            if ((int)$this->record->category_id != $this->category_id) {
+                $category = Category::find($this->record->category_id);
+
+                $category?->updateChildren();
+            }
+        }
+
+        redirect()->route('filament.resources.categories.edit', ['record' => $this->record->id]);
     }
 }

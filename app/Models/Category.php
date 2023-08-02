@@ -54,8 +54,34 @@ class Category extends Model
     {
         parent::boot();
 
-        self::created(function (self $category) {
-            $category->images()->save(new Image);
+        self::deleted(function (self $category) {
+            if ($category->category) {
+                $category->category->updateChildren();
+            }
         });
+
+        self::saved(function (self $category) {
+            if ($category->category) {
+                $category->category->updateChildren();
+            }
+        });
+    }
+
+    public function updateChildren(): void
+    {
+        $this->update([
+            'children' => $this->getCategoriesIds(),
+        ]);
+    }
+
+    protected function getCategoriesIds(): array
+    {
+        $ids = [$this->id];
+
+        foreach (Category::whereCategoryId($this->id)->get(['id', 'category_id']) as $category) {
+            $ids = array_merge($ids, $category->getCategoriesIds());
+        }
+
+        return $ids;
     }
 }

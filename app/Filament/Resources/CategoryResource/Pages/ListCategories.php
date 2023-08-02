@@ -37,7 +37,7 @@ class ListCategories extends ListRecords
         }
 
         return parent::getTableQuery()
-            ->with('categories')
+            ->with(['category', 'categories'])
             ->where('category_id', self::$category?->id);
     }
 

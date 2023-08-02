@@ -5,6 +5,7 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource;
 use App\Helpers\FilamentHelper;
 use App\Models\Category;
+use App\Models\Image;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Psr\Container\ContainerExceptionInterface;
@@ -14,9 +15,14 @@ class CreateCategory extends CreateRecord
 {
     protected static string $resource = CategoryResource::class;
 
-    protected int $category_id = 0;
-    protected string $category_name = '';
-    protected array $categories = [];
+    public int $category_id = 0;
+    public string $category_name = '';
+    public array $categories = [];
+
+    /**
+     * @var Category
+     */
+    public $record;
 
     protected function getTitle(): string
     {
@@ -67,6 +73,22 @@ class CreateCategory extends CreateRecord
                     ->label('Category'),
                 $helper->tabsTextInput('name', $locales, true),
                 $helper->tabsTextarea('description', $locales),
+                $helper->image('images')->multiple()
             ])->columns(1);
+    }
+
+    public function create(bool $another = false): void
+    {
+        $this->authorizeAccess();
+
+        $data = $this->form->getState();
+
+        $data = $this->mutateFormDataBeforeCreate($data);
+
+        $this->record = $this->handleRecordCreation($data);
+
+        $this->record->images()->save(new Image(['values' => $data['images']]));
+
+        $this->redirect(route('filament.resources.categories.edit', ['record' => $this->record->id]));
     }
 }

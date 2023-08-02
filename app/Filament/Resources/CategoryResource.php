@@ -39,9 +39,7 @@ class CategoryResource extends Resource
                     ->url(fn(Model $record) => route('filament.resources.categories.index', ['category_id' => $record->id])),
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getPages(): array
