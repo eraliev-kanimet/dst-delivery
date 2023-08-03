@@ -15,10 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained()->cascadeOnDelete();
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->json('properties')->nullable();
+            $table->boolean('is_available')->default(true);
             $table->integer('sorted')->nullable();
             $table->integer('preview');
-            $table->boolean('is_available')->default(true);
             $table->timestamps();
         });
     }

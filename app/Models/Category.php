@@ -43,17 +43,6 @@ class Category extends Model
         return $this->hasMany(Product::class);
     }
 
-    public function getImages(): array
-    {
-        $images = [];
-
-        foreach ($this->images->values ?? [] as $image) {
-            $images[] = asset('storage/' . $image);
-        }
-
-        return $images;
-    }
-
     public $timestamps = false;
 
     protected static function boot(): void

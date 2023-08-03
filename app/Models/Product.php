@@ -13,14 +13,9 @@ class Product extends Model
     protected $fillable = [
         'store_id',
         'category_id',
-        'properties',
         'sorted',
         'is_available',
         'preview',
-    ];
-
-    protected $casts = [
-        'properties' => 'array',
     ];
 
     public function store(): BelongsTo
@@ -43,6 +38,11 @@ class Product extends Model
         return $this->morphOne(Image::class, 'imageable');
     }
 
+    public function productAttributes(): HasMany
+    {
+        return $this->hasMany(Attribute::class);
+    }
+
     public function content_en(): HasOne
     {
         return $this->hasOne(ProductContent::class)->where('locale', 'en');
@@ -51,16 +51,5 @@ class Product extends Model
     public function content_ru(): HasOne
     {
         return $this->hasOne(ProductContent::class)->where('locale', 'ru');
-    }
-
-    public function getImages(): array
-    {
-        $images = [];
-
-        foreach ($this->images->values ?? [] as $image) {
-            $images[] = asset('storage/' . $image);
-        }
-
-        return $images;
     }
 }

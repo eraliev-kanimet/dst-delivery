@@ -3,6 +3,9 @@
 namespace App\Filament\Resources\ProductResource;
 
 use App\Helpers\FilamentHelper;
+use App\Service\ProductService;
+use Closure;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Tabs;
 use Nuhel\FilamentCroppie\Components\Croppie;
 
@@ -35,11 +38,12 @@ final class ProductResourceForm
                         ->options($this->categories)
                         ->searchable()
                         ->columnSpan(2),
-                    $this->helper->numericInput('sorted')
+                    $this->helper->input('sorted')
+                        ->numeric()
                         ->minValue(0)
                         ->maxValue(10000),
                 ], 3),
-                $this->helper->tabsTextInput('name', $this->locales, true),
+                $this->helper->tabsInput('name', $this->locales, true),
                 $this->helper->tabsTextarea('description', $this->locales, true),
                 $this->helper->grid([
                     $this->helper->toggle('is_available')
@@ -50,27 +54,21 @@ final class ProductResourceForm
                     ])->inline()->default(1),
                 ])
             ]),
-            $this->helper->tab('Attributes', [
-                $this->helper->repeater('properties', [
-                    $this->helper->tabsTextInput('name', $this->locales, true),
-                    $this->attributesTab(true),
-                ])
-                    ->label('')
-                    ->required()
-                    ->createItemButtonLabel('Add attribute')
-            ]),
+            $this->tabAttributes()
         ];
 
         if ($this->edit) {
             $tabs[] = $this->helper->tab('Selections', [
                 $this->helper->repeater('selections', [
                     $this->helper->grid([
-                        $this->helper->numericInput('quantity')
+                        $this->helper->input('quantity')
                             ->minValue(0)
-                            ->required(),
-                        $this->helper->numericInput('price')
+                            ->required()
+                            ->numeric(),
+                        $this->helper->input('price')
                             ->minValue(0)
-                            ->required(),
+                            ->required()
+                            ->numeric(),
                     ]),
                     $this->attributesTab(false),
                     $this->helper->toggle('is_available')
@@ -135,6 +133,59 @@ final class ProductResourceForm
     public function setEdit(bool $edit): void
     {
         $this->edit = $edit;
+    }
+
+    protected function tabAttributes(): Tabs\Tab
+    {
+        $productService = ProductService::new();
+
+        $schema = [
+            $this->helper->select('attribute')
+                ->options($productService->getAttributesName())
+                ->required()
+                ->reactive()
+        ];
+
+        if ($this->edit) {
+            $schema[] = Hidden::make('type');
+            $schema[] = $this->helper->tabsInput('value1', $this->locales, true, 'Value')
+                ->visible(function (Closure $get, Closure $set) use ($productService) {
+                    if ($productService->isAttributeType1($get('attribute'))) {
+                        $set('type', 1);
+
+                        return true;
+                    }
+
+                    return false;
+                });
+            $schema[] = $this->helper->input('value2')
+                ->visible(function (Closure $get, Closure $set) use ($productService) {
+                    if ($productService->isAttributeType2($get('attribute'))) {
+                        $set('type', 2);
+
+                        return true;
+                    }
+
+                    return false;
+                })->label('Value');
+        } else {
+            $schema[] = $this->helper->tabsInput('value1', $this->locales, true, 'Value')
+                ->visible(fn(Closure $get) => $productService->isAttributeType1($get('attribute')));
+            $schema[] = $this->helper->input('value2')
+                ->visible(fn(Closure $get) => $productService->isAttributeType2($get('attribute')))
+                ->label('Value');
+        }
+
+        $repeater = $this->helper->repeater('attributes', $schema)
+            ->label('')
+            ->required()
+            ->createItemButtonLabel('Add attribute');
+
+        if ($this->edit) {
+            $repeater->relationship('productAttributes');
+        }
+
+        return $this->helper->tab('Attributes', [$repeater]);
     }
 }
 

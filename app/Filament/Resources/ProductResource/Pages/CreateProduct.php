@@ -9,6 +9,7 @@ use App\Models\Image;
 use App\Models\Product;
 use App\Models\ProductContent;
 use App\Models\Store;
+use App\Service\ProductService;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Psr\Container\ContainerExceptionInterface;
@@ -85,8 +86,19 @@ class CreateProduct extends CreateRecord
             ]);
         }
 
+        ProductService::new()->createAttributes($data['attributes'], $this->record->id);
+
         $this->getCreatedNotification()?->send();
 
         $this->redirect($this->getRedirectUrl());
+    }
+
+    protected function getFormActions(): array
+    {
+        $actions = parent::getFormActions();
+
+        unset($actions[1]);
+
+        return $actions;
     }
 }

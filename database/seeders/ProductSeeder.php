@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
@@ -67,8 +68,28 @@ class ProductSeeder extends Seeder
                 'category_id' => $category_id,
                 'store_id' => $this->store->id,
                 'preview' => 1,
-                'properties' => $data['properties'],
             ]);
+
+            foreach ($data['attributes'] as $typeName => $attributes) {
+                $type = 0;
+
+                if ($typeName == 'type1') {
+                    $type = 1;
+                } elseif ($typeName == 'type2') {
+                    $type = 2;
+                }
+
+                if ($type) {
+                    foreach ($attributes as $attribute => $value) {
+                        Attribute::create([
+                            'product_id' => $product->id,
+                            'type' => $type,
+                            'attribute' => $attribute,
+                            'value' . $type => $value
+                        ]);
+                    }
+                }
+            }
 
             foreach ($this->store->locales as $locale) {
                 if (!$product->{'content_' . $locale}) {
@@ -89,7 +110,26 @@ class ProductSeeder extends Seeder
                     $selection = [
                         'quantity' => rand(5, 10),
                         'price' => rand(200, 300),
-                        'properties' => $data['properties'][0]['properties']
+                        'properties' => [
+                            'ru' => [
+                                'Цвет' => 'Черный',
+                                'Размер' => 'M',
+                                'Тип ростовки' => 'для невысоких',
+                                'Утеплитель' => 'синтепон',
+                                'Уход за вещами' => 'бережная стирка при 30 градусах',
+                                'Коллекция' => 'Базовая коллекция',
+                                'Материал подкладки' => 'синтепон',
+                            ],
+                            'en' => [
+                                'Color' => 'Black',
+                                'Size' => 'M',
+                                'Height type' => 'for short',
+                                'Insulation' => 'syntepon',
+                                'Care' => 'gentle washing at 30 degrees',
+                                'Collection' => 'Basic Collection',
+                                'Lining material' => 'syntepon',
+                            ],
+                        ]
                     ];
 
                     $product->selections()->save(new ProductSelection($selection));
