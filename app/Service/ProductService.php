@@ -6,6 +6,36 @@ use App\Models\Attribute;
 
 class ProductService
 {
+    protected array $attributes_type1 = [
+        'size',
+        'country_of_production',
+        'neckline',
+        'height_type',
+        'insulation',
+        'collection',
+        'care',
+        'lining_material',
+        'color',
+        'ram',
+        'storage',
+        'display',
+        'memory',
+        'camera',
+        'height',
+        'capacity',
+        'temperature_zones',
+        'max_load',
+        'power',
+        'pump_pressure',
+        'suction_power',
+        'bowl_capacity',
+    ];
+
+    protected array $attributes_type2 = [
+        'size_on_model',
+        'processor',
+    ];
+
     public static function new(): static
     {
         return new self;
@@ -13,68 +43,23 @@ class ProductService
 
     public function getAttributesName(): array
     {
-        return [
-            'size' => 'Size',
-            'color' => 'Color',
-            'neckline' => 'Neckline',
-            'country_of_production' => 'Country of production',
-            'size_on_model' => 'Size on model',
-            'height_type' => 'Height type',
-            'insulation' => 'Insulation',
-            'collection' => 'Collection',
-            'care' => 'Care',
-            'lining_material' => 'Lining material',
-            'ram' => 'RAM',
-            'storage' => 'Storage',
-            'processor' => 'Processor',
-            'display' => 'Display',
-            'memory' => 'Memory',
-            'camera' => 'Camera',
-            'height' => 'Height',
-            'capacity' => 'Capacity',
-            'temperature_zones' => 'Temperature zones',
-            'max_load' => 'Max load',
-            'power' => 'Power',
-            'pump_pressure' => 'Pump pressure',
-            'bowl_capacity' => 'Bowl Capacity',
-            'suction_power' => 'Suction power',
-        ];
+        $attributes = [];
+
+        foreach (array_merge($this->attributes_type1, $this->attributes_type2) as $attribute) {
+            $attributes[$attribute] = __('common.attributes.' . $attribute);
+        }
+
+        return $attributes;
     }
 
     public function isAttributeType1($value): bool
     {
-        return in_array($value, [
-            'size',
-            'country_of_production',
-            'neckline',
-            'height_type',
-            'insulation',
-            'collection',
-            'care',
-            'lining_material',
-            'color',
-            'ram',
-            'storage',
-            'display',
-            'memory',
-            'camera',
-            'height',
-            'capacity',
-            'temperature_zones',
-            'max_load',
-            'power',
-            'pump_pressure',
-            'suction_power',
-            'bowl_capacity',
-        ]);
+        return in_array($value, $this->attributes_type1);
     }
 
     public function isAttributeType2($value): bool
     {
-        return in_array($value, [
-            'size_on_model',
-            'processor',
-        ]);
+        return in_array($value, $this->attributes_type2);
     }
 
     public function createAttributes(array $attributes, int $product_id): void

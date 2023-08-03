@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'attributes' => [
+        'size' => 'Size',
+        'color' => 'Color',
+        'neckline' => 'Neckline',
+        'country_of_production' => 'Country of production',
+        'size_on_model' => 'Size on model',
+        'height_type' => 'Height type',
+        'insulation' => 'Insulation',
+        'collection' => 'Collection',
+        'care' => 'Care',
+        'lining_material' => 'Lining material',
+        'ram' => 'RAM',
+        'storage' => 'Storage',
+        'processor' => 'Processor',
+        'display' => 'Display',
+        'memory' => 'Memory',
+        'camera' => 'Camera',
+        'height' => 'Height',
+        'capacity' => 'Capacity',
+        'temperature_zones' => 'Temperature zones',
+        'max_load' => 'Max load',
+        'power' => 'Power',
+        'pump_pressure' => 'Pump pressure',
+        'bowl_capacity' => 'Bowl Capacity',
+        'suction_power' => 'Suction power',
+    ],
+];
