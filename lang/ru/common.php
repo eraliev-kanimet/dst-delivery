@@ -3,7 +3,7 @@
 return [
     'attributes' => [
         'size' => 'Размер',
-        'color' => 'Color',
+        'color' => 'Цвет',
         'neckline' => 'Вырез',
         'country_of_production' => 'Страна производства',
         'size_on_model' => 'Размер на модели',

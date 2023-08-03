@@ -83,4 +83,15 @@ class ProductService
             }
         }
     }
+
+    public function getType(string $attribute): int
+    {
+        if (in_array($attribute, $this->attributes_type1)) {
+            return 1;
+        } elseif (in_array($attribute, $this->attributes_type2)) {
+            return 2;
+        }
+
+        return 0;
+    }
 }
