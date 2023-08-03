@@ -44,9 +44,9 @@ class CustomerResource extends Resource
                     ->label('Store')
                     ->options(self::getStores())
                     ->required(),
-                $helper->textInput('name')
+                $helper->input('name')
                     ->required(),
-                $helper->textInput('phone')
+                $helper->input('phone')
                     ->label('Phone number')
                     ->regex('/^\+\d{1,}$/')
                     ->required(),

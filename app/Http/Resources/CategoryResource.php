@@ -30,7 +30,7 @@ class CategoryResource extends BaseResource
             'id' => $resource->id,
             'name' => $resource->name[$locale],
             'description' => $resource->description[$locale],
-            'images' => $resource->getImages(),
+            'images' => getImages($resource->images->values),
             'parent' => $parent,
             'children' => self::collection($resource->categories),
             'products' => $this->getProductsCount($resource),

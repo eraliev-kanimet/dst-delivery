@@ -29,7 +29,7 @@ class ProductResource extends BaseResource
             'name' => $content->name,
             'description' => $content->description,
             'is_available' => (bool) $this->resource->is_available,
-            'images' => $this->resource->getImages(),
+            'images' => getImages($this->resource->images->values),
             'properties' => $this->getProperties($this->resource->properties),
             'selections' => $this->getSelections($this->resource->selections),
             'preview' => $this->resource->preview,

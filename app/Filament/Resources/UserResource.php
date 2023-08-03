@@ -26,13 +26,13 @@ class UserResource extends Resource
         $helper = new FilamentHelper();
 
         return $form->schema([
-            $helper->textInput('name')
+            $helper->input('name')
                 ->required(),
-            $helper->textInput('email')
+            $helper->input('email')
                 ->required()
                 ->email()
                 ->unique(ignorable: fn(?Model $record): ?Model => $record),
-            $helper->textInput('password')
+            $helper->input('password')
                 ->required(fn(?Model $record): bool => is_null($record))
                 ->password()
                 ->maxLength(255)

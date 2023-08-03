@@ -68,3 +68,14 @@ function getSupportedLocale($acceptLanguage, $supportedLocales): bool|string|nul
 
     return null;
 }
+
+function getImages(?array $images): array
+{
+    $array = [];
+
+    foreach ($images ?? [] as $image) {
+        $array[] = asset('storage/' . $image);
+    }
+
+    return $array;
+}

@@ -29,7 +29,7 @@ class CategoryResourceForm
         return $form
             ->schema([
                 $categorySelect,
-                $helper->tabsTextInput('name', $locales, true),
+                $helper->tabsInput('name', $locales, true),
                 $helper->tabsTextarea('description', $locales),
                 $helper->radio('preview', [
                     1 => 'Normal',

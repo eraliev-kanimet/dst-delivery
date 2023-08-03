@@ -47,7 +47,7 @@ class StoreResource extends Resource
                     ->options(User::pluck('name', 'id'))
                     ->label('Store Owner')
                     ->required(),
-                $helper->textInput('name'),
+                $helper->input('name'),
                 $helper->grid([
                     $helper->checkbox('locales', $locales)
                         ->reactive()
