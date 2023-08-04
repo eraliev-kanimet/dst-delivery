@@ -41,7 +41,16 @@ class ProductResource extends Resource
 
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make("content_$locale.name")
+                Tables\Columns\TextColumn::make('name')
+                    ->formatStateUsing(function (Model $record) use ($locale) {
+                        $name = $record->{"content_$locale"}?->name;
+
+                        if ($name) {
+                            return $name;
+                        }
+
+                        return $record->{"content_{$record->store->fallback_locale}"}?->name;
+                    })
                     ->label('Name'),
                 Tables\Columns\TextColumn::make("category.name.$locale")
                     ->label('Category'),
