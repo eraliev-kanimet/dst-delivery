@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'attributes' => [
+        'size' => 'Размер',
+        'color' => 'Цвет',
+        'neckline' => 'Вырез',
+        'country_of_production' => 'Страна производства',
+        'size_on_model' => 'Размер на модели',
+        'height_type' => 'Тип высоты',
+        'insulation' => 'Изоляция',
+        'collection' => 'Коллекция',
+        'care' => 'Уход',
+        'lining_material' => 'Материал подкладки',
+        'ram' => 'Оперативная память',
+        'storage' => 'Хранилище',
+        'processor' => 'Процессор',
+        'display' => 'Дисплей',
+        'memory' => 'Память',
+        'camera' => 'Камера',
+        'height' => 'Высота',
+        'capacity' => 'Объем',
+        'temperature_zones' => 'Температурные зоны',
+        'max_load' => 'Максимальная нагрузка',
+        'power' => 'Мощность',
+        'pump_pressure' => 'Давление насоса',
+        'bowl_capacity' => 'Вместимость чаши',
+        'suction_power' => 'Мощность всасывания',
+    ],
+];

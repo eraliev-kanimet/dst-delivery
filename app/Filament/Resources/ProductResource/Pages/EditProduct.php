@@ -6,6 +6,7 @@ use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\ProductResourceForm;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Content;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\EditRecord;
 
@@ -52,6 +53,13 @@ class EditProduct extends EditRecord
     {
         $data['images'] = $this->record->images->values;
 
+        foreach ($this->record->store->locales as $locale) {
+            if ($this->record->{"content_$locale"}) {
+                $data['name'][$locale] = $this->record->{"content_$locale"}->name;
+                $data['description'][$locale] = $this->record->{"content_$locale"}->description;
+            }
+        }
+
         return $data;
     }
 
@@ -75,5 +83,34 @@ class EditProduct extends EditRecord
         $productForm->setCategoryDisabled($this->category_disabled);
 
         return $form->schema($productForm->form())->columns(1);
+    }
+
+    public function afterSave(): void
+    {
+        $data = $this->data;
+
+        foreach ($this->record->store->locales as $locale) {
+            if ($this->record->{"content_$locale"}) {
+                $content = [];
+
+                if ($this->record->{"content_$locale"}->name != $data['name'][$locale]) {
+                    $content['name'] = $data['name'][$locale];
+                }
+
+                if ($this->record->{"content_$locale"}->description != $data['description'][$locale]) {
+                    $content['description'] = $data['description'][$locale];
+                }
+
+                if (count($content)) {
+                    $this->record->{"content_$locale"}->update($content);
+                }
+            } else {
+                $this->record->{"content_$locale"}()->save(new Content([
+                    'locale' => $locale,
+                    'name' => $data['name'][$locale],
+                    'description' => $data['description'][$locale],
+                ]));
+            }
+        }
     }
 }

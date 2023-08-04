@@ -14,6 +14,7 @@ class Category extends Model
         'name',
         'description',
         'children',
+        'preview',
     ];
 
     protected $casts = [
@@ -37,15 +38,9 @@ class Category extends Model
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function getImages(): array
+    public function products(): HasMany
     {
-        $images = [];
-
-        foreach ($this->images->values ?? [] as $image) {
-            $images[] = asset('storage/' . $image);
-        }
-
-        return $images;
+        return $this->hasMany(Product::class);
     }
 
     public $timestamps = false;
@@ -54,8 +49,34 @@ class Category extends Model
     {
         parent::boot();
 
-        self::created(function (self $category) {
-            $category->images()->save(new Image);
+        self::deleted(function (self $category) {
+            if ($category->category) {
+                $category->category->updateChildren();
+            }
         });
+
+        self::saved(function (self $category) {
+            if ($category->category) {
+                $category->category->updateChildren();
+            }
+        });
+    }
+
+    public function updateChildren(): void
+    {
+        $this->update([
+            'children' => $this->getCategoriesIds(),
+        ]);
+    }
+
+    protected function getCategoriesIds(): array
+    {
+        $ids = [$this->id];
+
+        foreach (Category::whereCategoryId($this->id)->get(['id', 'category_id']) as $category) {
+            $ids = array_merge($ids, $category->getCategoriesIds());
+        }
+
+        return $ids;
     }
 }

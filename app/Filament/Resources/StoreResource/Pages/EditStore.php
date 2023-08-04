@@ -51,7 +51,7 @@ class EditStore extends EditRecord
         $categories = Category::whereNull('category_id')->get()->pluck("name.$locale", 'id');
 
         return $form->schema([
-            $helper->textInput('name'),
+            $helper->input('name'),
             $helper->tabsTextarea('description', $this->record->locales),
             $helper->image('images')
                 ->multiple(),

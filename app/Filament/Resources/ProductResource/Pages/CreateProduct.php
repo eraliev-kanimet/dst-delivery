@@ -2,52 +2,56 @@
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
+use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\ProductResourceForm;
-use App\Filament\Resources\StoreResource;
 use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
+use App\Models\Content;
 use App\Models\Store;
+use App\Service\ProductService;
 use Filament\Resources\Form;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\CreateRecord;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
-class CreateProduct extends EditRecord
+class CreateProduct extends CreateRecord
 {
-    protected static string $resource = StoreResource::class;
-
-    protected static ?string $title = 'Create Product';
-    protected static ?string $breadcrumb = 'Create Product';
+    protected static string $resource = ProductResource::class;
 
     /**
-     * @var Store
+     * @var Product
      */
     public $record;
 
+    public int $store_id = 0;
+    public array $locales = [];
     public array $categories = [];
 
-    public function mount($record): void
+    public function mount(): void
     {
-        $this->record = $this->resolveRecord($record);
+        try {
+            $store_id = request()->get('store_id', 'store');
 
-        $locale = config('app.locale');
+            $store = Store::find($store_id);
 
-        $this->categories = Category::whereIn('id', $this->record->categories)
-            ->get()
-            ->pluck("name.$locale", 'id')
-            ->toArray();
+            if (is_null($store)) {
+                abort(404);
+            } else {
+                $this->store_id = $store->id;
 
-        $this->authorizeAccess();
+                $locale = config('app.locale');
 
-        $this->fillForm();
+                $this->categories = Category::whereIn('id', $store->categories)
+                    ->get()
+                    ->pluck("name.$locale", 'id')
+                    ->toArray();
 
-        $this->previousUrl = url()->previous();
-    }
+                $this->locales = $store->locales;
+            }
+        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {}
 
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-        return [
-            'is_available' => true
-        ];
+        parent::mount();
     }
 
     protected function form(Form $form): Form
@@ -56,34 +60,45 @@ class CreateProduct extends EditRecord
 
         $productForm->setEdit(false);
         $productForm->setCategories($this->categories);
-        $productForm->setLocales($this->record->locales);
+        $productForm->setLocales($this->locales);
 
         return $form->schema($productForm->form())->columns(1);
     }
 
-    protected function getActions(): array
-    {
-        return [];
-    }
-
-    public function save(bool $shouldRedirect = true): void
+    public function create(bool $another = false): void
     {
         $this->authorizeAccess();
 
         $data = $this->form->getState();
 
-        $product = Product::create([
-            'store_id' => $this->record->id,
-            'category_id' => $data['category_id'],
-            'name' => $data['name'],
-            'description' => $data['description'],
-            'properties' => $data['properties'],
-            'sorted' => $data['sorted'],
-            'is_available' => $data['is_available'],
-        ]);
+        $data['store_id'] = $this->store_id;
 
-        $product->images()->save(new Image(['values' => $data['images']]));
+        $this->record = $this->handleRecordCreation($data);
 
-        $this->redirect(route('filament.resources.products.edit', ['record' => $product->id]));
+        $this->record->images()->save(new Image(['values' => $data['images']]));
+
+        foreach ($this->locales as $locale) {
+            Content::create([
+                'product_id' => $this->record->id,
+                'locale' => $locale,
+                'name' => $data['name'][$locale],
+                'description' => $data['description'][$locale],
+            ]);
+        }
+
+        ProductService::new()->createAttributes($data['attributes'], $this->record->id);
+
+        $this->getCreatedNotification()?->send();
+
+        $this->redirect($this->getRedirectUrl());
+    }
+
+    protected function getFormActions(): array
+    {
+        $actions = parent::getFormActions();
+
+        unset($actions[1]);
+
+        return $actions;
     }
 }

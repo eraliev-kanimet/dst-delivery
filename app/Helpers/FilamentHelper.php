@@ -7,7 +7,6 @@ use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -30,7 +29,7 @@ class FilamentHelper
         return Tabs\Tab::make($header)->schema($schema);
     }
 
-    public function textInput(string $model): TextInput
+    public function input(string $model): TextInput
     {
         return TextInput::make($model);
     }
@@ -65,12 +64,6 @@ class FilamentHelper
         return Select::make($model);
     }
 
-    public function numericInput(string $model): TextInput
-    {
-        return TextInput::make($model)
-            ->numeric();
-    }
-
     public function image(string $model): FileUpload
     {
         return FileUpload::make($model)->image();
@@ -79,11 +72,6 @@ class FilamentHelper
     public function grid(array $schema, array|int $columns = 2): Grid
     {
         return Grid::make($columns)->schema($schema);
-    }
-
-    public function markdown(string $model): MarkdownEditor
-    {
-        return MarkdownEditor::make($model);
     }
 
     public function radio(string $model, array|callable $options = []): Radio
@@ -96,14 +84,14 @@ class FilamentHelper
         return CheckboxList::make($model)->options($options);
     }
 
-    public function tabsTextInput(string $model, array $locales, bool $required = false): Tabs
+    public function tabsInput(string $model, array $locales, bool $required = false, ?string $label = null): Tabs
     {
         $tabs = [];
 
         foreach (filterAvailableLocales($locales) as $locale => $name) {
             $tabs[] = $this->tab($name, [
-                $this->textInput("$model.$locale")
-                    ->label(ucfirst($model))
+                $this->input("$model.$locale")
+                    ->label($label ?? ucfirst($model))
                     ->required($required)
             ]);
         }

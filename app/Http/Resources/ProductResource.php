@@ -2,9 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductSelection;
+use App\Models\Content;
+use App\Models\Selection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -18,17 +20,20 @@ class ProductResource extends BaseResource
     public function toArray(Request $request): array
     {
         $locale = self::$locale;
-        $fallback_locale = self::$fallback_locale;
+
+        /** @var Content $content */
+        $content = $this->resource->{"content_$locale"};
 
         return [
             'id' => $this->resource->id,
             'category' => $this->category($this->resource->category),
-            'name' => $this->resource->name[$locale] ?? $this->resource->name[$fallback_locale],
-            'description' => $this->resource->description[$locale] ?? $this->resource->description[$fallback_locale],
-            'is_available' => (bool) $this->resource->is_available,
-            'images' => $this->resource->getImages(),
-            'properties' => $this->getProperties($this->resource->properties),
+            'name' => $content->name,
+            'description' => $content->description,
+            'is_available' => (bool)$this->resource->is_available,
+            'images' => getImages($this->resource->images->values),
+            'attributes' => $this->getAttributes($this->resource->productAttributes ?? []),
             'selections' => $this->getSelections($this->resource->selections),
+            'preview' => $this->resource->preview,
         ];
     }
 
@@ -37,7 +42,7 @@ class ProductResource extends BaseResource
         if ($category) {
             return [
                 'id' => $category->id,
-                'name' => $category->name[self::$locale] ?? $category->name[self::$fallback_locale],
+                'name' => $category->name[self::$locale],
                 'category' => $this->category($category->category),
             ];
         }
@@ -45,38 +50,56 @@ class ProductResource extends BaseResource
         return null;
     }
 
-    protected function getProperties(array $properties): array
+    public function getAttributes(Collection|array $attributes): array
     {
         $locale = self::$locale;
-        $fallback_locale = self::$fallback_locale;
-
         $array = [];
 
-        foreach ($properties as $property) {
+        /** @var Attribute $attribute */
+        foreach ($attributes as $attribute) {
             $array[] = [
-                'name' => $property['name'][$locale] ?? $property['name'][$fallback_locale],
-                'properties' => $property['properties'][$locale] ?? $property['properties'][$fallback_locale],
+                'attribute' => $attribute->attribute,
+                'name' => __('common.attributes.' . $attribute->attribute),
+                'value' => $this->getAttributeValue($attribute->type, $attribute->{'value' . $attribute->type}, $locale)
             ];
         }
 
         return $array;
     }
 
+    protected function getAttributeValue(int $type, array|string $value, string $locale)
+    {
+        return match ($type) {
+            1 => $value[$locale],
+            default => $value
+        };
+    }
+
     protected function getSelections(Collection $selections): array
     {
         $locale = self::$locale;
-        $fallback_locale = self::$fallback_locale;
 
         $array = [];
 
-        /** @var ProductSelection $selection */
+        /** @var Selection $selection */
         foreach ($selections as $selection) {
+            $attributes = [];
+
+            foreach ($selection->properties ?? [] as $attribute) {
+                $attributes[] = [
+                    'attribute' => $attribute['attribute'],
+                    'name' => __('common.attributes.' . $attribute['attribute']),
+                    'value' => $this->getAttributeValue($attribute['type'], $attribute['value' . $attribute['type']], $locale)
+                ];
+            }
+
             $array[] = [
                 'id' => $selection->id,
                 'quantity' => $selection->quantity,
                 'price' => $selection->price,
                 'is_available' => $selection->is_available,
-                'properties' => $selection->properties[$locale] ?? $selection->properties[$fallback_locale],
+                'images' => getImages($selection->images ?? []),
+                'attributes' => $attributes,
             ];
         }
 

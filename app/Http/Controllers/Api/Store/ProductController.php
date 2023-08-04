@@ -3,36 +3,45 @@
 namespace App\Http\Controllers\Api\Store;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Store\ProductIndexRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\Store;
-use Illuminate\Http\Request;
+use App\Service\ApiProductService;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(
+        protected ApiProductService $apiProductService
+    )
+    {}
+
+    public function index(ProductIndexRequest $request)
     {
         $store = Store::current();
+        $locale = config('app.locale');
 
-        ProductResource::$locale = config('app.locale');
-        ProductResource::$fallback_locale = $store->fallback_locale;
+        ProductResource::$locale = $locale;
 
-        $products = Product::with(['category:id,name,category_id', 'selections', 'store:id', 'images'])
-            ->whereStoreId($store->id)
-            ->whereHas('selections')
-            ->whereIn('category_id', $store->categories)
-            ->orderBy('sorted', 'desc')
-            ->orderBy('category_id', 'desc')
-            ->paginate((int)$request->get('limit', 15));
+        $this->apiProductService->setStoreId($store->id);
+        $this->apiProductService->setLimit($request->get('limit', 15));
+        $this->apiProductService->setCategoryId($request->get('category_id'));
+        $this->apiProductService->setCategories($store->categories);
 
-        return ProductResource::collection($products);
+        return ProductResource::collection($this->apiProductService->all($request, $locale));
     }
 
     public function show(Product $product)
     {
-        ProductResource::$locale = config('app.locale');
-        ProductResource::$fallback_locale = Store::current()->fallback_locale;
+        $store = Store::current();
 
-        return new ProductResource($product);
+        ProductResource::$locale = config('app.locale');
+
+        if ($product->store_id == $store->id && $product->selections->count()) {
+            return new ProductResource($product);
+        }
+
+        throw new NotFoundHttpException('Product was not found!');
     }
 }

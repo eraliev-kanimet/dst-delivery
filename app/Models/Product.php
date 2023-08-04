@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Product extends Model
@@ -12,17 +13,9 @@ class Product extends Model
     protected $fillable = [
         'store_id',
         'category_id',
-        'name',
-        'description',
-        'properties',
         'sorted',
         'is_available',
-    ];
-
-    protected $casts = [
-        'name' => 'array',
-        'description' => 'array',
-        'properties' => 'array',
+        'preview',
     ];
 
     public function store(): BelongsTo
@@ -37,7 +30,7 @@ class Product extends Model
 
     public function selections(): HasMany
     {
-        return $this->hasMany(ProductSelection::class);
+        return $this->hasMany(Selection::class);
     }
 
     public function images(): MorphOne
@@ -45,14 +38,18 @@ class Product extends Model
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function getImages(): array
+    public function productAttributes(): HasMany
     {
-        $images = [];
+        return $this->hasMany(Attribute::class);
+    }
 
-        foreach ($this->images->values ?? [] as $image) {
-            $images[] = asset('storage/' . $image);
-        }
+    public function content_en(): HasOne
+    {
+        return $this->hasOne(Content::class)->where('locale', 'en');
+    }
 
-        return $images;
+    public function content_ru(): HasOne
+    {
+        return $this->hasOne(Content::class)->where('locale', 'ru');
     }
 }

@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ProductSelection extends Model
+class Selection extends Model
 {
     protected $fillable = [
         'product_id',
+        'images',
         'properties',
         'quantity',
         'price',
@@ -16,7 +17,8 @@ class ProductSelection extends Model
     ];
 
     protected $casts = [
-        'properties' => 'array'
+        'images' => 'array',
+        'properties' => 'array',
     ];
 
     public function product(): BelongsTo

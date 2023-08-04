@@ -18,22 +18,34 @@ class CategoryResource extends BaseResource
         $parent = null;
 
         $locale = self::$locale;
-        $fallback_locale = self::$fallback_locale;
 
         if ($resource->category_id) {
             $parent = [
                 'id' => $resource->category->id,
-                'name' => $resource->category->name[$locale] ?? $resource->category->name[$fallback_locale],
+                'name' => $resource->category->name[$locale],
             ];
         }
 
         return [
             'id' => $resource->id,
-            'name' => $resource->name[$locale] ?? $resource->name[$fallback_locale],
-            'description' => $resource->description[$locale] ?? $resource->description[$fallback_locale],
-            'images' => $resource->getImages(),
+            'name' => $resource->name[$locale],
+            'description' => $resource->description[$locale],
+            'images' => getImages($resource->images->values),
             'parent' => $parent,
-            'children' => self::collection($resource->categories)
+            'children' => self::collection($resource->categories),
+            'products' => $this->getProductsCount($resource),
+            'preview' => $resource->preview,
         ];
+    }
+
+    protected function getProductsCount(Category $category): int
+    {
+        $count = $category->products->count();
+
+        foreach ($category->categories as $category) {
+            $count += $this->getProductsCount($category);
+        }
+
+        return $count;
     }
 }
