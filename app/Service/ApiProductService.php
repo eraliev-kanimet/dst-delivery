@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ApiProductService
 {
     protected int $store_id = 0;
+    protected int $limit = 15;
     protected int $category_id = 0;
     protected array $categories = [];
 
@@ -74,7 +75,7 @@ class ApiProductService
             ->whereIn('category_id', $this->getCategories())
             ->orderBy('sorted', 'desc')
             ->orderBy('category_id', 'desc')
-            ->paginate($request->get('limit', 15))
+            ->paginate($this->limit)
             ->withQueryString();
     }
 
@@ -106,6 +107,11 @@ class ApiProductService
     public function setStoreId(int $store_id): void
     {
         $this->store_id = $store_id;
+    }
+
+    public function setLimit(int $limit): void
+    {
+        $this->limit = $limit;
     }
 
     protected function getFormattedAttributes(array $attributes): array

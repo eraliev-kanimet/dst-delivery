@@ -6,8 +6,8 @@ use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
-use App\Models\ProductContent;
-use App\Models\ProductSelection;
+use App\Models\Content;
+use App\Models\Selection;
 use App\Models\Store;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
@@ -63,7 +63,7 @@ class ProductSeeder extends Seeder
 
     protected function product(array $data, int $category_id): void
     {
-        if (!ProductContent::whereName($data['name']['en'])->whereLocale('en')->exists()) {
+        if (!Content::whereName($data['name']['en'])->whereLocale('en')->exists()) {
             $product = Product::create([
                 'category_id' => $category_id,
                 'store_id' => $this->store->id,
@@ -93,7 +93,7 @@ class ProductSeeder extends Seeder
 
             foreach ($this->store->locales as $locale) {
                 if (!$product->{'content_' . $locale}) {
-                    $product->{'content_' . $locale}()->save(new ProductContent([
+                    $product->{'content_' . $locale}()->save(new Content([
                         'locale' => $locale,
                         'name' => $data['name'][$locale],
                         'description' => $data['description'][$locale],
@@ -106,33 +106,37 @@ class ProductSeeder extends Seeder
             }
 
             if (!$product->selections->count()) {
-                for ($i = 0; $i < rand(1, 2); $i++) {
+                foreach ($data['selections'] as $selection) {
+                    $attributesArray = [];
+
+                    foreach ($selection as $typeName => $attributes) {
+                        $type = 0;
+
+                        if ($typeName == 'type1') {
+                            $type = 1;
+                        } elseif ($typeName == 'type2') {
+                            $type = 2;
+                        }
+
+                        if ($type) {
+                            foreach ($attributes as $attribute => $value) {
+                                $attributesArray[] = [
+                                    'type' => $type,
+                                    'attribute' => $attribute,
+                                    'value' . $type => $value
+                                ];
+                            }
+                        }
+                    }
+
                     $selection = [
                         'quantity' => rand(5, 10),
                         'price' => rand(200, 300),
-                        'properties' => [
-                            'ru' => [
-                                'Цвет' => 'Черный',
-                                'Размер' => 'M',
-                                'Тип ростовки' => 'для невысоких',
-                                'Утеплитель' => 'синтепон',
-                                'Уход за вещами' => 'бережная стирка при 30 градусах',
-                                'Коллекция' => 'Базовая коллекция',
-                                'Материал подкладки' => 'синтепон',
-                            ],
-                            'en' => [
-                                'Color' => 'Black',
-                                'Size' => 'M',
-                                'Height type' => 'for short',
-                                'Insulation' => 'syntepon',
-                                'Care' => 'gentle washing at 30 degrees',
-                                'Collection' => 'Basic Collection',
-                                'Lining material' => 'syntepon',
-                            ],
-                        ]
+                        'images' => $this->images('products'),
+                        'properties' => $attributesArray
                     ];
 
-                    $product->selections()->save(new ProductSelection($selection));
+                    $product->selections()->save(new Selection($selection));
                 }
             }
         }

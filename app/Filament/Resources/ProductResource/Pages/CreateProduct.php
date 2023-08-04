@@ -7,7 +7,7 @@ use App\Filament\Resources\ProductResource\ProductResourceForm;
 use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
-use App\Models\ProductContent;
+use App\Models\Content;
 use App\Models\Store;
 use App\Service\ProductService;
 use Filament\Resources\Form;
@@ -78,7 +78,7 @@ class CreateProduct extends CreateRecord
         $this->record->images()->save(new Image(['values' => $data['images']]));
 
         foreach ($this->locales as $locale) {
-            ProductContent::create([
+            Content::create([
                 'product_id' => $this->record->id,
                 'locale' => $locale,
                 'name' => $data['name'][$locale],

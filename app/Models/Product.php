@@ -30,7 +30,7 @@ class Product extends Model
 
     public function selections(): HasMany
     {
-        return $this->hasMany(ProductSelection::class);
+        return $this->hasMany(Selection::class);
     }
 
     public function images(): MorphOne
@@ -45,11 +45,11 @@ class Product extends Model
 
     public function content_en(): HasOne
     {
-        return $this->hasOne(ProductContent::class)->where('locale', 'en');
+        return $this->hasOne(Content::class)->where('locale', 'en');
     }
 
     public function content_ru(): HasOne
     {
-        return $this->hasOne(ProductContent::class)->where('locale', 'ru');
+        return $this->hasOne(Content::class)->where('locale', 'ru');
     }
 }

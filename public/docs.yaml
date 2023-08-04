@@ -105,6 +105,7 @@ paths:
         - $ref: '#/components/parameters/StoreUuid'
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/Query'
+        - $ref: '#/components/parameters/ProductAttributesFilter'
       responses:
         '200':
           $ref: '#/components/responses/ProductIndexResponse'
@@ -168,18 +169,17 @@ components:
           type: array
           items:
             type: string
-        properties:
+        attributes:
           type: array
           items:
             type: object
             properties:
+              attribute:
+                type: string
               name:
                 type: string
-              properties:
-                type: array
-                items:
-                  type: object
-                  default: {PropertyKey: PropertyValue}
+              value:
+                type: string
         selections:
           type: array
           items:
@@ -193,11 +193,21 @@ components:
                 type: number
               is_available:
                 type: boolean
-              properties:
+              images:
+                type: array
+                items:
+                  type: string
+              attributes:
                 type: array
                 items:
                   type: object
-                  default: {PropertyKey: PropertyValue}
+                  properties:
+                    attribute:
+                      type: string
+                    name:
+                      type: string
+                    value:
+                      type: string
         preview:
           type: integer
     Category:
@@ -446,15 +456,23 @@ components:
         type: integer
     Limit:
       name: limit
-      in: path
+      in: query
       required: false
       description: Per page in a query with pagination
       schema:
         type: integer
     Query:
       name: q
-      in: path
+      in: query
       required: false
       description: Search parameter
       schema:
         type: string
+    ProductAttributesFilter:
+      name: attributes
+      in: query
+      required: false
+      description: Product attribute filter
+      schema:
+        type: array
+      example: attributes[color][]=Black&attributes[color][]=Black-White&attributes[color][]=Gray&attributes[insulation]=syntepon&attributes[care]=gentle washing at 30 degrees&attributes[size][]=S

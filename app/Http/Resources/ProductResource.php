@@ -5,8 +5,8 @@ namespace App\Http\Resources;
 use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductContent;
-use App\Models\ProductSelection;
+use App\Models\Content;
+use App\Models\Selection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -21,7 +21,7 @@ class ProductResource extends BaseResource
     {
         $locale = self::$locale;
 
-        /** @var ProductContent $content */
+        /** @var Content $content */
         $content = $this->resource->{"content_$locale"};
 
         return [
@@ -81,14 +81,25 @@ class ProductResource extends BaseResource
 
         $array = [];
 
-        /** @var ProductSelection $selection */
+        /** @var Selection $selection */
         foreach ($selections as $selection) {
+            $attributes = [];
+
+            foreach ($selection->properties ?? [] as $attribute) {
+                $attributes[] = [
+                    'attribute' => $attribute['attribute'],
+                    'name' => __('common.attributes.' . $attribute['attribute']),
+                    'value' => $this->getAttributeValue($attribute['type'], $attribute['value' . $attribute['type']], $locale)
+                ];
+            }
+
             $array[] = [
                 'id' => $selection->id,
                 'quantity' => $selection->quantity,
                 'price' => $selection->price,
                 'is_available' => $selection->is_available,
-                'properties' => $selection->properties[$locale],
+                'images' => getImages($selection->images ?? []),
+                'attributes' => $attributes,
             ];
         }
 

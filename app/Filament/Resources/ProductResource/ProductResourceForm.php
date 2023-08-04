@@ -6,6 +6,7 @@ use App\Helpers\FilamentHelper;
 use App\Service\ProductService;
 use Closure;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
 use Nuhel\FilamentCroppie\Components\Croppie;
 
@@ -70,9 +71,10 @@ final class ProductResourceForm
                             ->required()
                             ->numeric(),
                     ]),
-                    $this->attributesTab(false),
                     $this->helper->toggle('is_available')
                         ->default(true),
+                    $this->helper->image('images')->multiple(),
+                    $this->attributesRepeater('properties'),
                 ])
                     ->relationship('selections')
                     ->required()
@@ -98,23 +100,6 @@ final class ProductResourceForm
         return [$this->helper->tabs($tabs)];
     }
 
-    protected function attributesTab(bool $required): Tabs
-    {
-        $tabs = [];
-
-        foreach (filterAvailableLocales($this->locales) as $locale => $name) {
-            $tabs[] = $this->helper->tab($name, [
-                $this->helper->keyValue("properties.$locale")
-                    ->label('')
-                    ->keyLabel('Attribute')
-                    ->valueLabel('Value')
-                    ->required($required),
-            ]);
-        }
-
-        return $this->helper->tabs($tabs);
-    }
-
     public function setCategories(array $categories): void
     {
         $this->categories = $categories;
@@ -136,6 +121,17 @@ final class ProductResourceForm
     }
 
     protected function tabAttributes(): Tabs\Tab
+    {
+        $repeater = $this->attributesRepeater();
+
+        if ($this->edit) {
+            $repeater->relationship('productAttributes');
+        }
+
+        return $this->helper->tab('Attributes', [$repeater]);
+    }
+
+    protected function attributesRepeater(string $model = 'attributes'): Repeater
     {
         $productService = ProductService::new();
 
@@ -176,16 +172,10 @@ final class ProductResourceForm
                 ->label('Value');
         }
 
-        $repeater = $this->helper->repeater('attributes', $schema)
+        return $this->helper->repeater($model, $schema)
             ->label('')
             ->required()
             ->createItemButtonLabel('Add attribute');
-
-        if ($this->edit) {
-            $repeater->relationship('productAttributes');
-        }
-
-        return $this->helper->tab('Attributes', [$repeater]);
     }
 }
 

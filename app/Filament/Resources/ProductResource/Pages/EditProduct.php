@@ -6,7 +6,7 @@ use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\ProductResourceForm;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductContent;
+use App\Models\Content;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\EditRecord;
 
@@ -105,7 +105,7 @@ class EditProduct extends EditRecord
                     $this->record->{"content_$locale"}->update($content);
                 }
             } else {
-                $this->record->{"content_$locale"}()->save(new ProductContent([
+                $this->record->{"content_$locale"}()->save(new Content([
                     'locale' => $locale,
                     'name' => $data['name'][$locale],
                     'description' => $data['description'][$locale],
