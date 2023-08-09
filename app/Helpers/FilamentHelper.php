@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -117,5 +118,10 @@ class FilamentHelper
     public function keyValue(string $model): KeyValue
     {
         return KeyValue::make($model);
+    }
+
+    public function dateTime(string $model): DateTimePicker
+    {
+        return DateTimePicker::make($model);
     }
 }

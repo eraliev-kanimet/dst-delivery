@@ -50,9 +50,9 @@ final class ProductResourceForm
                     $this->helper->toggle('is_available')
                         ->default(true),
                     $this->helper->radio('preview', [
-                        1 => 'Normal',
-                        2 => 'Large'
-                    ])->inline()->default(1),
+                        2 => 'Normal',
+                        1 => 'Large'
+                    ])->inline()->default(2),
                 ])
             ]),
             $this->tabAttributes()

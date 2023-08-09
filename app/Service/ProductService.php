@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Models\Attribute;
+use App\Models\Product;
 
 class ProductService
 {
@@ -93,5 +94,40 @@ class ProductService
         }
 
         return 0;
+    }
+
+    public function getSelectProduct(): array
+    {
+        $locale = config('app.locale');
+        $locales = config('app.locales');
+
+        unset($locales[$locale]);
+
+        $locales = array_keys(config('app.locales'));
+
+        $products = Product::with(['content_en:product_id,name', 'content_ru:product_id,name'])
+            ->whereIsAvailable(true)
+            ->get(['id']);
+
+        $array = [];
+
+        foreach ($products as $product) {
+            $name = '';
+
+            if ($product->{"content_$locale"}) {
+                $name = $product->{"content_$locale"}->name;
+            } else {
+                foreach ($locales as $altLocale) {
+                    if ($product->{"content_$altLocale"}) {
+                        $name = $product->{"content_$altLocale"}->name;
+                        break;
+                    }
+                }
+            }
+
+            $array[$product->id] = $name;
+        }
+
+        return $array;
     }
 }
