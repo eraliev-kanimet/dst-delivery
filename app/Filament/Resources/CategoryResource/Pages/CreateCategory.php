@@ -13,7 +13,7 @@ use Psr\Container\NotFoundExceptionInterface;
 class CreateCategory extends CreateRecord
 {
     protected static string $resource = CategoryResource::class;
-
+  
     public ?int $category_id = null;
     public string $category_name = '';
     public array $categories = [];
