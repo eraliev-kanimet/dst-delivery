@@ -8,6 +8,7 @@ use Exception;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,6 +17,19 @@ class BannerResource extends Resource
     protected static ?string $model = Banner::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photograph';
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            return parent::getEloquentQuery()->with('store');
+        }
+
+        return parent::getEloquentQuery()
+            ->with('store')
+            ->whereRelation('store', 'user_id', $user->id);
+    }
 
     /**
      * @throws Exception
@@ -26,6 +40,7 @@ class BannerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('store.name'),
+                Tables\Columns\TextColumn::make('type')->enum(Banner::$types),
                 Tables\Columns\IconColumn::make('active')->boolean(),
                 Tables\Columns\TextColumn::make('start_date')->date('Y-m-d'),
                 Tables\Columns\TextColumn::make('end_date')->date('Y-m-d'),
