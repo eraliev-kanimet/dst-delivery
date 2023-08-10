@@ -10,7 +10,6 @@ use App\Models\Content;
 use App\Models\Selection;
 use App\Models\Store;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\File;
 
 class ProductSeeder extends Seeder
 {
@@ -45,7 +44,7 @@ class ProductSeeder extends Seeder
         ]));
 
         if (!$category->images) {
-            $category->images()->save(new Image(['values' => $this->images('categories')]));
+            $category->images()->save(new Image(['values' => fakeImages('categories')]));
         }
 
         if (isset($data['children'])) {
@@ -102,7 +101,7 @@ class ProductSeeder extends Seeder
             }
 
             if (!$product->images) {
-                $product->images()->save(new Image(['values' => $this->images('products')]));
+                $product->images()->save(new Image(['values' => fakeImages('products')]));
             }
 
             if (!$product->selections->count()) {
@@ -132,7 +131,7 @@ class ProductSeeder extends Seeder
                     $selection = [
                         'quantity' => rand(5, 10),
                         'price' => rand(200, 300),
-                        'images' => $this->images('products'),
+                        'images' => fakeImages('products'),
                         'properties' => $attributesArray
                     ];
 
@@ -140,33 +139,5 @@ class ProductSeeder extends Seeder
                 }
             }
         }
-    }
-
-    protected function images(string $model): array
-    {
-        $images = [];
-
-        for ($i = 0; $i < rand(1, 3); $i++) {
-            $images[] = $this->image($model);
-        }
-
-        return $images;
-    }
-
-    protected function image(string $model): string
-    {
-        $dir = storage_path("app/public/$model");
-
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
-
-        $image = rand(1, 30) . '.jpg';
-
-        if (!file_exists("$dir/$image")) {
-            File::copy(storage_path("fake/images/$image"), "$dir/$image");
-        }
-
-        return "$model/$image";
     }
 }
