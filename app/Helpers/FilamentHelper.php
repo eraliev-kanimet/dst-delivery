@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Closure;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
@@ -20,7 +21,7 @@ use Illuminate\Support\Collection;
 
 class FilamentHelper
 {
-    public function tabs(array $tabs): Tabs
+    public function tabs(array|Closure $tabs): Tabs
     {
         return Tabs::make('')->tabs($tabs);
     }

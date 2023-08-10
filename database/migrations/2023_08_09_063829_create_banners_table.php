@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->string('image');
+            $table->json('image');
             $table->string('type');
             $table->string('type_value');
             $table->dateTime('start_date');

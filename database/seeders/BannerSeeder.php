@@ -15,7 +15,7 @@ class BannerSeeder extends Seeder
                 Banner::create([
                     'store_id' => $store->id,
                     'name' => fake()->name,
-                    'image' => fakeImage('banners'),
+                    'image' => ['en' => fakeImage('banners'), 'ru' => fakeImage('banners')],
                     'type' => 'url',
                     'type_value' => fake()->url,
                     'start_date' => now(),

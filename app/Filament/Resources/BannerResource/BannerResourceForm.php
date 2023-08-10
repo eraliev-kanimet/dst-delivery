@@ -14,7 +14,6 @@ class BannerResourceForm
 {
     public static function form(Collection|array $stores): array
     {
-        $now = now();
         $helper = new FilamentHelper;
 
         return [
@@ -74,14 +73,35 @@ class BannerResourceForm
                 ->label('Category'),
             $helper->dateTime('start_date')
                 ->required()
-                ->minDate($now),
+                ->reactive()
+                ->minDate(now()),
             $helper->dateTime('end_date')
                 ->required()
-                ->minDate($now),
-            $helper->image('image')
+                ->hidden(fn(Closure $get) => is_null($get('start_date')))
+                ->minDate(fn ($get) => $get('start_date')),
+            $helper->tabs(function (Closure $get) use ($helper) {
+                $store_id = $get('store_id');
+
+                if ($store_id) {
+                    $tabs = [];
+
+                    foreach (filterAvailableLocales(Store::find($store_id)->locales) as $locale => $name) {
+                        $tabs[] = $helper->tab('Image ' . $name, [
+                            $helper->image("image.$locale")
+                                ->label('')
+                                ->required()
+                        ]);
+                    }
+
+                    return $tabs;
+                }
+
+                return [];
+            })
                 ->columnSpan(2)
-                ->required(),
+                ->hidden(fn(Closure $get) => is_null($get('store_id'))),
             $helper->toggle('active')
+                ->columnSpan(2)
                 ->default(true),
         ];
     }

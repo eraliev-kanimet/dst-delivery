@@ -19,6 +19,10 @@ class Banner extends Model
         'active',
     ];
 
+    protected $casts = [
+        'image' => 'array'
+    ];
+
     public static array $types = [
         'url' => 'URL',
         'product' => 'Product',
