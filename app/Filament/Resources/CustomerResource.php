@@ -6,6 +6,7 @@ use App\Filament\Resources\CustomerResource\Pages;
 use App\Helpers\FilamentHelper;
 use App\Models\Customer;
 use App\Models\Store;
+use Closure;
 use Exception;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Unique;
 
 class CustomerResource extends Resource
 {
@@ -43,12 +45,17 @@ class CustomerResource extends Resource
                 $helper->select('store_id')
                     ->label('Store')
                     ->options(self::getStores())
+                    ->reactive()
                     ->required(),
                 $helper->input('name')
                     ->required(),
                 $helper->input('phone')
                     ->label('Phone number')
                     ->regex('/^\+\d{1,}$/')
+                    ->hidden(fn(Closure $get) => is_null($get('store_id')))
+                    ->unique(
+                        ignorable: fn(Model $record) => $record,
+                        callback: fn(Unique $rule, Closure $get) => $rule->where('store_id', $get('store_id')))
                     ->required(),
                 $helper->toggle('active')
                     ->default(true)
@@ -90,7 +97,7 @@ class CustomerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('store.name'),
                 Tables\Columns\TextColumn::make('Client phone number')
-                    ->formatStateUsing(fn (Model $record) => $record->phone),
+                    ->formatStateUsing(fn(Model $record) => $record->phone),
                 Tables\Columns\IconColumn::make('active')->boolean(),
                 Tables\Columns\TextColumn::make('updated_at'),
             ])

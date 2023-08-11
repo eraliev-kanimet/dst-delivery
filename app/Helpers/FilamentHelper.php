@@ -8,6 +8,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
@@ -124,5 +125,10 @@ class FilamentHelper
     public function dateTime(string $model): DateTimePicker
     {
         return DateTimePicker::make($model);
+    }
+
+    public function hidden(string $model, mixed $default)
+    {
+        return Hidden::make($model)->default($default);
     }
 }
