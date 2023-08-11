@@ -14,11 +14,16 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'stores_permission',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    protected $casts = [
+        'stores_permission' => 'array'
     ];
 
     public function role(): BelongsTo

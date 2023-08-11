@@ -36,6 +36,7 @@ class AppInstall extends Command
         $roles = [
             'admin' => 'Admin',
             'store_owner' => 'Store Owner',
+            'store_manager' => 'Store Manager',
         ];
 
         foreach ($roles as $slug => $name) {
