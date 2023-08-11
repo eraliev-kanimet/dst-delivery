@@ -52,6 +52,8 @@ class OrderResourceForm
                     ->createItemButtonLabel('Add product')
                     ->required()
             ]);
+        } else {
+            return $this->basic();
         }
 
         return [$this->helper->tabs($tabs)];
@@ -64,7 +66,10 @@ class OrderResourceForm
                 $this->helper->select('payment_type')
                     ->options(PaymentType::getSelect())
                     ->required()
-                    ->columnSpan(2),
+                    ->columnSpan($this->edited ? 1 : 2),
+                $this->helper->input('total')
+                    ->disabled()
+                    ->visible($this->edited),
                 $this->helper->select('delivery_type')
                     ->options(DeliveryType::getSelect()),
                 $this->helper->dateTime('delivery_date')
