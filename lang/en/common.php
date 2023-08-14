@@ -27,4 +27,23 @@ return [
         'bowl_capacity' => 'Bowl Capacity',
         'suction_power' => 'Suction power',
     ],
+    'payment_types' => [
+        'card' => 'Card',
+    ],
+    'delivery_types' => [
+        'courier' => 'Courier',
+        'self_delivery' => 'Self-Delivery',
+    ],
+    'order_status' => [
+        'inactive' => 'Inactive',
+        'pending_payment' => 'Pending Payment',
+        'processing' => 'Processing',
+        'confirmed' => 'Confirmed',
+        'shipped' => 'Shipped',
+        'delivered' => 'Delivered',
+        'received' => 'Received',
+        'canceled' => 'Canceled',
+    ],
+    'price' => 'Price',
+    'quantity' => 'Quantity',
 ];

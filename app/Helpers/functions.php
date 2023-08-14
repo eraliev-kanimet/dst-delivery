@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\File;
+
 function filterAvailableLocales(array $locales)
 {
     return array_intersect_key(config('app.locales'), array_flip($locales));
@@ -24,7 +26,8 @@ function ttt(string $value): array
     return $array;
 }
 
-function truncateStr($string, $maxLength = 13) {
+function truncateStr($string, $maxLength = 13)
+{
     if (mb_strlen($string) > $maxLength) {
         $string = mb_substr($string, 0, $maxLength) . '...';
     }
@@ -78,4 +81,32 @@ function getImages(?array $images): array
     }
 
     return $array;
+}
+
+function fakeImage(string $model): string
+{
+    $dir = storage_path("app/public/$model");
+
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+
+    $image = rand(1, 30) . '.jpg';
+
+    if (!file_exists("$dir/$image")) {
+        File::copy(storage_path("fake/images/$image"), "$dir/$image");
+    }
+
+    return "$model/$image";
+}
+
+function fakeImages(string $model): array
+{
+    $images = [];
+
+    for ($i = 0; $i < rand(1, 3); $i++) {
+        $images[] = fakeImage($model);
+    }
+
+    return $images;
 }

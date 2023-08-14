@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Models\Product;
+use App\Filament\Resources\BannerResource\Pages;
+use App\Models\Banner;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class ProductResource extends Resource
+class BannerResource extends Resource
 {
-    protected static ?string $model = Product::class;
+    protected static ?string $model = Banner::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-view-list';
+    protected static ?string $navigationIcon = 'heroicon-o-photograph';
 
     public static function getEloquentQuery(): Builder
     {
@@ -20,7 +20,7 @@ class ProductResource extends Resource
 
         if ($user->hasRole('store_manager')) {
             return parent::getEloquentQuery()->whereIn('store_id', $user->stores_permission);
-        } elseif ($user->hasRole('store_owner')) {
+        } else if ($user->hasRole('store_owner')) {
             return parent::getEloquentQuery()->whereRelation('store', 'user_id', $user->id);
         }
 
@@ -30,9 +30,9 @@ class ProductResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
-            'create' => Pages\CreateProduct::route('/create'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'index' => Pages\ListBanners::route('/'),
+            'create' => Pages\CreateBanner::route('/create'),
+            'edit' => Pages\EditBanner::route('/{record}/edit'),
         ];
     }
 }

@@ -96,7 +96,7 @@ class ProductService
         return 0;
     }
 
-    public function getSelectProduct(): array
+    public function getSelectProduct(?int $store_id = null): array
     {
         $locale = config('app.locale');
         $locales = config('app.locales');
@@ -105,13 +105,17 @@ class ProductService
 
         $locales = array_keys(config('app.locales'));
 
-        $products = Product::with(['content_en:product_id,name', 'content_ru:product_id,name'])
-            ->whereIsAvailable(true)
-            ->get(['id']);
+        $products = Product::query()
+            ->with(['content_en:product_id,name', 'content_ru:product_id,name'])
+            ->whereIsAvailable(true);
+
+        if ($store_id) {
+            $products->whereStoreId($store_id);
+        }
 
         $array = [];
 
-        foreach ($products as $product) {
+        foreach ($products->get(['id']) as $product) {
             $name = '';
 
             if ($product->{"content_$locale"}) {

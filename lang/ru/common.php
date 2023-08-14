@@ -27,4 +27,23 @@ return [
         'bowl_capacity' => 'Вместимость чаши',
         'suction_power' => 'Мощность всасывания',
     ],
+    'payment_types' => [
+        'card' => 'Карточка',
+    ],
+    'delivery_types' => [
+        'courier' => 'Курьер',
+        'self_delivery' => 'Самовывоз',
+    ],
+    'order_status' => [
+        'inactive' => 'Неактивный',
+        'pending_payment' => 'Ожидание платежа',
+        'processing' => 'В обработке',
+        'confirmed' => 'Подтверждено',
+        'shipped' => 'Отправлено',
+        'delivered' => 'Поставляется',
+        'received' => 'Получено',
+        'canceled' => 'Отменено',
+    ],
+    'price' => 'Цена',
+    'quantity' => 'Кол-во',
 ];

@@ -122,6 +122,18 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/ProductShowResponse'
+  /api/store/banners:
+    get:
+      tags:
+        - Banners
+      summary: Get Bannerss
+      description: Get all banners of the current store
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+      responses:
+        '200':
+          $ref: '#/components/responses/BannerIndexResponse'
 
 components:
   schemas:
@@ -238,6 +250,21 @@ components:
             default: 'Category'
         preview:
           type: integer
+    Banner:
+      type: object
+      properties:
+        id:
+          type: number
+        image:
+          type: string
+        type:
+          type: string
+        type_value:
+          type: string
+        start_date:
+          type: string
+        end_date:
+          type: string
   requestBodies:
     AuthCustomerRequest:
       required: true
@@ -424,6 +451,17 @@ components:
             properties:
               data:
                 $ref: '#/components/schemas/Product'
+    BannerIndexResponse:
+      description: Categories
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Banner'
   parameters:
     AcceptLanguage:
       name: Accept-Language

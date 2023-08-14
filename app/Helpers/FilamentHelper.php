@@ -2,11 +2,13 @@
 
 namespace App\Helpers;
 
+use Closure;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
@@ -20,7 +22,7 @@ use Illuminate\Support\Collection;
 
 class FilamentHelper
 {
-    public function tabs(array $tabs): Tabs
+    public function tabs(array|Closure $tabs): Tabs
     {
         return Tabs::make('')->tabs($tabs);
     }
@@ -123,5 +125,10 @@ class FilamentHelper
     public function dateTime(string $model): DateTimePicker
     {
         return DateTimePicker::make($model);
+    }
+
+    public function hidden(string $model, mixed $default)
+    {
+        return Hidden::make($model)->default($default);
     }
 }

@@ -2,17 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Models\Product;
+use App\Filament\Resources\OrderResource\Pages;
+use App\Models\Order;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-class ProductResource extends Resource
+class OrderResource extends Resource
 {
-    protected static ?string $model = Product::class;
+    protected static ?string $model = Order::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-view-list';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     public static function getEloquentQuery(): Builder
     {
@@ -27,12 +28,19 @@ class ProductResource extends Resource
         return parent::getEloquentQuery();
     }
 
+    public static function canDelete(Model $record): bool
+    {
+        $user = Auth::user();
+
+        return $user->hasRole('admin') || $user->hasRole('store_owner');
+    }
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
-            'create' => Pages\CreateProduct::route('/create'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'index' => Pages\ListOrders::route('/'),
+            'create' => Pages\CreateOrder::route('/create'),
+            'edit' => Pages\EditOrder::route('/{record}/edit'),
         ];
     }
 }
