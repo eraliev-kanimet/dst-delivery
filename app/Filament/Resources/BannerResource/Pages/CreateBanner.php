@@ -20,10 +20,12 @@ class CreateBanner extends CreateRecord
     {
         $user = Auth::user();
 
-        if ($user->hasRole('admin')) {
-            $this->stores = Store::pluck('name', 'id');
-        } else {
+        if ($user->hasRole('store_manager')) {
+            $this->stores = Store::whereIn('id', $user->stores_permission)->pluck('name', 'id');
+        } else if ($user->hasRole('store_owner')) {
             $this->stores = Store::whereUserId($user->id)->pluck('name', 'id');
+        } else {
+            $this->stores = Store::pluck('name', 'id');
         }
 
         parent::mount();

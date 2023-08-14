@@ -4,12 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BannerResource\Pages;
 use App\Models\Banner;
-use Exception;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class BannerResource extends Resource
@@ -22,49 +18,13 @@ class BannerResource extends Resource
     {
         $user = Auth::user();
 
-        if ($user->hasRole('admin')) {
-            return parent::getEloquentQuery()->with('store');
+        if ($user->hasRole('store_manager')) {
+            return parent::getEloquentQuery()->whereIn('store_id', $user->stores_permission);
+        } else if ($user->hasRole('store_owner')) {
+            return parent::getEloquentQuery()->whereRelation('store', 'user_id', $user->id);
         }
 
-        return parent::getEloquentQuery()
-            ->with('store')
-            ->whereRelation('store', 'user_id', $user->id);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('store.name'),
-                Tables\Columns\TextColumn::make('type')->enum(Banner::$types),
-                Tables\Columns\IconColumn::make('active')->boolean(),
-                Tables\Columns\TextColumn::make('start_date')->date('Y-m-d'),
-                Tables\Columns\TextColumn::make('end_date')->date('Y-m-d'),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole('admin') || $user->id == $record->store->user_id;
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole('admin') || $user->id == $record->store->user_id;
+        return parent::getEloquentQuery();
     }
 
     public static function getPages(): array
