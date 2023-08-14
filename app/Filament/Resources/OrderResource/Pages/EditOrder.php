@@ -42,7 +42,7 @@ class EditOrder extends EditRecord
 
     protected function form(Form $form): Form
     {
-        $resourceForm = new OrderResourceForm(true, $this->products);
+        $resourceForm = new OrderResourceForm(true, products: $this->products);
 
         return $form->schema($resourceForm->form())
             ->columns(1)

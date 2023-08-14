@@ -7,7 +7,6 @@ use App\Enums\PaymentType;
 use App\Helpers\FilamentHelper;
 use App\Models\Customer;
 use App\Models\Selection;
-use App\Models\Store;
 use Closure;
 use Illuminate\Support\Collection;
 
@@ -17,6 +16,7 @@ class OrderResourceForm
 
     public function __construct(
         protected bool $edited = false,
+        protected array|Collection $stores = [],
         protected array|Collection $products = [],
     )
     {
@@ -39,12 +39,13 @@ class OrderResourceForm
                         ->reactive()
                         ->searchable(),
                     $this->helper->input('quantity')
-                        ->hidden(fn (Closure $get) => is_null($get('product_id')))
                         ->numeric()
                         ->default(1)
                         ->minValue(1)
                         ->maxValue(function (Closure $get) {
-                            return Selection::find($get('product_id'))->quantity;
+                            $product_id = $get('product_id');
+
+                            return is_null($product_id) ? 0 : Selection::find($product_id)->quantity;
                         })
                         ->required()
                 ])->relationship()
@@ -98,7 +99,7 @@ class OrderResourceForm
         if (!$this->edited) {
             array_unshift($array, $this->helper->grid([
                 $this->helper->select('store_id')
-                    ->options(Store::pluck('name', 'id'))
+                    ->options($this->stores)
                     ->label('Store')
                     ->reactive()
                     ->required(),
