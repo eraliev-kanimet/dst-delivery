@@ -7,22 +7,25 @@ use App\Models\Category;
 use Exception;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Table;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 class ListCategories extends ListRecords
 {
-    public static ?Category $category = null;
+    public ?Category $category = null;
 
     protected static string $resource = CategoryResource::class;
 
     /**
-     * @return Builder
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    protected function getTableQuery(): Builder
+    public function mount(): void
     {
         if (!is_null(request()->get('category_id'))) {
             $category = Category::find(request()->get('category_id'));
@@ -33,17 +36,44 @@ class ListCategories extends ListRecords
 
             $category->name = truncateStr($category->name[config('app.locale')]);
 
-            self::$category = $category;
+            $this->category = $category;
         }
 
+        parent::mount();
+    }
+
+    protected function getTableQuery(): Builder
+    {
         return parent::getTableQuery()
-            ->with(['category', 'categories'])
-            ->where('category_id', self::$category?->id);
+            ->with(['category'])
+            ->where('category_id', $this->category?->id);
     }
 
     public function getTitle(): string
     {
-        return self::$category ? '"' . self::$category->name .'" categories'  : 'Main categories';
+        return $this->category ? '"' . $this->category->name . '" categories' : 'Main categories';
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function table(Table $table): Table
+    {
+        $locale = config('app.locale');
+
+        return $table
+            ->columns([
+                TextColumn::make("name.$locale"),
+            ])
+            ->actions([
+                Action::make('view')
+                    ->hidden(fn(Category $record) => $record->category?->category_id)
+                    ->url(fn(Category $record) => route(
+                        'filament.resources.categories.index', ['category_id' => $record->id]
+                    )),
+                EditAction::make(),
+            ])
+            ->bulkActions([]);
     }
 
     /**
@@ -55,7 +85,7 @@ class ListCategories extends ListRecords
         $actions = [];
         $params = [];
 
-        $category = self::$category;
+        $category = $this->category;
 
         if ($category) {
             $label = 'New category for ' . $category->name;
