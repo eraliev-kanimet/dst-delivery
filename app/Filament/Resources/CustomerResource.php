@@ -7,11 +7,8 @@ use App\Helpers\FilamentHelper;
 use App\Models\Customer;
 use App\Models\Store;
 use Closure;
-use Exception;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -27,13 +24,14 @@ class CustomerResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = Auth::user();
-        $query = parent::getEloquentQuery()->with('store');
 
-        if ($user->hasRole('admin')) {
-            return $query;
+        if ($user->hasRole('store_manager')) {
+            return parent::getEloquentQuery()->whereIn('store_id', $user->stores_permission);
+        } elseif ($user->hasRole('store_owner')) {
+            return parent::getEloquentQuery()->whereRelation('store', 'user_id', $user->id);
         }
 
-        return $query->whereIn('store_id', $user->stores->pluck('id'));
+        return parent::getEloquentQuery();
     }
 
     public static function form(Form $form): Form
@@ -67,44 +65,20 @@ class CustomerResource extends Resource
         $user = Auth::user();
         $query = Store::query();
 
-        if (!$user->hasRole('admin')) {
+        if ($user->hasRole('store_manager')) {
+            $query->where('id', $user->stores_permission);
+        } else if ($user->hasRole('store_owner')) {
             $query->whereUserId($user->id);
         }
 
         return $query->pluck('name', 'id');
     }
 
-    public static function canEdit(Model $record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole('admin') || $user->id == $record->store->user_id;
-    }
-
     public static function canDelete(Model $record): bool
     {
         $user = Auth::user();
 
-        return $user->hasRole('admin') || $user->id == $record->store->user_id;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('store.name'),
-                Tables\Columns\TextColumn::make('Client phone number')
-                    ->formatStateUsing(fn(Model $record) => $record->phone),
-                Tables\Columns\IconColumn::make('active')->boolean(),
-                Tables\Columns\TextColumn::make('updated_at'),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([]);
+        return $user->hasRole('admin') || $user->hasRole('store_owner');
     }
 
     public static function getPages(): array
