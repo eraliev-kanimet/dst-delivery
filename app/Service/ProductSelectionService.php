@@ -69,4 +69,21 @@ class ProductSelectionService
 
         return trim($attributes, ', ');
     }
+
+    public function getAttributes(array $properties, string $locale): array
+    {
+        $service = ProductService::new();
+
+        $attributes = [];
+
+        foreach ($properties as $attribute) {
+            $attributes[] = [
+                'attribute' => $attribute['attribute'],
+                'name' => __('common.attributes.' . $attribute['attribute']),
+                'value' => $service->getAttributeValue($attribute['type'], $attribute['value' . $attribute['type']], $locale)
+            ];
+        }
+
+        return $attributes;
+    }
 }

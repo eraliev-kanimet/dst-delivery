@@ -50,4 +50,9 @@ class Order extends Model
             $order->uuid = time();
         });
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 }

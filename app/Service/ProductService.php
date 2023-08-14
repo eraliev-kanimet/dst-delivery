@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Models\Attribute;
+use App\Models\Category;
 use App\Models\Product;
 
 class ProductService
@@ -96,6 +97,14 @@ class ProductService
         return 0;
     }
 
+    public function getAttributeValue(int $type, array|string $value, string $locale)
+    {
+        return match ($type) {
+            1 => $value[$locale],
+            default => $value
+        };
+    }
+
     public function getSelectProduct(?int $store_id = null): array
     {
         $locale = config('app.locale');
@@ -133,5 +142,18 @@ class ProductService
         }
 
         return $array;
+    }
+
+    public function category(?Category $category, string $locale): ?array
+    {
+        if ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name[$locale],
+                'category' => $this->category($category->category, $locale),
+            ];
+        }
+
+        return null;
     }
 }

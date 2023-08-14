@@ -14,8 +14,6 @@ class CategoryController extends Controller
     {
         $store = Store::current();
 
-        CategoryResource::$locale = config('app.locale');
-
         $categories = Category::with([
             'category',
             'categories',
@@ -30,8 +28,6 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        CategoryResource::$locale = config('app.locale');
-
         return new CategoryResource($category);
     }
 }

@@ -22,8 +22,6 @@ class ProductController extends Controller
         $store = Store::current();
         $locale = config('app.locale');
 
-        ProductResource::$locale = $locale;
-
         $this->apiProductService->setStoreId($store->id);
         $this->apiProductService->setLimit($request->get('limit', 15));
         $this->apiProductService->setCategoryId($request->get('category_id'));
@@ -35,8 +33,6 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $store = Store::current();
-
-        ProductResource::$locale = config('app.locale');
 
         if ($product->store_id == $store->id && $product->selections->count()) {
             return new ProductResource($product);
