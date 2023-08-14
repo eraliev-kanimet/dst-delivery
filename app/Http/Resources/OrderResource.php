@@ -7,7 +7,6 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentType;
 use App\Models\Order;
 use App\Models\Selection;
-use App\Service\ProductSelectionService;
 use Illuminate\Http\Request;
 
 class OrderResource extends BaseResource
@@ -51,7 +50,7 @@ class OrderResource extends BaseResource
         foreach ($orderItems as $order) {
             $item = [
                 'id' => $order->id,
-                'product_id' => $order->product_id,
+                'selection_id' => $order->product_id,
                 'quantity' => $order->quantity,
                 'price' => $order->price,
             ];
@@ -69,23 +68,20 @@ class OrderResource extends BaseResource
     protected function product(Selection $product): array
     {
         $locale = self::$locale;
-        $service = ProductSelectionService::new();
 
         return [
-            'id' => $product->id,
+            'selection_id' => $product->id,
             'product_id' => $product->product_id,
             'name' => $product->product->{"content_$locale"}->name,
             'category' => [
                 'id' => $product->product->category->id,
                 'name' => $product->product->category->name[$locale],
             ],
-            'preview' => $product->product->preview,
             'images' => getImages(
                 array_unique(
                     array_merge($product->images ?? [], $product->product->images->values ?? [])
                 )
             ),
-            'attributes' => $service->getAttributes($product->properties ?? [], $locale),
             'is_available' => $product->is_available && $product->product->is_available,
         ];
     }
