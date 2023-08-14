@@ -6,10 +6,8 @@ use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentType;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Selection;
 use App\Service\ProductSelectionService;
-use App\Service\ProductService;
 use Illuminate\Http\Request;
 
 class OrderResource extends BaseResource
@@ -45,9 +43,9 @@ class OrderResource extends BaseResource
         $items = [];
 
         if ($withProduct) {
-            $orderItems = OrderItem::with('product')->whereOrderId($this->resource->id)->get();
+            $orderItems = $this->resource->orderItemsWithProduct;
         } else {
-            $orderItems = OrderItem::whereOrderId($this->resource->id)->get();
+            $orderItems = $this->resource->orderItems;
         }
 
         foreach ($orderItems as $order) {
@@ -77,7 +75,10 @@ class OrderResource extends BaseResource
             'id' => $product->id,
             'product_id' => $product->product_id,
             'name' => $product->product->{"content_$locale"}->name,
-            'category' => ProductService::new()->category($product->product->category, $locale),
+            'category' => [
+                'id' => $product->product->category->id,
+                'name' => $product->product->category->name[$locale],
+            ],
             'preview' => $product->product->preview,
             'images' => getImages(
                 array_unique(

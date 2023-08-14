@@ -11,8 +11,24 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function index()
-    {}
+    public function index(Request $request)
+    {
+        $request->validate([
+            'withProduct' => ['nullable', 'in:0,1'],
+            'limit' => ['nullable', 'numeric'],
+        ]);
+
+        $withProduct = $request->get('withProduct', 0);
+
+        $orders = Order::with($withProduct ? 'orderItemsWithProduct' : 'orderItems')
+            ->whereStoreId(Store::current()->id)
+            ->whereCustomerId(Auth::user()->id)
+            ->paginate($request->get('limit', 15));
+
+        OrderResource::$withProduct = $withProduct;
+
+        return OrderResource::collection($orders);
+    }
 
     public function store($request)
     {}

@@ -42,6 +42,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function orderItemsWithProduct(): HasMany
+    {
+        return $this->orderItems()->with('product');
+    }
+
     protected static function boot(): void
     {
         parent::boot();

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 function filterAvailableLocales(array $locales)
@@ -109,4 +111,14 @@ function fakeImages(string $model): array
     }
 
     return $images;
+}
+
+function dbQueryLog(int $offset = 6): JsonResponse
+{
+    $logs = array_slice(DB::getQueryLog(), $offset);
+
+    return response()->json([
+        count($logs),
+        ...$logs
+    ]);
 }
