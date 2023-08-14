@@ -10,6 +10,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class CreateUser extends CreateRecord
 {
@@ -32,12 +33,18 @@ class CreateUser extends CreateRecord
         parent::mount();
     }
 
+    public function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['password'] = Hash::make($data['password']);
+
+        return $data;
+    }
+
     protected function form(Form $form): Form
     {
         return $form->schema(UserResourceForm::form(
-            $form,
             $this->stores,
-            $this->roles
+            $this->roles,
         ))->columns(2);
     }
 }

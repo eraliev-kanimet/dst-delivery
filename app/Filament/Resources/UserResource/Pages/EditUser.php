@@ -13,6 +13,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class EditUser extends EditRecord
 {
@@ -43,20 +44,25 @@ class EditUser extends EditRecord
     protected function form(Form $form): Form
     {
         return $form->schema(UserResourceForm::form(
-            $form,
             $this->stores,
-            $this->roles
+            $this->roles,
+            Auth::user()->hasRole('admin')
         ))->columns(2);
+    }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['password'] = null;
+
+        return $data;
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $user = User::where('email', $data['email'])->first();
-
-        if ($user) {
-            if (empty($data['password'])) {
-                $data['password'] = $user->password;
-            }
+        if (isset($data['password']) && $data['password']) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            $data['password'] = $this->record->password;
         }
 
         return $data;

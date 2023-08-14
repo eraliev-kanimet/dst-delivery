@@ -4,16 +4,17 @@ namespace App\Filament\Resources\UserResource;
 
 use App\Helpers\FilamentHelper;
 use App\Models\Store;
-use App\Models\User;
 use Closure;
-use Filament\Resources\Form;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Hash;
 
 class UserResourceForm
 {
-    public static function form(Form $form, array|Collection $stores, array|Collection $roles): array
+    public static function form(
+        array|Collection $stores,
+        array|Collection $roles,
+        bool $isAdmin = true
+    ): array
     {
         $roles_count = count($roles);
 
@@ -21,29 +22,22 @@ class UserResourceForm
 
         $schema = [
             $helper->input('name')
+                ->disabled(!$isAdmin)
                 ->required(),
             $helper->input('email')
+                ->disabled(!$isAdmin)
                 ->required()
                 ->email()
                 ->unique(ignorable: fn(?Model $record): ?Model => $record),
-            $helper->input('password')
+        ];
+
+        if ($isAdmin) {
+            $schema[] = $helper->input('password')
                 ->required(fn(?Model $record): bool => is_null($record))
                 ->password()
                 ->maxLength(255)
-                ->dehydrateStateUsing(static function ($state) use ($form) {
-                    if (!empty($state)) {
-                        return Hash::make($state);
-                    }
-
-                    $user = User::find($form->getColumns());
-                    if ($user) {
-                        return $user->password;
-                    }
-
-                    return $state;
-                })
-                ->columnSpan($roles_count ? 1 : 2),
-        ];
+                ->columnSpan($roles_count ? 1 : 2);
+        }
 
         if ($roles_count) {
             $schema[] = $helper->select('role_id')
