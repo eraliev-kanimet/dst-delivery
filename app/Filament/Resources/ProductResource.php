@@ -4,12 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
-use Exception;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class ProductResource extends Resource
@@ -21,62 +17,14 @@ class ProductResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = Auth::user();
-        $locale = config('app.locale');
 
-        if ($user->hasRole('admin')) {
-            return parent::getEloquentQuery()->with(['store', 'category', 'content_' . $locale]);
+        if ($user->hasRole('store_manager')) {
+            return parent::getEloquentQuery()->whereIn('store_id', $user->stores_permission);
+        } elseif ($user->hasRole('store_owner')) {
+            return parent::getEloquentQuery()->whereRelation('store', 'user_id', $user->id);
         }
 
-        return parent::getEloquentQuery()
-            ->with(['store', 'category', 'content_' . $locale])
-            ->whereRelation('store', 'user_id', $user->id);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public static function table(Table $table): Table
-    {
-        $locale = config('app.locale');
-
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->formatStateUsing(function (Model $record) use ($locale) {
-                        $name = $record->{"content_$locale"}?->name;
-
-                        if ($name) {
-                            return $name;
-                        }
-
-                        return $record->{"content_{$record->store->fallback_locale}"}?->name;
-                    })
-                    ->label('Name'),
-                Tables\Columns\TextColumn::make("category.name.$locale")
-                    ->label('Category'),
-                Tables\Columns\IconColumn::make('is_available')->boolean(),
-                Tables\Columns\TextColumn::make('store.name'),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole('admin') || $user->id == $record->store->user_id;
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole('admin') || $user->id == $record->store->user_id;
+        return parent::getEloquentQuery();
     }
 
     public static function getPages(): array

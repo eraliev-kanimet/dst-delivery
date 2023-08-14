@@ -20,12 +20,15 @@ class EditProduct extends EditRecord
     public $record;
 
     public array $categories = [];
+    public array $locales = [];
 
     public bool $category_disabled = false;
 
     public function mount($record): void
     {
         $this->record = $this->resolveRecord($record);
+
+        $this->locales = $this->record->store->locales;
 
         $locale = config('app.locale');
 
@@ -79,7 +82,7 @@ class EditProduct extends EditRecord
         $productForm = ProductResourceForm::create();
 
         $productForm->setCategories($this->categories);
-        $productForm->setLocales($this->record->store->locales);
+        $productForm->setLocales($this->locales);
         $productForm->setCategoryDisabled($this->category_disabled);
 
         return $form->schema($productForm->form())->columns(1);
