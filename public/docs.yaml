@@ -126,7 +126,7 @@ paths:
     get:
       tags:
         - Banners
-      summary: Get Bannerss
+      summary: Get Banners
       description: Get all banners of the current store
       parameters:
         - $ref: '#/components/parameters/AcceptLanguage'
@@ -134,6 +134,170 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/BannerIndexResponse'
+  /api/orders/info:
+    get:
+      tags:
+        - Orders
+      summary: Get information for orders
+      description: Receive order statuses, payment types and delivery types
+      responses:
+        '200':
+          description: Receive order statuses, payment types and delivery types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statuses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: integer
+                        name:
+                          type: string
+                  payment_types:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: integer
+                        name:
+                          type: string
+                  delivery_types:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: integer
+                        name:
+                          type: string
+  /api/store/orders:
+    get:
+      tags:
+        - Orders
+      summary: Get Orders
+      description: Get all orders of the customer
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/BearerToken'
+        - $ref: '#/components/parameters/OrderStatus'
+        - $ref: '#/components/parameters/OrderWithProduct'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+    post:
+      tags:
+        - Orders
+      summary: Create an order
+      description: Create a customer order
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/BearerToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+  /api/store/orders/{id}:
+    get:
+      tags:
+        - Orders
+      summary: Get order by id
+      description: Receiving an order by ID, customer order
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/BearerToken'
+        - $ref: '#/components/parameters/OrderWithProduct'
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+    post:
+      tags:
+        - Orders
+      summary: Update order
+      description: Update order, customer's order
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/BearerToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+  /api/store/orders/cancel/{id}:
+    get:
+      tags:
+        - Orders
+      summary: Cancel order
+      description: Cancel order, customer's order
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/BearerToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+  /api/store/orders/items/add:
+    post:
+      tags:
+        - Orders
+      summary: Add product to order
+      description: Add product to order, customer's order
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/BearerToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+  /api/store/orders/items/update:
+    post:
+      tags:
+        - Orders
+      summary: Update product on order
+      description: Update product on order, customer order
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/BearerToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+  /api/store/orders/items/remove/{id}:
+    get:
+      tags:
+        - Orders
+      summary: Remove a product from an order
+      description: Remove a product from an order, customer order
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/StoreUuid'
+        - $ref: '#/components/parameters/BearerToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/BlankResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
 
 components:
   schemas:
@@ -148,80 +312,6 @@ components:
           type: string
         name:
           type: string
-    Product:
-      type: object
-      properties:
-        id:
-          type: number
-        category:
-          type: object
-          properties:
-            id:
-              type: number
-            name:
-              type: string
-            category:
-              type: object
-              nullable: true
-              properties:
-                id:
-                  type: number
-                name:
-                  type: string
-                category:
-                    type: object
-                    nullable: true
-        name:
-          type: string
-        description:
-          type: string
-        is_available:
-          type: boolean
-        images:
-          type: array
-          items:
-            type: string
-        attributes:
-          type: array
-          items:
-            type: object
-            properties:
-              attribute:
-                type: string
-              name:
-                type: string
-              value:
-                type: string
-        selections:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: number
-              quantity:
-                type: number
-              price:
-                type: number
-              is_available:
-                type: boolean
-              images:
-                type: array
-                items:
-                  type: string
-              attributes:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    attribute:
-                      type: string
-                    name:
-                      type: string
-                    value:
-                      type: string
-        preview:
-          type: integer
     Category:
       type: object
       properties:
@@ -247,9 +337,73 @@ components:
         children:
           type: array
           items:
-            default: 'Category'
+            $ref: '#/components/schemas/Category'
         preview:
           type: integer
+    Product:
+      type: object
+      properties:
+        id:
+          type: number
+        category:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+            category:
+              type: object
+              nullable: true
+        name:
+          type: string
+        description:
+          type: string
+        is_available:
+          type: boolean
+        images:
+          type: array
+          items:
+            type: string
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductAttribute'
+        selections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductSelection'
+        preview:
+          type: integer
+    ProductAttribute:
+      type: object
+      properties:
+        attribute:
+          type: string
+        name:
+          type: string
+        value:
+          type: string
+    ProductSelection:
+      type: object
+      properties:
+        id:
+          type: number
+        quantity:
+          type: number
+        price:
+          type: number
+        is_available:
+          type: boolean
+        images:
+          type: array
+          items:
+            type: string
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductAttribute'
     Banner:
       type: object
       properties:
@@ -514,3 +668,20 @@ components:
       schema:
         type: array
       example: attributes[color][]=Black&attributes[color][]=Black-White&attributes[color][]=Gray&attributes[insulation]=syntepon&attributes[care]=gentle washing at 30 degrees&attributes[size][]=S
+    OrderStatus:
+      name: status
+      in: query
+      required: false
+      description: Status of order
+      schema:
+        type: integer
+    OrderWithProduct:
+      name: withProduct
+      in: query
+      required: false
+      description: Receiving orders with products
+      schema:
+        type: integer
+        enum:
+          - 0
+          - 1
