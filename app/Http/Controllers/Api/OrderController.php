@@ -13,7 +13,7 @@ class OrderController extends Controller
     {
         $statuses = [];
 
-        foreach (OrderStatus::cases() as $status) {
+        foreach (array_slice(OrderStatus::cases(), 1) as $status) {
             $statuses[] = [
                 'key' => $status->value,
                 'name' => __('common.order_status.' . $status->name)

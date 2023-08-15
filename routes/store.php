@@ -24,7 +24,7 @@ Route::middleware('auth:customer')->group(function () {
     Route::apiResource('orders', OrderController::class)->except('destroy');
 
     Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('cancel', [OrderController::class, 'cancel'])->name('cancel');
+        Route::get('cancel/{order}', [OrderController::class, 'cancel'])->name('cancel');
         Route::get('product/add', [OrderController::class, 'productAdd'])->name('product.add');
         Route::get('product/remove', [OrderController::class, 'productRemove'])->name('product.remove');
     });

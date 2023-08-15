@@ -23,4 +23,15 @@ enum OrderStatus: int
 
         return $array;
     }
+
+    public static function values(): array
+    {
+        $array = [];
+
+        foreach (array_slice(self::cases(), 1) as $case) {
+            $array[] = $case->value;
+        }
+
+        return $array;
+    }
 }

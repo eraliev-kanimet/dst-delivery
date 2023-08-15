@@ -20,18 +20,23 @@ class OrderController extends Controller
         $request->validate([
             'withProduct' => ['nullable', 'in:0,1'],
             'limit' => ['nullable', 'numeric'],
+            'status' => ['nullable', 'in:' . implode(',', OrderStatus::values())],
         ]);
 
         $withProduct = $request->get('withProduct', 0);
 
-        $orders = Order::with($withProduct ? 'orderItemsWithProduct' : 'orderItems')
+        $orders = Order::query()
+            ->with($withProduct ? 'orderItemsWithProduct' : 'orderItems')
             ->whereStoreId(Store::current()->id)
-            ->whereCustomerId(Auth::user()->id)
-            ->paginate($request->get('limit', 15));
+            ->whereCustomerId(Auth::user()->id);
+
+        if ($request->has('status')) {
+            $orders->whereStatus($request->get('status'));
+        }
 
         OrderResource::$withProduct = $withProduct;
 
-        return OrderResource::collection($orders);
+        return OrderResource::collection($orders->paginate($request->get('limit', 15)));
     }
 
     public function store(StoreRequest $request)
@@ -69,9 +74,10 @@ class OrderController extends Controller
             'withProduct' => ['nullable', 'in:0,1'],
         ]);
 
-        $store = Store::current();
-
-        $order = Order::whereStoreId($store->id)->whereUuid($uuid)->whereCustomerId(Auth::user()->id)->first();
+        $order = Order::whereStoreId(Store::current()->id)
+            ->whereUuid($uuid)
+            ->whereCustomerId(Auth::user()->id)
+            ->first();
 
         if ($order) {
             OrderResource::$withProduct = $request->get('withProduct', 0);
@@ -85,8 +91,25 @@ class OrderController extends Controller
     public function update($request, Order $order)
     {}
 
-    public function cancel(Order $order)
-    {}
+    public function cancel(string $uuid)
+    {
+        $order = Order::whereStoreId(Store::current()->id)
+            ->whereUuid($uuid)
+            ->whereCustomerId(Auth::user()->id)
+            ->first();
+
+        if ($order) {
+            if ($order->status == OrderStatus::pending_payment->value) {
+                $order->actionCancel();
+
+                return new OrderResource($order);
+            }
+
+            return response()->json(errors(__('validation2.an_order_cannot_be_canceled')), 422);
+        }
+
+        return response()->json([], 404);
+    }
 
     public function productAdd($request)
     {}
