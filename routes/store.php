@@ -25,7 +25,7 @@ Route::middleware('auth:customer')->group(function () {
 
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('cancel/{order}', [OrderController::class, 'cancel'])->name('cancel');
-        Route::get('product/add', [OrderController::class, 'productAdd'])->name('product.add');
-        Route::get('product/remove/{id}', [OrderController::class, 'productRemove'])->name('product.remove');
+        Route::post('items/add', [OrderController::class, 'itemAdd'])->name('items.add');
+        Route::get('items/remove/{id}', [OrderController::class, 'itemRemove'])->name('items.remove');
     });
 });

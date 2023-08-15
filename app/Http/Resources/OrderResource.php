@@ -21,7 +21,7 @@ class OrderResource extends BaseResource
     public function toArray(Request $request): array
     {
         return [
-            'uuid' => $this->resource->uuid,
+            'id' => $this->resource->uuid,
             'status' => $this->resource->status,
             'status_name' => __('common.order_status.' . OrderStatus::from($this->resource->status)->name),
             'total' => $this->resource->total,
