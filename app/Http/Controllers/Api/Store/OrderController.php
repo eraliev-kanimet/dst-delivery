@@ -7,66 +7,29 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Store\Order\StoreRequest;
 use App\Http\Requests\Api\Store\Order\UpdateRequest;
 use App\Http\Resources\OrderResource;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Selection;
-use App\Models\Store;
+use App\Service\ApiOrderService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Api\Store\Order\IndexRequest;
 
 class OrderController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(
+        protected ApiOrderService $service
+    )
+    {}
+
+    public function index(IndexRequest $request)
     {
-        $request->validate([
-            'withProduct' => ['nullable', 'in:0,1'],
-            'limit' => ['nullable', 'numeric'],
-            'status' => ['nullable', 'in:' . implode(',', OrderStatus::values())],
-        ]);
-
-        $withProduct = $request->get('withProduct', 0);
-
-        $orders = Order::query()
-            ->with($withProduct ? 'orderItemsWithProduct' : 'orderItems')
-            ->whereStoreId(Store::current()->id)
-            ->whereCustomerId(Auth::user()->id);
-
-        if ($request->has('status')) {
-            $orders->whereStatus($request->get('status'));
-        }
-
-        OrderResource::$withProduct = $withProduct;
-
-        return OrderResource::collection($orders->paginate($request->get('limit', 15)));
+        return $this->service->getAll(
+            $request->get('withProduct', 0),
+            $request->get('status', false),
+            $request->get('limit', 15),
+        );
     }
 
     public function store(StoreRequest $request)
     {
-        $order = Order::create([
-            'store_id' => Store::current()->id,
-            'customer_id' => Auth::user()->id,
-            'status' => OrderStatus::pending_payment->value,
-            'delivery_date' => now()->addDays(10),
-            'delivery_type' => $request->get('delivery_type'),
-            'payment_type' => $request->get('payment_type'),
-            'delivery_address' => $request->get('delivery_address'),
-        ]);
-
-        /** @var Selection $product */
-        foreach ($request->get('products') as $product) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'quantity' => $product->quantity,
-                'price' => $product->price,
-            ]);
-        }
-
-        $order->actionTotalCostRecalculation();
-
-        OrderResource::$withProduct = true;
-
-        return new OrderResource($order);
+        return $this->service->create($request->all());
     }
 
     public function show(string $uuid, Request $request)
@@ -75,10 +38,7 @@ class OrderController extends Controller
             'withProduct' => ['nullable', 'in:0,1'],
         ]);
 
-        $order = Order::whereStoreId(Store::current()->id)
-            ->whereUuid($uuid)
-            ->whereCustomerId(Auth::user()->id)
-            ->first();
+        $order = $this->service->getByUuid($uuid);
 
         if ($order) {
             OrderResource::$withProduct = $request->get('withProduct', 0);
@@ -91,10 +51,7 @@ class OrderController extends Controller
 
     public function update(UpdateRequest $request, string $uuid)
     {
-        $order = Order::whereStoreId(Store::current()->id)
-            ->whereUuid($uuid)
-            ->whereCustomerId(Auth::user()->id)
-            ->first();
+        $order = $this->service->getByUuid($uuid);
 
         if ($order) {
             if ($order->status == OrderStatus::pending_payment->value) {
@@ -111,10 +68,7 @@ class OrderController extends Controller
 
     public function cancel(string $uuid)
     {
-        $order = Order::whereStoreId(Store::current()->id)
-            ->whereUuid($uuid)
-            ->whereCustomerId(Auth::user()->id)
-            ->first();
+        $order = $this->service->getByUuid($uuid);
 
         if ($order) {
             if ($order->status == OrderStatus::pending_payment->value) {
