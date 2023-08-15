@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Store;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Store\Order\ItemStoreRequest;
+use App\Http\Requests\Api\Store\Order\ItemUpdateRequest;
 use App\Http\Requests\Api\Store\Order\StoreRequest;
 use App\Http\Requests\Api\Store\Order\UpdateRequest;
 use App\Http\Resources\OrderResource;
@@ -112,6 +113,29 @@ class OrderController extends Controller
                 }
 
                 return response()->json(errors(__('validation2.order_api.text2')), 404);
+            }
+
+            return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
+        }
+
+        return response()->json([], 404);
+    }
+
+    public function itemUpdate(ItemUpdateRequest $request)
+    {
+        $orderItem = OrderItem::find($request->get('order_item_id'));
+
+        if ($orderItem) {
+            $order = $orderItem->order;
+
+            if ($order->status == OrderStatus::pending_payment->value) {
+                $orderItem->update([
+                    'quantity' => $request->get('quantity'),
+                ]);
+
+                $order->actionTotalCostRecalculation();
+
+                return new OrderResource($order);
             }
 
             return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
