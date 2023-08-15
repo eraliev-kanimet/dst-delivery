@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Store;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Store\Order\StoreRequest;
+use App\Http\Requests\Api\Store\Order\UpdateRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -88,8 +89,25 @@ class OrderController extends Controller
         return response()->json([], 404);
     }
 
-    public function update($request, Order $order)
-    {}
+    public function update(UpdateRequest $request, string $uuid)
+    {
+        $order = Order::whereStoreId(Store::current()->id)
+            ->whereUuid($uuid)
+            ->whereCustomerId(Auth::user()->id)
+            ->first();
+
+        if ($order) {
+            if ($order->status == OrderStatus::pending_payment->value) {
+                $order->update($request->all());
+
+                return new OrderResource($order);
+            }
+
+            return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
+        }
+
+        return response()->json([], 404);
+    }
 
     public function cancel(string $uuid)
     {

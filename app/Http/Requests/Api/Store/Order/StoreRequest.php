@@ -2,35 +2,25 @@
 
 namespace App\Http\Requests\Api\Store\Order;
 
-use App\Enums\DeliveryType;
-use App\Enums\PaymentType;
 use App\Models\Selection;
 use App\Models\Store;
 use App\Rules\Order\ProductArray;
-use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRequest extends FormRequest
+class StoreRequest extends UpdateRequest
 {
     public function rules(): array
     {
-        return [
-            'delivery_type' => ['bail', 'required', 'in:' . implode(',', DeliveryType::values())],
-            'payment_type' => ['bail', 'required', 'in:' . implode(',', PaymentType::values())],
+        $rules = parent::rules();
 
-            'first_name' => ['bail', 'required'],
-            'last_name' => ['bail', 'required'],
-            'email' => ['bail', 'required', 'email'],
-            'country' => ['bail', 'required'],
-            'city' => ['bail', 'required'],
-            'address' => ['bail', 'required'],
-            'zip' => ['bail', 'required'],
+        $rules['products'] = ['required', new ProductArray];
 
-            'products' => ['required', new ProductArray],
-        ];
+        return $rules;
     }
 
     protected function passedValidation(): void
     {
+        $data = $this->passedValidationData();
+
         $products = [];
 
         foreach ($this->get('products') as $key => $value) {
@@ -45,17 +35,8 @@ class StoreRequest extends FormRequest
             $selection->quantity = $products[$selection->id];
         }
 
-        $this->merge([
-            'delivery_address' => [
-                'first_name' => $this->get('first_name'),
-                'last_name' => $this->get('last_name'),
-                'email' => $this->get('email'),
-                'country' => $this->get('country'),
-                'city' => $this->get('city'),
-                'address' => $this->get('address'),
-                'zip' => $this->get('zip'),
-            ],
-            'products' => $selections,
-        ]);
+        $data['products'] = $selections;
+
+        $this->merge($data);
     }
 }
