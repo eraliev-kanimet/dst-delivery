@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\AcceptLanguageMiddleware;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\CurrentStoreMiddleware;
 use App\Http\Middleware\EncryptCookies;
@@ -56,5 +57,6 @@ class Kernel extends HttpKernel
         'signed' => ValidateSignature::class,
         'throttle' => ThrottleRequests::class,
         'store' => CurrentStoreMiddleware::class,
+        'language.api' => AcceptLanguageMiddleware::class,
     ];
 }

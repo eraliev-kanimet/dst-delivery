@@ -11,8 +11,6 @@ class BannerController extends Controller
 {
     public function index()
     {
-        BannerResource::$locale = config('app.locale');
-
         $now = now();
 
         $banners = Banner::whereStoreId(Store::current()->id)

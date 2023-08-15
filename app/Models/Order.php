@@ -42,6 +42,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function orderItemsWithProduct(): HasMany
+    {
+        return $this->orderItems()->with('product');
+    }
+
     protected static function boot(): void
     {
         parent::boot();
@@ -49,5 +54,10 @@ class Order extends Model
         self::creating(function (self $order) {
             $order->uuid = time();
         });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 }

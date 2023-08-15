@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\BaseResource;
 use App\Models\Store;
 use Closure;
 use Illuminate\Http\Request;
@@ -35,6 +36,8 @@ class CurrentStoreMiddleware
         }
 
         App::setLocale($locale);
+
+        BaseResource::$locale = $locale;
 
         return $next($request);
     }

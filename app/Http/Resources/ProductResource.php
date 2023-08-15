@@ -3,10 +3,11 @@
 namespace App\Http\Resources;
 
 use App\Models\Attribute;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\Content;
 use App\Models\Selection;
+use App\Service\ProductSelectionService;
+use App\Service\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -26,7 +27,7 @@ class ProductResource extends BaseResource
 
         return [
             'id' => $this->resource->id,
-            'category' => $this->category($this->resource->category),
+            'category' => ProductService::new()->category($this->resource->category, $locale),
             'name' => $content->name,
             'description' => $content->description,
             'is_available' => (bool)$this->resource->is_available,
@@ -37,22 +38,10 @@ class ProductResource extends BaseResource
         ];
     }
 
-    protected function category(?Category $category): ?array
-    {
-        if ($category) {
-            return [
-                'id' => $category->id,
-                'name' => $category->name[self::$locale],
-                'category' => $this->category($category->category),
-            ];
-        }
-
-        return null;
-    }
-
     public function getAttributes(Collection|array $attributes): array
     {
         $locale = self::$locale;
+        $service = ProductService::new();
         $array = [];
 
         /** @var Attribute $attribute */
@@ -60,46 +49,29 @@ class ProductResource extends BaseResource
             $array[] = [
                 'attribute' => $attribute->attribute,
                 'name' => __('common.attributes.' . $attribute->attribute),
-                'value' => $this->getAttributeValue($attribute->type, $attribute->{'value' . $attribute->type}, $locale)
+                'value' => $service->getAttributeValue($attribute->type, $attribute->{'value' . $attribute->type}, $locale)
             ];
         }
 
         return $array;
     }
 
-    protected function getAttributeValue(int $type, array|string $value, string $locale)
-    {
-        return match ($type) {
-            1 => $value[$locale],
-            default => $value
-        };
-    }
-
     protected function getSelections(Collection $selections): array
     {
         $locale = self::$locale;
+        $service = ProductSelectionService::new();
 
         $array = [];
 
         /** @var Selection $selection */
         foreach ($selections as $selection) {
-            $attributes = [];
-
-            foreach ($selection->properties ?? [] as $attribute) {
-                $attributes[] = [
-                    'attribute' => $attribute['attribute'],
-                    'name' => __('common.attributes.' . $attribute['attribute']),
-                    'value' => $this->getAttributeValue($attribute['type'], $attribute['value' . $attribute['type']], $locale)
-                ];
-            }
-
             $array[] = [
                 'id' => $selection->id,
                 'quantity' => $selection->quantity,
                 'price' => $selection->price,
                 'is_available' => $selection->is_available,
                 'images' => getImages($selection->images ?? []),
-                'attributes' => $attributes,
+                'attributes' => $service->getAttributes($selection->properties ?? [], $locale),
             ];
         }
 

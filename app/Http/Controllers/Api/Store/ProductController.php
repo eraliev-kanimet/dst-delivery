@@ -8,7 +8,6 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\Store;
 use App\Service\ApiProductService;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductController extends Controller
 {
@@ -22,8 +21,6 @@ class ProductController extends Controller
         $store = Store::current();
         $locale = config('app.locale');
 
-        ProductResource::$locale = $locale;
-
         $this->apiProductService->setStoreId($store->id);
         $this->apiProductService->setLimit($request->get('limit', 15));
         $this->apiProductService->setCategoryId($request->get('category_id'));
@@ -32,16 +29,16 @@ class ProductController extends Controller
         return ProductResource::collection($this->apiProductService->all($request, $locale));
     }
 
-    public function show(Product $product)
+    public function show(string $id)
     {
         $store = Store::current();
 
-        ProductResource::$locale = config('app.locale');
+        $product = Product::whereStoreId($store->id)->whereId($id)->whereHas('selections')->first();
 
-        if ($product->store_id == $store->id && $product->selections->count()) {
+        if ($product) {
             return new ProductResource($product);
         }
 
-        throw new NotFoundHttpException('Product was not found!');
+        return response()->json([], 404);
     }
 }
