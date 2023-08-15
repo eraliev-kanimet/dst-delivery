@@ -7,9 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Store\Order\StoreRequest;
 use App\Http\Requests\Api\Store\Order\UpdateRequest;
 use App\Http\Resources\OrderResource;
+use App\Models\OrderItem;
 use App\Service\ApiOrderService;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\Store\Order\IndexRequest;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -86,6 +88,30 @@ class OrderController extends Controller
     public function productAdd($request)
     {}
 
-    public function productRemove($request)
-    {}
+    public function productRemove(string $id)
+    {
+        $orderItem = OrderItem::find($id);
+
+        if ($orderItem) {
+            $order = $orderItem->order;
+
+            if ($order->customer_id != Auth::user()->id) {
+                return response()->json([], 403);
+            }
+
+            if ($order->orderItems()->count() == 1) {
+                return response()->json(errors(__('validation2.order_api.text1')), 422);
+            }
+
+            if ($order->status == OrderStatus::pending_payment->value) {
+                $orderItem->delete();
+
+                return new OrderResource($order);
+            }
+
+            return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
+        }
+
+        return response()->json([], 404);
+    }
 }
