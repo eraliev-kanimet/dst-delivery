@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Service\ProductSelectionService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -9,19 +10,18 @@ class OrderItem extends Model
 {
     protected $fillable = [
         'order_id',
-        'product_id',
+        'product',
         'quantity',
         'price',
+    ];
+
+    protected $casts = [
+        'product' => 'array',
     ];
 
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
-    }
-
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Selection::class);
     }
 
     public $timestamps = false;
@@ -30,8 +30,23 @@ class OrderItem extends Model
     {
         parent::boot();
 
-        self::creating(function (self $item) {
-            $item->price = $item->product->price;
+        self::updating(function (self $item) {
+            $item->updateProduct();
         });
+
+        self::creating(function (self $item) {
+            $item->updateProduct();
+        });
+    }
+
+    protected function updateProduct(): void
+    {
+        $selection = Selection::find($this->product['selection_id']);
+
+        if ($selection) {
+            $this->product = ProductSelectionService::new()->creatingProductForOrder($selection);
+
+            $this->price = $selection->price;
+        }
     }
 }

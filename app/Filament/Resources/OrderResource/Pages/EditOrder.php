@@ -11,7 +11,6 @@ use Exception;
 use Filament\Pages\Actions;
 use Filament\Resources\Form;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Collection;
 
 class EditOrder extends EditRecord
 {
@@ -22,16 +21,31 @@ class EditOrder extends EditRecord
      */
     public $record;
 
-    public array|Collection $products = [];
+    public array $products = [];
+    public array $items = [];
 
     public function mount($record): void
     {
         $this->record = $this->resolveRecord($record);
 
-        $this->products = ProductSelectionService::new()->getSelectSelection(
+        $products = ProductSelectionService::new()->getSelectSelection(
             $this->record->store_id,
             $this->record->store->fallback_locale
         );
+
+        $items = [];
+
+        foreach ($this->record->orderItems as $item) {
+            $selection_id = $item->product['selection_id'];
+
+            if (!isset($products[$selection_id])) {
+                $items[$selection_id] = true;
+            }
+        }
+
+        $this->items = $items;
+
+        $this->products = $this->getSelectionFromOrderItems($products, config('app.locale'), $this->record->store->fallback_locale);
 
         $this->authorizeAccess();
 
@@ -40,9 +54,40 @@ class EditOrder extends EditRecord
         $this->previousUrl = url()->previous();
     }
 
+    protected function getSelectionFromOrderItems(array $products, string $locale, string $fallback_locale): array
+    {
+        $service = ProductSelectionService::new();
+
+        foreach ($this->record->orderItems as $orderItem) {
+            $product = $orderItem->product;
+
+            if (isset($products[$product['selection_id']])) {
+                continue;
+            }
+
+            $name = '';
+
+            if (isset($product["content_$locale"])) {
+                $name = $product["content_$locale"]['name'];
+            } else {
+                if (isset($product["content_$fallback_locale"])) {
+                    $name = $product["content_$fallback_locale"]['name'];
+                }
+            }
+
+            $name = $name . ': ' . __('common.price') . ' ' . $orderItem->price;
+            $name .= ', ' . __('common.quantity') . ' ' . $orderItem->quantity;
+            $name .= ', ' . $service->getPropertiesToString($product['attributes'], $locale, $fallback_locale, 5);
+
+            $products[$product['selection_id']] = $name;
+        }
+
+        return $products;
+    }
+
     protected function form(Form $form): Form
     {
-        $resourceForm = new OrderResourceForm(true, products: $this->products);
+        $resourceForm = new OrderResourceForm(true, products: $this->products, items: $this->items);
 
         return $form->schema($resourceForm->form())
             ->columns(1)

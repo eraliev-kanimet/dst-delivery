@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Models\Product;
+use App\Models\Selection;
 use Illuminate\Database\Eloquent\Builder;
 
 class ProductSelectionService
@@ -12,7 +13,7 @@ class ProductSelectionService
         return new self;
     }
 
-    public function getSelectSelection($store_id, string $fallback_locale): array
+    public function getSelectSelection(int $store_id, string $fallback_locale): array
     {
         $locale = config('app.locale');
 
@@ -23,7 +24,7 @@ class ProductSelectionService
         ])
             ->whereStoreId($store_id)
             ->whereHas('selections', function (Builder $query) {
-                $query->whereNot('price', 0);
+                $query->whereNot('price', 0)->whereNot('quantity', 0);
             })
             ->whereIsAvailable(true)
             ->get(['id']);
@@ -49,11 +50,16 @@ class ProductSelectionService
         return $array;
     }
 
-    protected function getPropertiesToString(array|null $properties, string $locale, string $fallback_locale): string
+    public function getPropertiesToString(array|null $properties, string $locale, string $fallback_locale, $limit = 10): string
     {
         $attributes = '';
 
+        $count = 0;
         foreach ($properties ?? [] as $attribute) {
+            if ($count == $limit) {
+                break;
+            }
+
             if ($attribute['type'] == 1) {
                 $value = $attribute['value' . $attribute['type']][$locale];
 
@@ -65,6 +71,8 @@ class ProductSelectionService
             }
 
             $attributes .= __('common.attributes.' . $attribute['attribute']) . ': ' . $value . ', ';
+
+            $count++;
         }
 
         return trim($attributes, ', ');
@@ -85,5 +93,53 @@ class ProductSelectionService
         }
 
         return $attributes;
+    }
+
+    public function creatingProductForOrder(Selection $selection): array
+    {
+        $product = $selection->product;
+
+        $contents = [];
+
+        foreach (array_keys(config('app.locales')) as $locale) {
+            if ($product->{"content_$locale"}) {
+                $contents["content_$locale"] = [
+                    'name' => $product->{"content_$locale"}->name,
+                    'description' => $product->{"content_$locale"}->description,
+                ];
+            }
+        }
+
+        $attributes = [];
+
+        foreach ($product->productAttributes as $attribute) {
+            $attributes[$attribute->attribute] = [
+                'attribute' => $attribute->attribute,
+                'type' => $attribute->type,
+                'value1' => $attribute->value1,
+                'value2' => $attribute->value2,
+            ];
+        }
+
+        foreach ($selection->properties as $attribute) {
+            $attributes[$attribute['attribute']] = [
+                'attribute' => $attribute['attribute'],
+                'type' => $attribute['type'],
+                'value1' => $attribute['value1'] ?? [],
+                'value2' => $attribute['value2'] ?? null,
+            ];
+        }
+
+        return [
+            'product_id' => $product->id,
+            'selection_id' => $selection->id,
+            'category' => [
+                'id' => $product->category->id,
+                'name' => $product->category->name,
+            ],
+            ...$contents,
+            'images' => array_merge($product->images->values ?? [], $selection->images ?? []),
+            'attributes' => $attributes,
+        ];
     }
 }

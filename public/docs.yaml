@@ -187,7 +187,6 @@ paths:
         - $ref: '#/components/parameters/Limit'
         - $ref: '#/components/parameters/BearerToken'
         - $ref: '#/components/parameters/OrderStatus'
-        - $ref: '#/components/parameters/OrderWithProduct'
       responses:
         '200':
           $ref: '#/components/responses/BlankResponse'
@@ -217,7 +216,6 @@ paths:
         - $ref: '#/components/parameters/AcceptLanguage'
         - $ref: '#/components/parameters/StoreUuid'
         - $ref: '#/components/parameters/BearerToken'
-        - $ref: '#/components/parameters/OrderWithProduct'
         - $ref: '#/components/parameters/ID'
       responses:
         '200':
@@ -675,13 +673,3 @@ components:
       description: Status of order
       schema:
         type: integer
-    OrderWithProduct:
-      name: withProduct
-      in: query
-      required: false
-      description: Receiving orders with products
-      schema:
-        type: integer
-        enum:
-          - 0
-          - 1

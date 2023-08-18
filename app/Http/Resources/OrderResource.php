@@ -6,13 +6,11 @@ use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentType;
 use App\Models\Order;
-use App\Models\Selection;
+use App\Service\ProductSelectionService;
 use Illuminate\Http\Request;
 
 class OrderResource extends BaseResource
 {
-    public static bool $withProduct = false;
-
     /**
      * @var Order
      */
@@ -37,52 +35,35 @@ class OrderResource extends BaseResource
 
     protected function getOrderItems(): array
     {
-        $withProduct = self::$withProduct;
+        $locale = self::$locale;
+        $service = ProductSelectionService::new();
 
         $items = [];
 
-        if ($withProduct) {
-            $orderItems = $this->resource->orderItemsWithProduct;
-        } else {
-            $orderItems = $this->resource->orderItems;
-        }
+        foreach ($this->resource->orderItems as $order) {
+            $product = $order->product;
 
-        foreach ($orderItems as $order) {
             $item = [
                 'id' => $order->id,
-                'selection_id' => $order->product_id,
+                'product' => [
+                    'product_id' => $product['product_id'],
+                    'selection_id' => $product['selection_id'],
+                    'name' => $product["content_$locale"]['name'],
+                    'description' => $product["content_$locale"]['description'],
+                    'category' => [
+                        'id' => $product['category']['id'],
+                        'name' => $product['category']['name'][$locale],
+                    ],
+                    'images' => getImages($product['images']),
+                    'attributes' => $service->getAttributes($product['attributes'], $locale)
+                ],
                 'quantity' => $order->quantity,
                 'price' => $order->price,
             ];
-
-            if ($withProduct) {
-                $item['product'] = $this->product($order->product);
-            }
 
             $items[] = $item;
         }
 
         return $items;
-    }
-
-    protected function product(Selection $product): array
-    {
-        $locale = self::$locale;
-
-        return [
-            'selection_id' => $product->id,
-            'product_id' => $product->product_id,
-            'name' => $product->product->{"content_$locale"}->name,
-            'category' => [
-                'id' => $product->product->category->id,
-                'name' => $product->product->category->name[$locale],
-            ],
-            'images' => getImages(
-                array_unique(
-                    array_merge($product->images ?? [], $product->product->images->values ?? [])
-                )
-            ),
-            'is_available' => $product->is_available && $product->product->is_available,
-        ];
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Selection;
 use App\Models\Store;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ApiOrderService
 {
@@ -37,15 +38,13 @@ class ApiOrderService
 
         $order->actionTotalCostRecalculation();
 
-        OrderResource::$withProduct = true;
-
         return new OrderResource($order);
     }
 
-    public function getAll(bool $withProduct, bool|int $status = false, int $limit = 15): AnonymousResourceCollection
+    public function getAll(bool|int $status = false, int $limit = 15): AnonymousResourceCollection
     {
         $orders = Order::query()
-            ->with($withProduct ? 'orderItemsWithProduct' : 'orderItems')
+            ->with('orderItems')
             ->whereStoreId(Store::current()->id)
             ->whereCustomerId(Auth::user()->id);
 
@@ -53,16 +52,17 @@ class ApiOrderService
             $orders->whereStatus($status);
         }
 
-        OrderResource::$withProduct = $withProduct;
-
         return OrderResource::collection($orders->paginate($limit));
     }
 
     public function getByUuid(string $uuid): ?Order
     {
-        return Order::whereStoreId(Store::current()->id)
-            ->whereCustomerId(Auth::user()->id)
-            ->whereUuid($uuid)
-            ->first();
+        $order = Order::whereUuid($uuid)->first();
+
+        if ($order) {
+            return $order;
+        }
+
+        throw new NotFoundHttpException('Order not found!');
     }
 }

@@ -52,7 +52,7 @@ class CustomerResource extends Resource
                     ->regex('/^\+\d{1,}$/')
                     ->hidden(fn(Closure $get) => is_null($get('store_id')))
                     ->unique(
-                        ignorable: fn(Model $record) => $record,
+                        ignorable: fn(?Model $record) => $record,
                         callback: fn(Unique $rule, Closure $get) => $rule->where('store_id', $get('store_id')))
                     ->required(),
                 $helper->toggle('active')

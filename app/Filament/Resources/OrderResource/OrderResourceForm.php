@@ -17,7 +17,8 @@ class OrderResourceForm
     public function __construct(
         protected bool $edited = false,
         protected array|Collection $stores = [],
-        protected array|Collection $products = [],
+        protected array $products = [],
+        protected array $items = [],
     )
     {
         $this->helper = new FilamentHelper;
@@ -32,20 +33,37 @@ class OrderResourceForm
         if ($this->edited) {
             $tabs[] = $this->helper->tab('Products', [
                 $this->helper->repeater('orderItems', [
-                    $this->helper->select('product_id')
+                    $this->helper->hidden('product'),
+                    $this->helper->select('product.selection_id')
                         ->options($this->products)
                         ->label('Product')
                         ->required()
                         ->reactive()
+                        ->disabled(function (Closure $get) {
+                            return isset($this->items[$get('product.selection_id')]);
+                        })
                         ->searchable(),
                     $this->helper->input('quantity')
                         ->numeric()
                         ->default(1)
                         ->minValue(1)
                         ->maxValue(function (Closure $get) {
-                            $product_id = $get('product_id');
+                            $selection_id = $get('product.selection_id');
 
-                            return is_null($product_id) ? 0 : Selection::find($product_id)->quantity;
+                            if (is_null($selection_id)) {
+                                return 0;
+                            }
+
+                            $selection = Selection::find($selection_id);
+
+                            if ($selection) {
+                                return $selection->quantity;
+                            }
+
+                            return $get('quantity');
+                        })
+                        ->disabled(function (Closure $get) {
+                            return isset($this->items[$get('product.selection_id')]);
                         })
                         ->required()
                 ])->relationship()

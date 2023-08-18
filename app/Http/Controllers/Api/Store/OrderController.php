@@ -13,9 +13,9 @@ use App\Models\OrderItem;
 use App\Models\Selection;
 use App\Models\Store;
 use App\Service\ApiOrderService;
-use Illuminate\Http\Request;
 use App\Http\Requests\Api\Store\Order\IndexRequest;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class OrderController extends Controller
 {
@@ -27,7 +27,6 @@ class OrderController extends Controller
     public function index(IndexRequest $request)
     {
         return $this->service->getAll(
-            $request->get('withProduct', 0),
             $request->get('status', false),
             $request->get('limit', 15),
         );
@@ -38,87 +37,65 @@ class OrderController extends Controller
         return $this->service->create($request->all());
     }
 
-    public function show(string $uuid, Request $request)
+    public function show(string $uuid)
     {
-        $request->validate([
-            'withProduct' => ['nullable', 'in:0,1'],
-        ]);
-
-        $order = $this->service->getByUuid($uuid);
-
-        if ($order) {
-            OrderResource::$withProduct = $request->get('withProduct', 0);
-
-            return new OrderResource($order);
-        }
-
-        return response()->json([], 404);
+        return new OrderResource($this->service->getByUuid($uuid));
     }
 
     public function update(UpdateRequest $request, string $uuid)
     {
         $order = $this->service->getByUuid($uuid);
 
-        if ($order) {
-            if ($order->status == OrderStatus::pending_payment->value) {
-                $order->update($request->all());
+        if ($order->status == OrderStatus::pending_payment->value) {
+            $order->update($request->all());
 
-                return new OrderResource($order);
-            }
-
-            return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
+            return new OrderResource($order);
         }
 
-        return response()->json([], 404);
+        return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
     }
 
     public function cancel(string $uuid)
     {
         $order = $this->service->getByUuid($uuid);
 
-        if ($order) {
-            if ($order->status == OrderStatus::pending_payment->value) {
-                $order->actionCancel();
+        if ($order->status == OrderStatus::pending_payment->value) {
+            $order->actionCancel();
 
-                return new OrderResource($order);
-            }
-
-            return response()->json(errors(__('validation2.an_order_cannot_be_canceled')), 422);
+            return new OrderResource($order);
         }
 
-        return response()->json([], 404);
+        return response()->json(errors(__('validation2.an_order_cannot_be_canceled')), 422);
     }
 
     public function itemAdd(ItemStoreRequest $request)
     {
         $order = $this->service->getByUuid($request->get('order_id'));
 
-        if ($order) {
-            if ($order->status == OrderStatus::pending_payment->value) {
-                $selection = Selection::whereRelation('product', 'store_id', Store::current()->id)
-                    ->whereId($request->get('selection_id'))
-                    ->first();
+        if ($order->status == OrderStatus::pending_payment->value) {
+            $selection = Selection::whereRelation('product', 'store_id', Store::current()->id)
+                ->whereId($request->get('selection_id'))
+                ->first();
 
-                if ($selection) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $selection->id,
-                        'quantity' => $request->get('quantity'),
-                        'price' => $selection->price,
-                    ]);
+            if ($selection) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product' => [
+                        'selection_id' => $selection->id
+                    ],
+                    'quantity' => $request->get('quantity'),
+                    'price' => $selection->price,
+                ]);
 
-                    $order->actionTotalCostRecalculation();
+                $order->actionTotalCostRecalculation();
 
-                    return new OrderResource($order);
-                }
-
-                return response()->json(errors(__('validation2.order_api.text2')), 404);
+                return new OrderResource($order);
             }
 
-            return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
+            return response()->json(errors(__('validation2.order_api.text2')), 404);
         }
 
-        return response()->json([], 404);
+        return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
     }
 
     public function itemUpdate(ItemUpdateRequest $request)
@@ -141,7 +118,7 @@ class OrderController extends Controller
             return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
         }
 
-        return response()->json([], 404);
+        throw new NotFoundHttpException('Order item not found!');
     }
 
     public function itemRemove(string $id)
@@ -168,6 +145,6 @@ class OrderController extends Controller
             return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
         }
 
-        return response()->json([], 404);
+        throw new NotFoundHttpException('Order item not found!');
     }
 }

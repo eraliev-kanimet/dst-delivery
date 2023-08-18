@@ -127,8 +127,8 @@ class FilamentHelper
         return DateTimePicker::make($model);
     }
 
-    public function hidden(string $model, mixed $default)
+    public function hidden(string $model)
     {
-        return Hidden::make($model)->default($default);
+        return Hidden::make($model);
     }
 }

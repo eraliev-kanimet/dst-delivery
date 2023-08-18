@@ -10,7 +10,6 @@ class IndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'withProduct' => ['nullable', 'in:0,1'],
             'limit' => ['nullable', 'numeric'],
             'status' => ['nullable', 'in:' . implode(',', OrderStatus::values())],
         ];
