@@ -4,11 +4,11 @@ namespace App\Filament\Resources\ProductResource;
 
 use App\Helpers\FilamentHelper;
 use App\Service\ProductService;
-use Closure;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
-use Nuhel\FilamentCroppie\Components\Croppie;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 
 final class ProductResourceForm
 {
@@ -70,16 +70,18 @@ final class ProductResourceForm
                             ->minValue(0)
                             ->required()
                             ->numeric(),
+                        $this->helper->toggle('is_available')
+                            ->default(true),
                     ]),
-                    $this->helper->toggle('is_available')
-                        ->default(true),
-                    $this->helper->image('images')->multiple(),
+                    $this->helper->image('images')
+                        ->multiple()
+                        ->imageEditor(),
                     $this->attributesRepeater('properties'),
                 ])
                     ->relationship('selections')
                     ->required()
                     ->label('')
-                    ->createItemButtonLabel('Add selection')
+                    ->addActionLabel('Add selection')
                     ->mutateRelationshipDataBeforeSaveUsing(function ($data) {
                         $data['properties'] = removeEmptyElements($data['properties']);
 
@@ -89,10 +91,8 @@ final class ProductResourceForm
         }
 
         $tabs[] = $this->helper->tab('Images', [
-            Croppie::make('images')
-                ->imageResizeTargetHeight(500)
-                ->imageResizeTargetWidth(500)
-                ->modalSize('xl')
+            $this->helper->image('images')
+                ->imageEditor()
                 ->multiple()
                 ->required()
         ]);
@@ -131,7 +131,7 @@ final class ProductResourceForm
         return $this->helper->tab('Attributes', [$repeater]);
     }
 
-    protected function attributesRepeater(string $model = 'attributes'): Repeater
+    protected function attributesRepeater(string $model = 'productAttributes'): Repeater
     {
         $productService = ProductService::new();
 
@@ -145,7 +145,7 @@ final class ProductResourceForm
         if ($this->edit) {
             $schema[] = Hidden::make('type');
             $schema[] = $this->helper->tabsInput('value1', $this->locales, true, 'Value')
-                ->visible(function (Closure $get, Closure $set) use ($productService) {
+                ->visible(function (Get $get, Set $set) use ($productService) {
                     if ($productService->isAttributeType1($get('attribute'))) {
                         $set('type', 1);
 
@@ -155,7 +155,7 @@ final class ProductResourceForm
                     return false;
                 });
             $schema[] = $this->helper->input('value2')
-                ->visible(function (Closure $get, Closure $set) use ($productService) {
+                ->visible(function (Get $get, Set $set) use ($productService) {
                     if ($productService->isAttributeType2($get('attribute'))) {
                         $set('type', 2);
 
@@ -166,16 +166,15 @@ final class ProductResourceForm
                 })->label('Value');
         } else {
             $schema[] = $this->helper->tabsInput('value1', $this->locales, true, 'Value')
-                ->visible(fn(Closure $get) => $productService->isAttributeType1($get('attribute')));
+                ->visible(fn(Get $get) => $productService->isAttributeType1($get('attribute')));
             $schema[] = $this->helper->input('value2')
-                ->visible(fn(Closure $get) => $productService->isAttributeType2($get('attribute')))
+                ->visible(fn(Get $get) => $productService->isAttributeType2($get('attribute')))
                 ->label('Value');
         }
 
         return $this->helper->repeater($model, $schema)
             ->label('')
             ->required()
-            ->createItemButtonLabel('Add attribute');
+            ->addActionLabel('Add attribute');
     }
 }
-

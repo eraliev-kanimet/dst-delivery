@@ -7,17 +7,15 @@ use App\Filament\Resources\ProductResource\ProductResourceForm;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Content;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditProduct extends EditRecord
 {
     protected static string $resource = ProductResource::class;
 
-    /**
-     * @var Product
-     */
-    public $record;
+    public string|int|null|Model|Product $record;
 
     public array $categories = [];
     public array $locales = [];
@@ -77,7 +75,7 @@ class EditProduct extends EditRecord
         return $data;
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
         $productForm = ProductResourceForm::create();
 
@@ -85,7 +83,8 @@ class EditProduct extends EditRecord
         $productForm->setLocales($this->locales);
         $productForm->setCategoryDisabled($this->category_disabled);
 
-        return $form->schema($productForm->form())->columns(1);
+        return parent::form($form->schema($productForm->form()))
+            ->columns(1);
     }
 
     public function afterSave(): void

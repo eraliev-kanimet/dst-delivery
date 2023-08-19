@@ -10,8 +10,9 @@ use App\Models\Product;
 use App\Models\Content;
 use App\Models\Store;
 use App\Service\ProductService;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -19,10 +20,7 @@ class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;
 
-    /**
-     * @var Product
-     */
-    public $record;
+    public null|Model|Product $record;
 
     public int $store_id = 0;
     public array $locales = [];
@@ -54,7 +52,7 @@ class CreateProduct extends CreateRecord
         parent::mount();
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
         $productForm = ProductResourceForm::create();
 
@@ -62,7 +60,8 @@ class CreateProduct extends CreateRecord
         $productForm->setCategories($this->categories);
         $productForm->setLocales($this->locales);
 
-        return $form->schema($productForm->form())->columns(1);
+        return parent::form($form->schema($productForm->form()))
+            ->columns(1);
     }
 
     public function create(bool $another = false): void
@@ -86,7 +85,7 @@ class CreateProduct extends CreateRecord
             ]);
         }
 
-        ProductService::new()->createAttributes($data['attributes'], $this->record->id);
+        ProductService::new()->createAttributes($data['productAttributes'], $this->record->id);
 
         $this->getCreatedNotification()?->send();
 
