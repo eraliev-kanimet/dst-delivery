@@ -6,8 +6,8 @@ use App\Filament\Resources\BannerResource;
 use App\Filament\Resources\BannerResource\BannerResourceForm;
 use App\Models\Store;
 use Exception;
-use Filament\Pages\Actions;
-use Filament\Resources\Form;
+use Filament\Actions\DeleteAction;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +18,7 @@ class EditBanner extends EditRecord
 
     public Collection|array $stores = [];
 
-    public function mount($record): void
+    public function mount(int|string $record): void
     {
         $user = Auth::user();
 
@@ -40,9 +40,9 @@ class EditBanner extends EditRecord
         return $data;
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
-        return $form->schema(BannerResourceForm::form($this->stores));
+        return parent::form($form->schema(BannerResourceForm::form($this->stores)));
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
@@ -55,10 +55,10 @@ class EditBanner extends EditRecord
     /**
      * @throws Exception
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

@@ -7,7 +7,7 @@ use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Store;
 use App\Service\ProductService;
-use Closure;
+use Filament\Forms\Get;
 use Illuminate\Support\Collection;
 
 class BannerResourceForm
@@ -36,11 +36,11 @@ class BannerResourceForm
                 ->reactive(),
             $helper->input('type_url')
                 ->required()
-                ->visible(fn(Closure $get) => $get('type') == 'url')
+                ->visible(fn(Get $get) => $get('type') == 'url')
                 ->columnSpan(2)
                 ->label('URL'),
             $helper->select('type_product')
-                ->options(function (Closure $get) {
+                ->options(function (Get $get) {
                     $store_id = $get('store_id');
 
                     if ($store_id) {
@@ -50,11 +50,11 @@ class BannerResourceForm
                     return [];
                 })
                 ->required()
-                ->visible(fn(Closure $get) => $get('type') == 'product')
+                ->visible(fn(Get $get) => $get('type') == 'product')
                 ->columnSpan(2)
                 ->label('Product'),
             $helper->select('type_category')
-                ->options(function (Closure $get) {
+                ->options(function (Get $get) {
                     $store_id = $get('store_id');
 
                     if ($store_id) {
@@ -68,7 +68,7 @@ class BannerResourceForm
                     return [];
                 })
                 ->required()
-                ->visible(fn(Closure $get) => $get('type') == 'category')
+                ->visible(fn(Get $get) => $get('type') == 'category')
                 ->columnSpan(2)
                 ->label('Category'),
             $helper->dateTime('start_date')
@@ -77,9 +77,9 @@ class BannerResourceForm
                 ->minDate(now()),
             $helper->dateTime('end_date')
                 ->required()
-                ->hidden(fn(Closure $get) => is_null($get('start_date')))
+                ->hidden(fn(Get $get) => is_null($get('start_date')))
                 ->minDate(fn ($get) => $get('start_date')),
-            $helper->tabs(function (Closure $get) use ($helper) {
+            $helper->tabs(function (Get $get) use ($helper) {
                 $store_id = $get('store_id');
 
                 if ($store_id) {
@@ -88,6 +88,7 @@ class BannerResourceForm
                     foreach (filterAvailableLocales(Store::find($store_id)->locales) as $locale => $name) {
                         $tabs[] = $helper->tab('Image ' . $name, [
                             $helper->image("image.$locale")
+                                ->imageEditor()
                                 ->label('')
                                 ->required()
                         ]);
@@ -99,7 +100,7 @@ class BannerResourceForm
                 return [];
             })
                 ->columnSpan(2)
-                ->hidden(fn(Closure $get) => is_null($get('store_id'))),
+                ->hidden(fn(Get $get) => is_null($get('store_id'))),
             $helper->toggle('active')
                 ->columnSpan(2)
                 ->default(true),

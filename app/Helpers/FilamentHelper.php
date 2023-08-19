@@ -64,7 +64,7 @@ class FilamentHelper
 
     public function select(string $model): Select
     {
-        return Select::make($model);
+        return Select::make($model)->native(false);
     }
 
     public function image(string $model): FileUpload
@@ -124,7 +124,7 @@ class FilamentHelper
 
     public function dateTime(string $model): DateTimePicker
     {
-        return DateTimePicker::make($model);
+        return DateTimePicker::make($model)->native(false);
     }
 
     public function hidden(string $model)
