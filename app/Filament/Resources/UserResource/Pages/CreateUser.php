@@ -6,7 +6,7 @@ use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\UserResourceForm;
 use App\Models\Role;
 use App\Models\Store;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -40,11 +40,11 @@ class CreateUser extends CreateRecord
         return $data;
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
-        return $form->schema(UserResourceForm::form(
+        return parent::form($form->schema(UserResourceForm::form(
             $this->stores,
             $this->roles,
-        ))->columns(2);
+        )));
     }
 }

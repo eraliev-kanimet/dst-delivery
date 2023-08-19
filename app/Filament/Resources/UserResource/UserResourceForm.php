@@ -4,7 +4,7 @@ namespace App\Filament\Resources\UserResource;
 
 use App\Helpers\FilamentHelper;
 use App\Models\Store;
-use Closure;
+use Filament\Forms\Get;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -52,7 +52,7 @@ class UserResourceForm
         $schema[] = $helper->checkbox('stores_permission', $stores)
             ->required()
             ->columns()
-            ->visible(fn(Closure $get) => $get('role_id') == 3)
+            ->visible(fn(Get $get) => $get('role_id') == 3)
             ->columnSpan(2)
             ->dehydrateStateUsing(function ($state) {
                 $array = [];

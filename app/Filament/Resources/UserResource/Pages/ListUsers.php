@@ -4,8 +4,9 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use Exception;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,7 +23,7 @@ class ListUsers extends ListRecords
     /**
      * @throws Exception
      */
-    protected function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -34,5 +35,12 @@ class ListUsers extends ListRecords
                 EditAction::make(),
             ])
             ->bulkActions([]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            CreateAction::make()
+        ];
     }
 }
