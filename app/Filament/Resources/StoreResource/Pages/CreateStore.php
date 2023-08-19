@@ -5,7 +5,7 @@ namespace App\Filament\Resources\StoreResource\Pages;
 use App\Filament\Resources\StoreResource;
 use App\Models\Category;
 use App\Models\User;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Collection;
 
@@ -24,13 +24,13 @@ class CreateStore extends CreateRecord
         parent::mount();
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
         $resourceForm = new StoreResource\StoreResourceForm(
             $this->categories,
             $this->users,
         );
 
-        return $resourceForm->form($form);
+        return parent::form($resourceForm->form($form));
     }
 }

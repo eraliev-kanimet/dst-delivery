@@ -4,8 +4,8 @@ namespace App\Filament\Resources\StoreResource;
 
 use App\Helpers\FilamentHelper;
 use App\Models\Category;
-use Closure;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Illuminate\Support\Collection;
 
 class StoreResourceForm
@@ -24,7 +24,7 @@ class StoreResourceForm
 
     public function form(Form $form): Form
     {
-        return $form->schema($this->getSchema())->columns($this->isAdmin ? 2 : 1);
+        return $form->schema($this->getSchema());
     }
 
     protected function getSchema(): array
@@ -64,9 +64,9 @@ class StoreResourceForm
                     ->columns(count($locales)),
                 $this->helper->radio(
                     'fallback_locale',
-                    fn(Closure $get) => filterAvailableLocales($get('locales'))
-                )->hidden(fn(Closure $get) => !count($get('locales')))
-                    ->required(fn(Closure $get) => count($get('locales')))
+                    fn(Get $get) => filterAvailableLocales($get('locales'))
+                )->hidden(fn(Get $get) => !count($get('locales')))
+                    ->required(fn(Get $get) => count($get('locales')))
                     ->inline(),
             ];
         }
