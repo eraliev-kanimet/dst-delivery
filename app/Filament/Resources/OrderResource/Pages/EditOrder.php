@@ -8,23 +8,22 @@ use App\Filament\Resources\OrderResource\OrderResourceForm;
 use App\Models\Order;
 use App\Service\ProductSelectionService;
 use Exception;
-use Filament\Pages\Actions;
-use Filament\Resources\Form;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditOrder extends EditRecord
 {
     protected static string $resource = OrderResource::class;
 
-    /**
-     * @var Order
-     */
-    public $record;
+    public string|int|null|Model|Order $record;
 
     public array $products = [];
     public array $deleted_products = [];
 
-    public function mount($record): void
+    public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
 
@@ -74,7 +73,7 @@ class EditOrder extends EditRecord
         $this->deleted_products = $products;
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
         $resourceForm = new OrderResourceForm(
             true,
@@ -82,9 +81,10 @@ class EditOrder extends EditRecord
             deleted_products: $this->deleted_products
         );
 
-        return $form->schema($resourceForm->form())
-            ->columns(1)
-            ->disabled(in_array($this->record->status, [5, 6, 7]));
+        return parent::form(
+            $form->schema($resourceForm->form())
+                ->disabled(in_array($this->record->status, [5, 6, 7]))
+        )->columns(1);
     }
 
     public function afterSave(): void
@@ -111,18 +111,18 @@ class EditOrder extends EditRecord
     /**
      * @throws Exception
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('Cancel')
+            Action::make('Cancel')
                 ->color('warning')
                 ->action('customActionCancel')
                 ->hidden(in_array($this->record->status, [0, 5, 6, 7])),
-            Actions\Action::make('Confirmed')
+            Action::make('Confirmed')
                 ->color('success')
                 ->action('customActionConfirmed')
                 ->visible($this->record->status == 1),
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

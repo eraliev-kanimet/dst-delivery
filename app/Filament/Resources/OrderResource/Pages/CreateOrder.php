@@ -5,7 +5,7 @@ namespace App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\OrderResourceForm;
 use App\Models\Store;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -31,10 +31,10 @@ class CreateOrder extends CreateRecord
         parent::mount();
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
         $resourceForm = new OrderResourceForm(stores: $this->stores);
 
-        return $form->schema($resourceForm->form())->columns(1);
+        return parent::form($form->schema($resourceForm->form()));
     }
 }

@@ -7,7 +7,7 @@ use App\Enums\PaymentType;
 use App\Helpers\FilamentHelper;
 use App\Models\Customer;
 use App\Models\Selection;
-use Closure;
+use Filament\Forms\Get;
 use Illuminate\Support\Collection;
 
 class OrderResourceForm
@@ -15,10 +15,10 @@ class OrderResourceForm
     protected FilamentHelper $helper;
 
     public function __construct(
-        protected bool $edited = false,
+        protected bool             $edited = false,
         protected array|Collection $stores = [],
-        protected array $products = [],
-        protected array $deleted_products = [],
+        protected array            $products = [],
+        protected array            $deleted_products = [],
     )
     {
         $this->helper = new FilamentHelper;
@@ -35,7 +35,7 @@ class OrderResourceForm
                 $this->helper->repeater('orderItems', [
                     $this->helper->hidden('product'),
                     $this->helper->select('product.selection_id')
-                        ->options(function (Closure $get) {
+                        ->options(function (Get $get) {
                             if (isset($this->deleted_products[$get('product.selection_id')])) {
                                 return $this->deleted_products;
                             }
@@ -45,7 +45,7 @@ class OrderResourceForm
                         ->label('Product')
                         ->required()
                         ->reactive()
-                        ->disabled(function (Closure $get) {
+                        ->disabled(function (Get $get) {
                             return isset($this->deleted_products[$get('product.selection_id')]);
                         })
                         ->searchable(),
@@ -53,7 +53,7 @@ class OrderResourceForm
                         ->numeric()
                         ->default(1)
                         ->minValue(1)
-                        ->maxValue(function (Closure $get) {
+                        ->maxValue(function (Get $get) {
                             $selection_id = $get('product.selection_id');
 
                             if (is_null($selection_id)) {
@@ -68,13 +68,13 @@ class OrderResourceForm
 
                             return 1;
                         })
-                        ->disabled(function (Closure $get) {
+                        ->disabled(function (Get $get) {
                             return isset($this->deleted_products[$get('product.selection_id')]);
                         })
                         ->required()
                 ])->relationship()
                     ->label('')
-                    ->createItemButtonLabel('Add product')
+                    ->addActionLabel('Add product')
                     ->required()
             ]);
         } else {
@@ -128,8 +128,8 @@ class OrderResourceForm
                     ->reactive()
                     ->required(),
                 $this->helper->select('customer_id')
-                    ->hidden(fn(Closure $get) => is_null($get('store_id')))
-                    ->options(function (Closure $get) {
+                    ->hidden(fn(Get $get) => is_null($get('store_id')))
+                    ->options(function (Get $get) {
                         $store_id = $get('store_id');
 
                         if ($store_id) {
