@@ -6,8 +6,8 @@ use App\Filament\Resources\CustomerResource\Pages;
 use App\Helpers\FilamentHelper;
 use App\Models\Customer;
 use App\Models\Store;
-use Closure;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -50,10 +50,10 @@ class CustomerResource extends Resource
                 $helper->input('phone')
                     ->label('Phone number')
                     ->regex('/^\+\d{1,}$/')
-                    ->hidden(fn(Closure $get) => is_null($get('store_id')))
+                    ->hidden(fn(Get $get) => is_null($get('store_id')))
                     ->unique(
                         ignorable: fn(?Model $record) => $record,
-                        callback: fn(Unique $rule, Closure $get) => $rule->where('store_id', $get('store_id')))
+                        modifyRuleUsing: fn(Unique $rule, Get $get) => $rule->where('store_id', $get('store_id')))
                     ->required(),
                 $helper->toggle('active')
                     ->default(true)

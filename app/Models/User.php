@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -41,7 +42,7 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Store::class);
     }
 
-    public function canAccessFilament(): bool
+    public function canAccessPanel(Panel $panel): bool
     {
         return true;
     }
