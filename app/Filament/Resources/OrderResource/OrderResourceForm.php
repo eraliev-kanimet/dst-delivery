@@ -18,7 +18,7 @@ class OrderResourceForm
         protected bool $edited = false,
         protected array|Collection $stores = [],
         protected array $products = [],
-        protected array $items = [],
+        protected array $deleted_products = [],
     )
     {
         $this->helper = new FilamentHelper;
@@ -35,12 +35,18 @@ class OrderResourceForm
                 $this->helper->repeater('orderItems', [
                     $this->helper->hidden('product'),
                     $this->helper->select('product.selection_id')
-                        ->options($this->products)
+                        ->options(function (Closure $get) {
+                            if (isset($this->deleted_products[$get('product.selection_id')])) {
+                                return $this->deleted_products;
+                            }
+
+                            return $this->products;
+                        })
                         ->label('Product')
                         ->required()
                         ->reactive()
                         ->disabled(function (Closure $get) {
-                            return isset($this->items[$get('product.selection_id')]);
+                            return isset($this->deleted_products[$get('product.selection_id')]);
                         })
                         ->searchable(),
                     $this->helper->input('quantity')
@@ -51,7 +57,7 @@ class OrderResourceForm
                             $selection_id = $get('product.selection_id');
 
                             if (is_null($selection_id)) {
-                                return 0;
+                                return 1;
                             }
 
                             $selection = Selection::find($selection_id);
@@ -60,10 +66,10 @@ class OrderResourceForm
                                 return $selection->quantity;
                             }
 
-                            return $get('quantity');
+                            return 1;
                         })
                         ->disabled(function (Closure $get) {
-                            return isset($this->items[$get('product.selection_id')]);
+                            return isset($this->deleted_products[$get('product.selection_id')]);
                         })
                         ->required()
                 ])->relationship()

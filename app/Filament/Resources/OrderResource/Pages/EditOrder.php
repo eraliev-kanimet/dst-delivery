@@ -22,30 +22,18 @@ class EditOrder extends EditRecord
     public $record;
 
     public array $products = [];
-    public array $items = [];
+    public array $deleted_products = [];
 
     public function mount($record): void
     {
         $this->record = $this->resolveRecord($record);
 
-        $products = ProductSelectionService::new()->getSelectSelection(
+        $this->products = ProductSelectionService::new()->getSelectSelection(
             $this->record->store_id,
             $this->record->store->fallback_locale
         );
 
-        $items = [];
-
-        foreach ($this->record->orderItems as $item) {
-            $selection_id = $item->product['selection_id'];
-
-            if (!isset($products[$selection_id])) {
-                $items[$selection_id] = true;
-            }
-        }
-
-        $this->items = $items;
-
-        $this->products = $this->getSelectionFromOrderItems($products, config('app.locale'), $this->record->store->fallback_locale);
+        $this->setDeletedProducts(config('app.locale'), $this->record->store->fallback_locale);
 
         $this->authorizeAccess();
 
@@ -54,14 +42,16 @@ class EditOrder extends EditRecord
         $this->previousUrl = url()->previous();
     }
 
-    protected function getSelectionFromOrderItems(array $products, string $locale, string $fallback_locale): array
+    protected function setDeletedProducts(string $locale, string $fallback_locale): void
     {
+        $products = [];
+
         $service = ProductSelectionService::new();
 
         foreach ($this->record->orderItems as $orderItem) {
             $product = $orderItem->product;
 
-            if (isset($products[$product['selection_id']])) {
+            if (isset($this->products[$product['selection_id']])) {
                 continue;
             }
 
@@ -76,18 +66,21 @@ class EditOrder extends EditRecord
             }
 
             $name = $name . ': ' . __('common.price') . ' ' . $orderItem->price;
-            $name .= ', ' . __('common.quantity') . ' ' . $orderItem->quantity;
             $name .= ', ' . $service->getPropertiesToString($product['attributes'], $locale, $fallback_locale, 5);
 
             $products[$product['selection_id']] = $name;
         }
 
-        return $products;
+        $this->deleted_products = $products;
     }
 
     protected function form(Form $form): Form
     {
-        $resourceForm = new OrderResourceForm(true, products: $this->products, items: $this->items);
+        $resourceForm = new OrderResourceForm(
+            true,
+            products: $this->products,
+            deleted_products: $this->deleted_products
+        );
 
         return $form->schema($resourceForm->form())
             ->columns(1)
