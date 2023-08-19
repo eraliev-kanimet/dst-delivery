@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CategoryResource;
 
 use App\Helpers\FilamentHelper;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Illuminate\Support\Collection;
 
 class CategoryResourceForm
@@ -35,7 +35,7 @@ class CategoryResourceForm
                     2 => 'Normal',
                     1 => 'Large',
                 ])->inline()->default(2),
-                $helper->image('images')->multiple(),
-            ])->columns(1);
+                $helper->image('images')->multiple()->imageEditor(),
+            ]);
     }
 }

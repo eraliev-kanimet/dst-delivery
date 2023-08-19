@@ -5,10 +5,10 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
 use Exception;
-use Filament\Pages\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Table;
-use Filament\Tables\Actions\Action;
+use Filament\Tables\Table;
+use Filament\Tables\Actions\Action as ActionTable;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
@@ -57,7 +57,7 @@ class ListCategories extends ListRecords
     /**
      * @throws Exception
      */
-    protected function table(Table $table): Table
+    public function table(Table $table): Table
     {
         $locale = config('app.locale');
 
@@ -66,10 +66,10 @@ class ListCategories extends ListRecords
                 TextColumn::make("name.$locale"),
             ])
             ->actions([
-                Action::make('view')
+                ActionTable::make('view')
                     ->hidden(fn(Category $record) => $record->category?->category_id)
                     ->url(fn(Category $record) => route(
-                        'filament.resources.categories.index', ['category_id' => $record->id]
+                        'filament.admin.resources.categories.index', ['category_id' => $record->id]
                     )),
                 EditAction::make(),
             ])
@@ -79,7 +79,7 @@ class ListCategories extends ListRecords
     /**
      * @throws Exception
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         $label = 'New main category';
         $actions = [];
@@ -101,14 +101,14 @@ class ListCategories extends ListRecords
                 $params2['category_id'] = $category->category_id;
             }
 
-            $actions[] = Actions\Action::make('parent category')
+            $actions[] = Action::make('parent category')
                 ->label($label2)
-                ->url(route('filament.resources.categories.index', $params2));
+                ->url(route('filament.admin.resources.categories.index', $params2));
         }
 
-        $actions[] = Actions\Action::make('create category')
+        $actions[] = Action::make('create category')
             ->label($label)
-            ->url(route('filament.resources.categories.create', $params));
+            ->url(route('filament.admin.resources.categories.create', $params));
 
         return $actions;
     }
