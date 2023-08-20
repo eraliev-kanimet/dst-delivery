@@ -63,6 +63,17 @@ class ApiOrderService
             return $order;
         }
 
-        throw new NotFoundHttpException('Order not found!');
+        throw new NotFoundHttpException(__('validation2.order.text4'));
+    }
+
+    public function getOrderItem(string $id): OrderItem
+    {
+        $item = OrderItem::find($id);
+
+        if ($item) {
+            return $item;
+        }
+
+        throw new NotFoundHttpException(__('validation2.order.text3'));
     }
 }

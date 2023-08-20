@@ -31,9 +31,7 @@ class ProductController extends Controller
 
     public function show(string $id)
     {
-        $store = Store::current();
-
-        $product = Product::whereStoreId($store->id)->whereId($id)->whereHas('selections')->first();
+        $product = Product::whereId($id)->whereHas('selections')->first();
 
         if ($product) {
             return new ProductResource($product);

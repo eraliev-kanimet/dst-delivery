@@ -39,7 +39,7 @@ class CustomerAuthController extends Controller
             ]);
         }
 
-        return response()->json(['message' => 'Invalid authorization data'], 401);
+        return response()->json(['message' => __('validation2.auth.text1')], 401);
     }
 
     public function logout()

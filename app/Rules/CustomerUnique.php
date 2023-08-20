@@ -22,7 +22,7 @@ class CustomerUnique implements ValidationRule
                 ->wherePhone($this->phone)
                 ->exists()
         ) {
-            $fail('The customer already exists!');
+            $fail(__('validation2.customer.text1'));
         }
     }
 }
