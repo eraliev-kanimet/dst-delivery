@@ -6,7 +6,6 @@ use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class ProductResource extends Resource
 {
@@ -16,15 +15,7 @@ class ProductResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $user = Auth::user();
-
-        if ($user->hasRole('store_manager')) {
-            return parent::getEloquentQuery()->whereIn('store_id', $user->stores_permission);
-        } elseif ($user->hasRole('store_owner')) {
-            return parent::getEloquentQuery()->whereRelation('store', 'user_id', $user->id);
-        }
-
-        return parent::getEloquentQuery();
+        return getEloquentQueryFilament(parent::getEloquentQuery());
     }
 
     public static function getPages(): array

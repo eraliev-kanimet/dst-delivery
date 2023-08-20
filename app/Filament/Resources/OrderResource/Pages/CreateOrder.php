@@ -8,7 +8,6 @@ use App\Models\Store;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 
 class CreateOrder extends CreateRecord
 {
@@ -18,15 +17,7 @@ class CreateOrder extends CreateRecord
 
     public function mount(): void
     {
-        $user = Auth::user();
-
-        if ($user->hasRole('store_manager')) {
-            $this->stores = Store::whereIn('id', $user->stores_permission)->pluck('name', 'id');
-        } else if ($user->hasRole('store_owner')) {
-            $this->stores = Store::whereUserId($user->id)->pluck('name', 'id');
-        } else {
-            $this->stores = Store::pluck('name', 'id');
-        }
+        $this->stores = getEloquentQueryFilament(Store::query())->pluck('name', 'id');
 
         parent::mount();
     }

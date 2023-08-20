@@ -98,16 +98,6 @@ class EditOrder extends EditRecord
         }
     }
 
-    public function customActionCancel(): void
-    {
-        $this->record->actionCancel();
-    }
-
-    public function customActionConfirmed(): void
-    {
-        $this->record->actionConfirmed();
-    }
-
     /**
      * @throws Exception
      */
@@ -116,11 +106,25 @@ class EditOrder extends EditRecord
         return [
             Action::make('Cancel')
                 ->color('warning')
-                ->action('customActionCancel')
+                ->action(function () {
+                    $this->record->actionCancel();
+                })
+                ->requiresConfirmation()
+                ->modalHeading('Cancel order')
+                ->modalDescription('Are you sure you want to change the order status to cancel?')
+                ->modalSubmitActionLabel('Yeah, change status')
+                ->modalCancelActionLabel('Cancel')
                 ->hidden(in_array($this->record->status, [0, 5, 6, 7])),
             Action::make('Confirmed')
                 ->color('success')
-                ->action('customActionConfirmed')
+                ->action(function () {
+                    $this->record->actionConfirmed();
+                })
+                ->requiresConfirmation()
+                ->modalHeading('Confirmed order')
+                ->modalDescription('Are you sure you want to change the order status to confirmed?')
+                ->modalSubmitActionLabel('Yeah, change status')
+                ->modalCancelActionLabel('Cancel')
                 ->visible($this->record->status == 1),
             DeleteAction::make(),
         ];

@@ -17,15 +17,7 @@ class OrderResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $user = Auth::user();
-
-        if ($user->hasRole('store_manager')) {
-            return parent::getEloquentQuery()->whereIn('store_id', $user->stores_permission);
-        } elseif ($user->hasRole('store_owner')) {
-            return parent::getEloquentQuery()->whereRelation('store', 'user_id', $user->id);
-        }
-
-        return parent::getEloquentQuery();
+        return getEloquentQueryFilament(parent::getEloquentQuery());
     }
 
     public static function canDelete(Model $record): bool

@@ -23,15 +23,7 @@ class CustomerResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $user = Auth::user();
-
-        if ($user->hasRole('store_manager')) {
-            return parent::getEloquentQuery()->whereIn('store_id', $user->stores_permission);
-        } elseif ($user->hasRole('store_owner')) {
-            return parent::getEloquentQuery()->whereRelation('store', 'user_id', $user->id);
-        }
-
-        return parent::getEloquentQuery();
+        return getEloquentQueryFilament(parent::getEloquentQuery());
     }
 
     public static function form(Form $form): Form
@@ -66,7 +58,7 @@ class CustomerResource extends Resource
         $query = Store::query();
 
         if ($user->hasRole('store_manager')) {
-            $query->where('id', $user->stores_permission);
+            $query->where('id', $user->permissions);
         } else if ($user->hasRole('store_owner')) {
             $query->whereUserId($user->id);
         }

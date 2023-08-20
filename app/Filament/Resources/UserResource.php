@@ -26,16 +26,16 @@ class UserResource extends Resource
         $stores = $user->stores->pluck('id')->toArray();
         $users = User::whereHas('role', function (Builder $query) {
             $query->where('slug', 'store_manager');
-        })->get(['id', 'role_id', 'stores_permission']);
+        })->get(['id', 'role_id', 'permissions']);
 
         $array = [];
 
         foreach ($users as $user) {
-            if (is_null($user->stores_permission)) {
+            if (is_null($user->permissions)) {
                 continue;
             }
 
-            if (count(array_intersect($user->stores_permission, $stores))) {
+            if (count(array_intersect($user->permissions, $stores))) {
                 $array[] = $user->id;
             }
         }

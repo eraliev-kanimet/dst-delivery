@@ -23,7 +23,7 @@ class EditBanner extends EditRecord
         $user = Auth::user();
 
         if ($user->hasRole('store_manager')) {
-            $this->stores = Store::whereIn('id', $user->stores_permission)->pluck('name', 'id');
+            $this->stores = Store::whereIn('id', $user->permissions)->pluck('name', 'id');
         } else if ($user->hasRole('store_owner')) {
             $this->stores = Store::whereUserId($user->id)->pluck('name', 'id');
         } else {

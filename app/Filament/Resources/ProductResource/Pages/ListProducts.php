@@ -67,7 +67,7 @@ class ListProducts extends ListRecords
         $user = Auth::user();
 
         if ($user->hasRole('store_manager')) {
-            $stores = Store::whereIn('id', $user->stores_permission)->get(['id', 'name']);
+            $stores = Store::whereIn('id', $user->permissions)->get(['id', 'name']);
         } else if ($user->hasRole('store_owner')) {
             $stores = Store::whereUserId($user->id)->get(['id', 'name']);
         } else {

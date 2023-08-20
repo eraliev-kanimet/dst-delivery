@@ -49,7 +49,7 @@ class UserResourceForm
             $schema[] = $helper->hidden('role_id')->default(3);
         }
 
-        $schema[] = $helper->checkbox('stores_permission', $stores)
+        $schema[] = $helper->checkbox('permissions', $stores)
             ->required()
             ->columns()
             ->visible(fn(Get $get) => $get('role_id') == 3)

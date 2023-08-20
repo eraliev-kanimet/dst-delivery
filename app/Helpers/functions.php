@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -15,17 +17,6 @@ function errors(string $message, array $errors = []): array
         'message' => $message,
         'errors' => $errors
     ];
-}
-
-function ttt(string $value): array
-{
-    $array = [];
-
-    foreach (array_keys(config('app.locales')) as $key) {
-        $array[$key] = $value;
-    }
-
-    return $array;
 }
 
 function truncateStr($string, $maxLength = 13)
@@ -121,4 +112,17 @@ function dbQueryLog(int $offset = 6): JsonResponse
         count($logs),
         ...$logs
     ]);
+}
+
+function getEloquentQueryFilament(Builder $builder): Builder
+{
+    $user = Auth::user();
+
+    if ($user->hasRole('store_manager')) {
+        return $builder->whereIn('id', $user->permissions);
+    } else if ($user->hasRole('store_owner')) {
+        return $builder->where('user_id', $user->id);
+    }
+
+    return $builder;
 }

@@ -15,7 +15,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
-        'stores_permission',
+        'permissions',
     ];
 
     protected $hidden = [
@@ -24,7 +24,7 @@ class User extends Authenticatable implements FilamentUser
     ];
 
     protected $casts = [
-        'stores_permission' => 'array'
+        'permissions' => 'array'
     ];
 
     public function role(): BelongsTo
