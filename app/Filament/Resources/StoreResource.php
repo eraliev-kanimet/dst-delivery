@@ -13,20 +13,11 @@ class StoreResource extends Resource
 {
     protected static ?string $model = Store::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
 
     public static function getEloquentQuery(): Builder
     {
-        $user = Auth::user();
-
-        if ($user->hasRole('store_manager')) {
-            return parent::getEloquentQuery()->whereIn('id', $user->stores_permission);
-        } else if ($user->hasRole('store_owner')) {
-            return parent::getEloquentQuery()->where('user_id', $user->id);
-        }
-
-        return parent::getEloquentQuery();
-
+        return getEloquentQueryFilament(parent::getEloquentQuery());
     }
 
     public static function canCreate(): bool

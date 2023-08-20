@@ -5,9 +5,9 @@ namespace App\Filament\Resources\StoreResource\Pages;
 use App\Filament\Resources\StoreResource;
 use App\Models\Store;
 use Exception;
-use Filament\Pages\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -26,7 +26,7 @@ class ListStores extends ListRecords
     /**
      * @throws Exception
      */
-    protected function table(Table $table): Table
+    public function table(Table $table): Table
     {
         $columns = [
             TextColumn::make('name'),
@@ -34,8 +34,10 @@ class ListStores extends ListRecords
 
         if (Auth::user()->hasRole('admin')) {
             $columns[] = TextColumn::make('uuid')
-                ->copyable();
-            $columns[] = TextColumn::make('user.name');
+                ->copyable()
+                ->label('UUID');
+            $columns[] = TextColumn::make('user.name')
+                ->label('Owner');
         }
 
         $columns[] = TextColumn::make('updated_at');
@@ -44,7 +46,7 @@ class ListStores extends ListRecords
             ->columns($columns)
             ->actions([
                 Action::make('Add product')
-                    ->url(fn(Store $record) => route('filament.resources.products.create', [
+                    ->url(fn(Store $record) => route('filament.admin.resources.products.create', [
                         'store_id' => $record->id
                     ]))
                     ->icon('heroicon-o-check-circle')
@@ -58,10 +60,10 @@ class ListStores extends ListRecords
     /**
      * @throws Exception
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

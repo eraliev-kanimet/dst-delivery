@@ -27,6 +27,6 @@ class VerifySmsCode implements ValidationRule
             }
         }
 
-        $fail('Incorrect confirmation code, code does not match!');
+        $fail(__('validation2.verify.text1'));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,7 +15,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
-        'stores_permission',
+        'permissions',
     ];
 
     protected $hidden = [
@@ -23,7 +24,7 @@ class User extends Authenticatable implements FilamentUser
     ];
 
     protected $casts = [
-        'stores_permission' => 'array'
+        'permissions' => 'array'
     ];
 
     public function role(): BelongsTo
@@ -41,7 +42,7 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Store::class);
     }
 
-    public function canAccessFilament(): bool
+    public function canAccessPanel(Panel $panel): bool
     {
         return true;
     }

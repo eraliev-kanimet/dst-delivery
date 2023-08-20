@@ -4,24 +4,23 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
-use Filament\Resources\Form;
+use Filament\Actions\DeleteAction;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class EditCategory extends EditRecord
 {
     protected static string $resource = CategoryResource::class;
 
-    /**
-     * @var Category
-     */
-    public $record;
+    public string|int|null|Model|Category $record;
 
     public int $category_id = 0;
 
     public array|Collection $categories = [];
 
-    public function mount($record): void
+    public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
 
@@ -41,14 +40,16 @@ class EditCategory extends EditRecord
         $this->previousUrl = url()->previous();
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
-        return CategoryResource\CategoryResourceForm::form(
-            $form,
-            $this->categories,
-            $this->record->category_id,
-            false
-        );
+        return parent::form(
+            CategoryResource\CategoryResourceForm::form(
+                $form,
+                $this->categories,
+                $this->record->category_id,
+                false
+            )
+        )->columns(1);
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -79,6 +80,13 @@ class EditCategory extends EditRecord
             }
         }
 
-        redirect()->route('filament.resources.categories.edit', ['record' => $this->record->id]);
+        redirect()->route('filament.admin.resources.categories.edit', ['record' => $this->record->id]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            DeleteAction::make()
+        ];
     }
 }

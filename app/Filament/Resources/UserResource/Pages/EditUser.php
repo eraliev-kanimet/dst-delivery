@@ -8,9 +8,10 @@ use App\Models\Role;
 use App\Models\Store;
 use App\Models\User;
 use Exception;
-use Filament\Pages\Actions;
-use Filament\Resources\Form;
+use Filament\Actions\DeleteAction;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -22,12 +23,12 @@ class EditUser extends EditRecord
     /**
      * @var User
      */
-    public $record;
+    public string|int|null|Model|User $record;
 
     public array|Collection $stores = [];
     public array|Collection $roles = [];
 
-    public function mount($record): void
+    public function mount(int | string $record): void
     {
         $user = Auth::user();
 
@@ -41,13 +42,13 @@ class EditUser extends EditRecord
         parent::mount($record);
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
-        return $form->schema(UserResourceForm::form(
+        return parent::form($form->schema(UserResourceForm::form(
             $this->stores,
             $this->roles,
             Auth::user()->hasRole('admin')
-        ))->columns(2);
+        )));
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -71,10 +72,10 @@ class EditUser extends EditRecord
     /**
      * @throws Exception
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

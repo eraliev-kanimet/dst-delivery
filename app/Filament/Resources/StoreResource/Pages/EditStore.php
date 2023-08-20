@@ -7,9 +7,10 @@ use App\Models\Category;
 use App\Models\Store;
 use App\Models\User;
 use Exception;
-use Filament\Pages\Actions;
-use Filament\Resources\Form;
+use Filament\Actions\DeleteAction;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,9 +24,9 @@ class EditStore extends EditRecord
     /**
      * @var Store
      */
-    public $record;
+    public string|int|null|Model|Store $record;
 
-    public function mount($record): void
+    public function mount(int|string $record): void
     {
         $this->categories = Category::all()->pluck('name.' . config('app.locale'), 'id');
 
@@ -36,16 +37,18 @@ class EditStore extends EditRecord
         parent::mount($record);
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
+        $isAdmin = Auth::user()->hasRole('admin');
+
         $resourceForm = new StoreResource\StoreResourceForm(
             $this->categories,
             $this->users,
             $this->record->locales,
-            Auth::user()->hasRole('admin')
+            $isAdmin
         );
 
-        return $resourceForm->form($form);
+        return parent::form($resourceForm->form($form))->columns($isAdmin ? 2 : 1);
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -71,10 +74,10 @@ class EditStore extends EditRecord
     /**
      * @throws Exception
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()
+            DeleteAction::make()
         ];
     }
 }

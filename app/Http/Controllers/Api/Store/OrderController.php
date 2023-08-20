@@ -14,8 +14,6 @@ use App\Models\Selection;
 use App\Models\Store;
 use App\Service\ApiOrderService;
 use App\Http\Requests\Api\Store\Order\IndexRequest;
-use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class OrderController extends Controller
 {
@@ -92,7 +90,7 @@ class OrderController extends Controller
                 return new OrderResource($order);
             }
 
-            return response()->json(errors(__('validation2.order_api.text2')), 404);
+            return response()->json(errors(__('validation2.order.text2')), 404);
         }
 
         return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
@@ -100,51 +98,41 @@ class OrderController extends Controller
 
     public function itemUpdate(ItemUpdateRequest $request)
     {
-        $orderItem = OrderItem::find($request->get('order_item_id'));
+        $orderItem = $this->service->getOrderItem($request->get('order_item_id'));
 
-        if ($orderItem) {
-            $order = $orderItem->order;
+        $order = $orderItem->order;
 
-            if ($order->status == OrderStatus::pending_payment->value) {
-                $orderItem->update([
-                    'quantity' => $request->get('quantity'),
-                ]);
+        if ($order->status == OrderStatus::pending_payment->value) {
+            $orderItem->update([
+                'quantity' => $request->get('quantity'),
+            ]);
 
-                $order->actionTotalCostRecalculation();
+            $order->actionTotalCostRecalculation();
 
-                return new OrderResource($order);
-            }
-
-            return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
+            return new OrderResource($order);
         }
 
-        throw new NotFoundHttpException('Order item not found!');
+        return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
     }
 
     public function itemRemove(string $id)
     {
-        $orderItem = OrderItem::whereRelation('order', 'customer_id', Auth::user()->id)
-            ->whereId($id)
-            ->first();
+        $orderItem = $this->service->getOrderItem($id);
 
-        if ($orderItem) {
-            $order = $orderItem->order;
+        $order = $orderItem->order;
 
-            if ($order->orderItems()->count() == 1) {
-                return response()->json(errors(__('validation2.order_api.text1')), 422);
-            }
-
-            if ($order->status == OrderStatus::pending_payment->value) {
-                $orderItem->delete();
-
-                $order->actionTotalCostRecalculation();
-
-                return new OrderResource($order);
-            }
-
-            return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
+        if ($order->orderItems()->count() == 1) {
+            return response()->json(errors(__('validation2.order.text1')), 422);
         }
 
-        throw new NotFoundHttpException('Order item not found!');
+        if ($order->status == OrderStatus::pending_payment->value) {
+            $orderItem->delete();
+
+            $order->actionTotalCostRecalculation();
+
+            return new OrderResource($order);
+        }
+
+        return response()->json(errors(__('validation2.the_order_cannot_be_changed')), 422);
     }
 }

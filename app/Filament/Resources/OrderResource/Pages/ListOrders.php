@@ -7,9 +7,9 @@ use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\Store;
 use Exception;
-use Filament\Pages\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -29,7 +29,7 @@ class ListOrders extends ListRecords
         $user = Auth::user();
 
         if ($user->hasRole('store_manager')) {
-            $this->stores = Store::whereIn('id', $user->stores_permission)->pluck('name', 'id');
+            $this->stores = Store::whereIn('id', $user->permissions)->pluck('name', 'id');
         } else if ($user->hasRole('store_owner')) {
             $this->stores = Store::whereUserId($user->id)->pluck('name', 'id');
         } else {
@@ -47,8 +47,10 @@ class ListOrders extends ListRecords
     /**
      * @throws Exception
      */
-    protected function table(Table $table): Table
+    public function table(Table $table): Table
     {
+        $statuses = OrderStatus::getSelect();
+
         return $table
             ->columns([
                 TextColumn::make('uuid')
@@ -61,7 +63,7 @@ class ListOrders extends ListRecords
                     ->copyable(),
                 TextColumn::make('total'),
                 TextColumn::make('status')
-                    ->enum(OrderStatus::getSelect())
+                    ->formatStateUsing(fn(Order $order) => $statuses[$order->status])
                     ->color(function (Order $record) {
                         return match ($record->status) {
                             0 => 'warning',
@@ -92,10 +94,10 @@ class ListOrders extends ListRecords
     /**
      * @throws Exception
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

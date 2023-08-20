@@ -5,25 +5,23 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\Image;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 class CreateCategory extends CreateRecord
 {
     protected static string $resource = CategoryResource::class;
-  
+
     public ?int $category_id = null;
     public string $category_name = '';
     public array $categories = [];
 
-    /**
-     * @var Category
-     */
-    public $record;
+    public null|Model|Category $record;
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         return $this->category_id ? 'Create a child category "' . truncateStr($this->category_name) . '"' : 'Create main category';
     }
@@ -49,14 +47,26 @@ class CreateCategory extends CreateRecord
                 $this->category_id = $category_id;
                 $this->category_name = $name;
             }
-        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {}
+        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {
+        }
 
         parent::mount();
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
-        return CategoryResource\CategoryResourceForm::form($form, $this->categories, $this->category_id);
+        return parent::form(
+            CategoryResource\CategoryResourceForm::form($form, $this->categories, $this->category_id)
+        )->columns(1);
+    }
+
+    protected function getFormActions(): array
+    {
+        $actions = parent::getFormActions();
+
+        unset($actions[1]);
+
+        return $actions;
     }
 
     public function create(bool $another = false): void
@@ -65,12 +75,12 @@ class CreateCategory extends CreateRecord
 
         $data = $this->form->getState();
 
-        $data = $this->mutateFormDataBeforeCreate($data);
+        $data['category_id'] = $this->category_id;
 
         $this->record = $this->handleRecordCreation($data);
 
         $this->record->images()->save(new Image(['values' => $data['images']]));
 
-        $this->redirect(route('filament.resources.categories.edit', ['record' => $this->record->id]));
+        $this->redirect(route('filament.admin.resources.categories.edit', ['record' => $this->record->id]));
     }
 }

@@ -18,7 +18,7 @@ class VerificationController extends Controller
 
         $phone = $data['phone_code'] . $data['phone_number'];
 
-        $code = mt_rand(100000, 999999);
+        $code = mt_rand(1000, 9999);
 
         Cache::put("sms_code_$phone", $code, now()->addMinutes(15));
 
