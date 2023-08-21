@@ -36,7 +36,7 @@ class ListCustomers extends ListRecords
                 TextColumn::make('store.name')
                     ->label(__('common.store_name')),
                 TextColumn::make('phone')
-                    ->label(__('common.client_phone_number')),
+                    ->label(__('common.customer_phone_number')),
                 IconColumn::make('active')
                     ->label(__('common.active'))->boolean(),
                 TextColumn::make('updated_at')

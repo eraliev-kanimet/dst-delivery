@@ -27,11 +27,11 @@ class OrderResourceForm
     public function form(): array
     {
         $tabs = [
-            $this->helper->tab('Basic', $this->basic()),
+            $this->helper->tab(__('common.basic'), $this->basic()),
         ];
 
         if ($this->edited) {
-            $tabs[] = $this->helper->tab('Products', [
+            $tabs[] = $this->helper->tab(__('common.products'), [
                 $this->helper->repeater('orderItems', [
                     $this->helper->hidden('product'),
                     $this->helper->select('product.selection_id')
@@ -42,7 +42,7 @@ class OrderResourceForm
 
                             return $this->products;
                         })
-                        ->label('Product')
+                        ->label(__('common.product'))
                         ->required()
                         ->reactive()
                         ->disabled(function (Get $get) {
@@ -50,6 +50,7 @@ class OrderResourceForm
                         })
                         ->searchable(),
                     $this->helper->input('quantity')
+                        ->label(__('common.quantity'))
                         ->numeric()
                         ->default(1)
                         ->minValue(1)
@@ -74,7 +75,7 @@ class OrderResourceForm
                         ->required()
                 ])->relationship()
                     ->label('')
-                    ->addActionLabel('Add product')
+                    ->addActionLabel(__('common.add_product'))
                     ->required()
             ]);
         } else {
@@ -89,33 +90,43 @@ class OrderResourceForm
         $array = [
             $this->helper->grid([
                 $this->helper->select('payment_type')
+                    ->label(__('common.payment_type'))
                     ->options(PaymentType::getSelect())
                     ->required()
                     ->columnSpan($this->edited ? 1 : 2),
                 $this->helper->input('total')
+                    ->label(__('common.total'))
                     ->disabled()
                     ->visible($this->edited),
                 $this->helper->select('delivery_type')
+                    ->label(__('common.delivery_type'))
                     ->options(DeliveryType::getSelect()),
                 $this->helper->dateTime('delivery_date')
+                    ->label(__('common.delivery_date'))
                     ->minDate(now())
                     ->required(),
                 $this->helper->input('delivery_address.first_name')
+                    ->label(__('common.first_name'))
                     ->required(),
                 $this->helper->input('delivery_address.last_name')
+                    ->label(__('common.last_name'))
                     ->required(),
                 $this->helper->input('delivery_address.email')
+                    ->label(__('common.email'))
                     ->required()
                     ->email()
                     ->columnSpan(2),
                 $this->helper->input('delivery_address.country')
+                    ->label(__('common.country'))
                     ->required(),
                 $this->helper->input('delivery_address.city')
+                    ->label(__('common.city'))
                     ->required(),
                 $this->helper->input('delivery_address.address')
+                    ->label(__('common.address'))
                     ->required(),
                 $this->helper->input('delivery_address.zip')
-                    ->label('Zip code')
+                    ->label(__('common.zip'))
                     ->required(),
             ]),
         ];
@@ -124,10 +135,11 @@ class OrderResourceForm
             array_unshift($array, $this->helper->grid([
                 $this->helper->select('store_id')
                     ->options($this->stores)
-                    ->label('Store')
+                    ->label(__('common.store'))
                     ->reactive()
                     ->required(),
                 $this->helper->select('customer_id')
+                    ->label(__('common.customer'))
                     ->hidden(fn(Get $get) => is_null($get('store_id')))
                     ->options(function (Get $get) {
                         $store_id = $get('store_id');
@@ -140,7 +152,6 @@ class OrderResourceForm
 
                         return [];
                     })
-                    ->label('Customer')
                     ->required(),
             ], 1));
         }

@@ -15,6 +15,16 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('common.orders');
+    }
+
+    public static function getPluralLabel(): string
+    {
+        return __('common.orders');
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return getEloquentQueryFilament(parent::getEloquentQuery());

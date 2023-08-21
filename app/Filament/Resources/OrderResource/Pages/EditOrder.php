@@ -18,6 +18,11 @@ class EditOrder extends EditRecord
 {
     protected static string $resource = OrderResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.edit_order');
+    }
+
     public string|int|null|Model|Order $record;
 
     public array $products = [];
@@ -110,10 +115,11 @@ class EditOrder extends EditRecord
                     $this->record->actionCancel();
                 })
                 ->requiresConfirmation()
-                ->modalHeading('Cancel order')
-                ->modalDescription('Are you sure you want to change the order status to cancel?')
-                ->modalSubmitActionLabel('Yeah, change status')
-                ->modalCancelActionLabel('Cancel')
+                ->label(__('common.cancel'))
+                ->modalHeading(__('common.order_admin.text1'))
+                ->modalDescription(__('common.order_admin.text2'))
+                ->modalSubmitActionLabel(__('common.order_admin.text3'))
+                ->modalCancelActionLabel(__('common.cancel'))
                 ->hidden(in_array($this->record->status, [0, 5, 6, 7])),
             Action::make('Confirmed')
                 ->color('success')
@@ -121,10 +127,11 @@ class EditOrder extends EditRecord
                     $this->record->actionConfirmed();
                 })
                 ->requiresConfirmation()
-                ->modalHeading('Confirmed order')
-                ->modalDescription('Are you sure you want to change the order status to confirmed?')
-                ->modalSubmitActionLabel('Yeah, change status')
-                ->modalCancelActionLabel('Cancel')
+                ->label(__('common.confirmed'))
+                ->modalHeading(__('common.order_admin.text4'))
+                ->modalDescription(__('common.order_admin.text5'))
+                ->modalSubmitActionLabel(__('common.order_admin.text3'))
+                ->modalCancelActionLabel(__('common.cancel'))
                 ->visible($this->record->status == 1),
             DeleteAction::make(),
         ];
