@@ -22,9 +22,11 @@ class UserResourceForm
 
         $schema = [
             $helper->input('name')
+                ->label(__('common.name'))
                 ->disabled(!$isAdmin)
                 ->required(),
             $helper->input('email')
+                ->label(__('common.email'))
                 ->disabled(!$isAdmin)
                 ->required()
                 ->email()
@@ -33,6 +35,7 @@ class UserResourceForm
 
         if ($isAdmin) {
             $schema[] = $helper->input('password')
+                ->label(__('common.password'))
                 ->required(fn(?Model $record): bool => is_null($record))
                 ->password()
                 ->maxLength(255)
@@ -41,8 +44,8 @@ class UserResourceForm
 
         if ($roles_count) {
             $schema[] = $helper->select('role_id')
+                ->label(__('common.role'))
                 ->options($roles)
-                ->label('Role')
                 ->reactive()
                 ->default(2);
         } else {
@@ -50,6 +53,7 @@ class UserResourceForm
         }
 
         $schema[] = $helper->checkbox('permissions', $stores)
+            ->label(__('common.permissions'))
             ->required()
             ->columns()
             ->visible(fn(Get $get) => $get('role_id') == 3)

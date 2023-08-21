@@ -15,6 +15,11 @@ class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.users');
+    }
+
     protected function getTableQuery(): Builder
     {
         return parent::getTableQuery()->with('role');
@@ -27,9 +32,12 @@ class ListUsers extends ListRecords
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
+                TextColumn::make('name')
+                    ->label(__('common.name')),
+                TextColumn::make('email')
+                    ->label(__('common.email')),
                 TextColumn::make('role.name')
+                    ->label(__('common.role'))
             ])
             ->actions([
                 EditAction::make(),
@@ -41,6 +49,7 @@ class ListUsers extends ListRecords
     {
         return [
             CreateAction::make()
+                ->label(__('common.create_user'))
         ];
     }
 }

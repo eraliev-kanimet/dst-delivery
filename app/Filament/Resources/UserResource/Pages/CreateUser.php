@@ -16,6 +16,11 @@ class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.create_user');
+    }
+
     public array|Collection $stores = [];
     public array|Collection $roles = [];
 

@@ -15,6 +15,16 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('common.users');
+    }
+
+    public static function getPluralLabel(): string
+    {
+        return __('common.users');
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $user = Auth::user();

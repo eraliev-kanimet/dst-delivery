@@ -20,6 +20,11 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.edit_user');
+    }
+
     /**
      * @var User
      */

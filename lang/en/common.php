@@ -108,4 +108,10 @@ return [
     'address' => 'Address',
     'zip' => 'Zip code',
     'customer' => 'Customer',
+    'users' => 'Users',
+    'create_user' => 'Create user',
+    'edit_user' => 'Edit user',
+    'password' => 'Password',
+    'role' => 'Role',
+    'permissions' => 'Permissions',
 ];
