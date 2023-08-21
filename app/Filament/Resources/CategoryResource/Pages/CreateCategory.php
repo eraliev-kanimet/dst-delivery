@@ -23,7 +23,7 @@ class CreateCategory extends CreateRecord
 
     public function getTitle(): string
     {
-        return $this->category_id ? 'Create a child category "' . truncateStr($this->category_name) . '"' : 'Create main category';
+        return $this->category_id ? __('common.create_a_child_category') . ' "' . truncateStr($this->category_name) . '"' : __('common.create_main_category');
     }
 
     public function mount(): void

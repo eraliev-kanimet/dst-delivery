@@ -14,6 +14,11 @@ class EditCategory extends EditRecord
 {
     protected static string $resource = CategoryResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.edit_category');
+    }
+
     public string|int|null|Model|Category $record;
 
     public int $category_id = 0;

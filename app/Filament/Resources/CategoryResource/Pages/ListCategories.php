@@ -51,7 +51,7 @@ class ListCategories extends ListRecords
 
     public function getTitle(): string
     {
-        return $this->category ? '"' . $this->category->name . '" categories' : 'Main categories';
+        return $this->category ? '"' . $this->category->name . '" ' . strtolower(__('common.categories')) : __('common.main_categories');
     }
 
     /**
@@ -63,10 +63,12 @@ class ListCategories extends ListRecords
 
         return $table
             ->columns([
-                TextColumn::make("name.$locale"),
+                TextColumn::make("name.$locale")
+                    ->label(__('common.name')),
             ])
             ->actions([
                 ActionTable::make('view')
+                    ->label(__('common.view'))
                     ->hidden(fn(Category $record) => $record->category?->category_id)
                     ->url(fn(Category $record) => route(
                         'filament.admin.resources.categories.index', ['category_id' => $record->id]
@@ -81,22 +83,22 @@ class ListCategories extends ListRecords
      */
     protected function getHeaderActions(): array
     {
-        $label = 'New main category';
+        $label = __('common.create_main_category');
         $actions = [];
         $params = [];
 
         $category = $this->category;
 
         if ($category) {
-            $label = 'New category for ' . $category->name;
+            $label = __('common.create_category_for') . ' ' . $category->name;
 
             $params['category_id'] = $category->id;
 
-            $label2 = 'Back to the main categories';
+            $label2 = __('common.back_to_the_main_categories');
             $params2 = [];
 
             if ($category->category) {
-                $label2 = 'Go back to previous category';
+                $label2 = __('common.go_back_to_previous_category');
 
                 $params2['category_id'] = $category->category_id;
             }

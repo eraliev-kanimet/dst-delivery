@@ -102,14 +102,14 @@ class FilamentHelper
         return $this->tabs($tabs);
     }
 
-    public function tabsTextarea(string $model, array $locales, bool $required = false): Tabs
+    public function tabsTextarea(string $model, array $locales, bool $required = false, ?string $label = null): Tabs
     {
         $tabs = [];
 
         foreach (filterAvailableLocales($locales) as $locale => $name) {
             $tabs[] = $this->tab($name, [
                 $this->textarea("$model.$locale")
-                    ->label(ucfirst($model))
+                    ->label($label ?: ucfirst($model))
                     ->required($required)
             ]);
         }

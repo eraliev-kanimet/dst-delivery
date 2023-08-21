@@ -16,7 +16,7 @@ class BannerResource extends Resource
         return __('common.banners');
     }
 
-    public static function getModelLabel(): string
+    public static function getPluralLabel(): string
     {
         return __('common.banners');
     }

@@ -17,7 +17,7 @@ class CategoryResourceForm
         $categorySelect = $helper
             ->select('category_id')
             ->options($categories)
-            ->label('Category')
+            ->label(__('common.category'))
             ->hidden(is_null($category_id));
 
         if ($create) {
@@ -29,13 +29,19 @@ class CategoryResourceForm
         return $form
             ->schema([
                 $categorySelect,
-                $helper->tabsInput('name', $locales, true),
-                $helper->tabsTextarea('description', $locales),
+                $helper->tabsInput('name', $locales, true, __('common.name')),
+                $helper->tabsTextarea('description', $locales, false, __('common.description')),
                 $helper->radio('preview', [
                     2 => 'Normal',
                     1 => 'Large',
-                ])->inline()->default(2),
-                $helper->image('images')->multiple()->imageEditor(),
+                ])
+                    ->inline()
+                    ->default(2)
+                    ->label(__('common.preview')),
+                $helper->image('images')
+                    ->multiple()
+                    ->imageEditor()
+                    ->label(__('common.images')),
             ]);
     }
 }
