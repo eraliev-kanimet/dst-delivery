@@ -23,12 +23,6 @@ class Banner extends Model
         'image' => 'array'
     ];
 
-    public static array $types = [
-        'url' => 'URL',
-        'product' => 'Product',
-        'category' => 'Category',
-    ];
-
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);

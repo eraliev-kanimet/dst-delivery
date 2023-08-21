@@ -18,6 +18,11 @@ class ListBanners extends ListRecords
 {
     protected static string $resource = BannerResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.banners');
+    }
+
     protected function getTableQuery(): Builder
     {
         return parent::getTableQuery()->with('store');
@@ -30,15 +35,24 @@ class ListBanners extends ListRecords
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('store.name'),
+                TextColumn::make('name')
+                    ->label(__('common.name')),
+                TextColumn::make('store.name')
+                    ->label(__('common.store_name')),
                 TextColumn::make('type')
+                    ->label(__('common.type'))
                     ->formatStateUsing(function (Banner $banner) {
-                        return Banner::$types[$banner->type];
+                        return __('common.' . $banner->type);
                     }),
-                IconColumn::make('active')->boolean(),
-                TextColumn::make('start_date')->date('Y-m-d'),
-                TextColumn::make('end_date')->date('Y-m-d'),
+                IconColumn::make('active')
+                    ->label(__('common.active'))
+                    ->boolean(),
+                TextColumn::make('start_date')
+                    ->label(__('common.start_date'))
+                    ->date('Y-m-d'),
+                TextColumn::make('end_date')
+                    ->label(__('common.end_date'))
+                    ->date('Y-m-d'),
             ])
             ->actions([
                 EditAction::make(),
@@ -54,7 +68,8 @@ class ListBanners extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->label(__('common.create')),
         ];
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\BannerResource;
 
 use App\Helpers\FilamentHelper;
-use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Store;
 use App\Service\ProductService;
@@ -16,22 +15,31 @@ class BannerResourceForm
     {
         $helper = new FilamentHelper;
 
+        $types = [
+            'url' => __('common.url'),
+            'product' => __('common.product'),
+            'category' => __('common.category'),
+        ];
+
         return [
             $helper->grid([
                 $helper->input('name')
+                    ->label(__('common.name'))
                     ->required()
                     ->columnSpan(2),
                 $helper->input('sorted')
+                    ->label(__('common.sorted'))
                     ->numeric()
                     ->minValue(0),
             ], 3),
             $helper->select('store_id')
                 ->options($stores)
                 ->required()
-                ->label('Store')
+                ->label(__('common.store'))
                 ->reactive(),
             $helper->select('type')
-                ->options(Banner::$types)
+                ->options($types)
+                ->label(__('common.type'))
                 ->required()
                 ->reactive(),
             $helper->input('type_url')
@@ -52,7 +60,7 @@ class BannerResourceForm
                 ->required()
                 ->visible(fn(Get $get) => $get('type') == 'product')
                 ->columnSpan(2)
-                ->label('Product'),
+                ->label(__('common.product')),
             $helper->select('type_category')
                 ->options(function (Get $get) {
                     $store_id = $get('store_id');
@@ -70,12 +78,14 @@ class BannerResourceForm
                 ->required()
                 ->visible(fn(Get $get) => $get('type') == 'category')
                 ->columnSpan(2)
-                ->label('Category'),
+                ->label(__('common.category')),
             $helper->dateTime('start_date')
+                ->label(__('common.start_date'))
                 ->required()
                 ->reactive()
                 ->minDate(now()),
             $helper->dateTime('end_date')
+                ->label(__('common.end_date'))
                 ->required()
                 ->hidden(fn(Get $get) => is_null($get('start_date')))
                 ->minDate(fn ($get) => $get('start_date')),
@@ -86,7 +96,7 @@ class BannerResourceForm
                     $tabs = [];
 
                     foreach (filterAvailableLocales(Store::find($store_id)->locales) as $locale => $name) {
-                        $tabs[] = $helper->tab('Image ' . $name, [
+                        $tabs[] = $helper->tab(__('common.image')  .' ' . $name, [
                             $helper->image("image.$locale")
                                 ->imageEditor()
                                 ->label('')
@@ -102,6 +112,7 @@ class BannerResourceForm
                 ->columnSpan(2)
                 ->hidden(fn(Get $get) => is_null($get('store_id'))),
             $helper->toggle('active')
+                ->label(__('common.active'))
                 ->columnSpan(2)
                 ->default(true),
         ];

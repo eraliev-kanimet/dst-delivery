@@ -15,6 +15,11 @@ class CreateBanner extends CreateRecord
 
     public Collection|array $stores = [];
 
+    public function getTitle(): string
+    {
+        return __('common.create_banner');
+    }
+
     public function mount(): void
     {
         $this->stores = getEloquentQueryFilament(Store::query())->pluck('name', 'id');

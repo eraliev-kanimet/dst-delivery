@@ -11,6 +11,16 @@ class BannerResource extends Resource
 {
     protected static ?string $model = Banner::class;
 
+    public static function getNavigationLabel(): string
+    {
+        return __('common.banners');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('common.banners');
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-film';
 
     public static function getEloquentQuery(): Builder

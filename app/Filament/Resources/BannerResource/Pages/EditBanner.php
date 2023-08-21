@@ -10,25 +10,21 @@ use Filament\Actions\DeleteAction;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 
 class EditBanner extends EditRecord
 {
     protected static string $resource = BannerResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.edit_banner');
+    }
+
     public Collection|array $stores = [];
 
     public function mount(int|string $record): void
     {
-        $user = Auth::user();
-
-        if ($user->hasRole('store_manager')) {
-            $this->stores = Store::whereIn('id', $user->permissions)->pluck('name', 'id');
-        } else if ($user->hasRole('store_owner')) {
-            $this->stores = Store::whereUserId($user->id)->pluck('name', 'id');
-        } else {
-            $this->stores = Store::pluck('name', 'id');
-        }
+        $this->stores = getEloquentQueryFilament(Store::query())->pluck('name', 'id');
 
         parent::mount($record);
     }
