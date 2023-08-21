@@ -121,4 +121,12 @@ return [
     'store_owner' => 'Store Owner',
     'locales' => 'Languages',
     'fallback_locale' => 'Default language',
+    'create_product' => 'Create product',
+    'is_available' => 'Is available',
+    'selections' => 'Selections',
+    'add_selection' => 'Add selection',
+    'properties' => 'Properties',
+    'add_property' => 'Add property',
+    'value' => 'Value',
+    'attribute' => 'Attribute',
 ];

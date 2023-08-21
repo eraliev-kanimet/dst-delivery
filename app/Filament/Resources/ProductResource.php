@@ -13,6 +13,16 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-4';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('common.products');
+    }
+
+    public static function getPluralLabel(): string
+    {
+        return __('common.products');
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return getEloquentQueryFilament(parent::getEloquentQuery());

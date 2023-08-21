@@ -15,6 +15,11 @@ class EditProduct extends EditRecord
 {
     protected static string $resource = ProductResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.edit_product');
+    }
+
     public string|int|null|Model|Product $record;
 
     public array $categories = [];

@@ -30,50 +30,57 @@ final class ProductResourceForm
     public function form(): array
     {
         $tabs = [
-            $this->helper->tab('Basic', [
+            $this->helper->tab(__('common.basic'), [
                 $this->helper->grid([
                     $this->helper->select('category_id')
-                        ->label('Category')
+                        ->label(__('common.category'))
                         ->required()
                         ->disabled($this->category_disabled)
                         ->options($this->categories)
                         ->searchable()
                         ->columnSpan(2),
                     $this->helper->input('sorted')
+                        ->label(__('common.sorted'))
                         ->numeric()
                         ->minValue(0)
                         ->maxValue(10000),
                 ], 3),
-                $this->helper->tabsInput('name', $this->locales, true),
-                $this->helper->tabsTextarea('description', $this->locales, true),
+                $this->helper->tabsInput('name', $this->locales, true, __('common.name')),
+                $this->helper->tabsTextarea('description', $this->locales, true, __('common.description')),
                 $this->helper->grid([
                     $this->helper->toggle('is_available')
+                        ->label(__('common.is_available'))
                         ->default(true),
                     $this->helper->radio('preview', [
                         2 => 'Normal',
                         1 => 'Large'
-                    ])->inline()->default(2),
+                    ])
+                        ->label(__('common.preview'))->inline()->default(2),
                 ])
             ]),
             $this->tabAttributes()
         ];
 
         if ($this->edit) {
-            $tabs[] = $this->helper->tab('Selections', [
+            $tabs[] = $this->helper->tab(__('common.selections'), [
                 $this->helper->repeater('selections', [
                     $this->helper->grid([
                         $this->helper->input('quantity')
+                            ->label(__('common.quantity'))
                             ->minValue(0)
                             ->required()
                             ->numeric(),
                         $this->helper->input('price')
+                            ->label(__('common.price'))
                             ->minValue(0)
                             ->required()
                             ->numeric(),
                         $this->helper->toggle('is_available')
+                            ->label(__('common.is_available'))
                             ->default(true),
                     ]),
                     $this->helper->image('images')
+                        ->label(__('common.images'))
                         ->multiple()
                         ->imageEditor(),
                     $this->attributesRepeater('properties'),
@@ -81,7 +88,7 @@ final class ProductResourceForm
                     ->relationship('selections')
                     ->required()
                     ->label('')
-                    ->addActionLabel('Add selection')
+                    ->addActionLabel(__('common.add_selection'))
                     ->mutateRelationshipDataBeforeSaveUsing(function ($data) {
                         $data['properties'] = removeEmptyElements($data['properties']);
 
@@ -90,7 +97,7 @@ final class ProductResourceForm
             ]);
         }
 
-        $tabs[] = $this->helper->tab('Images', [
+        $tabs[] = $this->helper->tab(__('common.images'), [
             $this->helper->image('images')
                 ->imageEditor()
                 ->multiple()
@@ -128,7 +135,7 @@ final class ProductResourceForm
             $repeater->relationship('productAttributes');
         }
 
-        return $this->helper->tab('Attributes', [$repeater]);
+        return $this->helper->tab(__('common.properties'), [$repeater]);
     }
 
     protected function attributesRepeater(string $model = 'productAttributes'): Repeater
@@ -137,6 +144,7 @@ final class ProductResourceForm
 
         $schema = [
             $this->helper->select('attribute')
+                ->label(__('common.attribute'))
                 ->options($productService->getAttributesName())
                 ->required()
                 ->reactive()
@@ -144,7 +152,7 @@ final class ProductResourceForm
 
         if ($this->edit) {
             $schema[] = Hidden::make('type');
-            $schema[] = $this->helper->tabsInput('value1', $this->locales, true, 'Value')
+            $schema[] = $this->helper->tabsInput('value1', $this->locales, true, __('common.value'))
                 ->visible(function (Get $get, Set $set) use ($productService) {
                     if ($productService->isAttributeType1($get('attribute'))) {
                         $set('type', 1);
@@ -163,18 +171,18 @@ final class ProductResourceForm
                     }
 
                     return false;
-                })->label('Value');
+                })->label(__('common.value'));
         } else {
-            $schema[] = $this->helper->tabsInput('value1', $this->locales, true, 'Value')
+            $schema[] = $this->helper->tabsInput('value1', $this->locales, true, __('common.value'))
                 ->visible(fn(Get $get) => $productService->isAttributeType1($get('attribute')));
             $schema[] = $this->helper->input('value2')
                 ->visible(fn(Get $get) => $productService->isAttributeType2($get('attribute')))
-                ->label('Value');
+                ->label(__('common.value'));
         }
 
         return $this->helper->repeater($model, $schema)
             ->label('')
             ->required()
-            ->addActionLabel('Add attribute');
+            ->addActionLabel(__('common.add_property'));
     }
 }

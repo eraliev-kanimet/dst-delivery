@@ -20,6 +20,11 @@ class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.create_product');
+    }
+
     public null|Model|Product $record;
 
     public int $store_id = 0;

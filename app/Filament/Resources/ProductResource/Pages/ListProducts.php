@@ -15,7 +15,6 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class ListProducts extends ListRecords
 {
@@ -45,11 +44,14 @@ class ListProducts extends ListRecords
 
                         return $record->{"content_{$record->store->fallback_locale}"}?->name;
                     })
-                    ->label('Name'),
+                    ->label(__('common.name')),
                 TextColumn::make("category.name.$locale")
-                    ->label('Category'),
-                IconColumn::make('is_available')->boolean(),
-                TextColumn::make('store.name'),
+                    ->label(__('common.category')),
+                IconColumn::make('is_available')
+                    ->label(__('common.is_available'))
+                    ->boolean(),
+                TextColumn::make('store.name')
+                    ->label(__('common.store_name')),
             ])
             ->actions([
                 EditAction::make(),
@@ -64,15 +66,7 @@ class ListProducts extends ListRecords
      */
     protected function getHeaderActions(): array
     {
-        $user = Auth::user();
-
-        if ($user->hasRole('store_manager')) {
-            $stores = Store::whereIn('id', $user->permissions)->get(['id', 'name']);
-        } else if ($user->hasRole('store_owner')) {
-            $stores = Store::whereUserId($user->id)->get(['id', 'name']);
-        } else {
-            $stores = Store::get(['id', 'name']);
-        }
+        $stores = getEloquentQueryFilament(Store::query())->get(['id', 'name']);
 
         $stores = $stores->map(function (Store $store) {
             return Action::make('create_product_' . $store->id)
@@ -85,7 +79,7 @@ class ListProducts extends ListRecords
         return [
             ActionGroup::make($stores)
                 ->icon('heroicon-o-building-storefront')
-                ->label('Create a product')
+                ->label(__('common.create_product'))
                 ->button()
         ];
     }

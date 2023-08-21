@@ -121,4 +121,13 @@ return [
     'store_owner' => 'Владелец магазина',
     'locales' => 'Языки',
     'fallback_locale' => 'Язык по умолчанию',
+    'create_product' => 'Создать продукт',
+    'edit_product' => 'Редактировать продукт',
+    'is_available' => 'Есть в наличии',
+    'selections' => 'Выборки',
+    'add_selection' => 'Добавить выбор',
+    'properties' => 'Свойства',
+    'add_property' => 'Добавить свойство',
+    'value' => 'Значение',
+    'attribute' => 'Атрибут',
 ];
