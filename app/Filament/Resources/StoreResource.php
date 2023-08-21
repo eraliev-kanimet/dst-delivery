@@ -15,6 +15,16 @@ class StoreResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('common.stores');
+    }
+
+    public static function getPluralLabel(): string
+    {
+        return __('common.stores');
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return getEloquentQueryFilament(parent::getEloquentQuery());

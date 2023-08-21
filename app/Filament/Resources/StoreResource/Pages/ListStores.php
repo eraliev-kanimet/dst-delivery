@@ -18,6 +18,11 @@ class ListStores extends ListRecords
 {
     protected static string $resource = StoreResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.stores');
+    }
+
     protected function getTableQuery(): Builder
     {
         return parent::getTableQuery()->with('user');
@@ -29,7 +34,8 @@ class ListStores extends ListRecords
     public function table(Table $table): Table
     {
         $columns = [
-            TextColumn::make('name'),
+            TextColumn::make('name')
+                ->label(__('common.name')),
         ];
 
         if (Auth::user()->hasRole('admin')) {
@@ -37,15 +43,17 @@ class ListStores extends ListRecords
                 ->copyable()
                 ->label('UUID');
             $columns[] = TextColumn::make('user.name')
-                ->label('Owner');
+                ->label(__('common.owner'));
         }
 
-        $columns[] = TextColumn::make('updated_at');
+        $columns[] = TextColumn::make('updated_at')
+            ->label(__('common.updated_at'));
 
         return $table
             ->columns($columns)
             ->actions([
-                Action::make('Add product')
+                Action::make('create_product')
+                    ->label(__('common.add_product'))
                     ->url(fn(Store $record) => route('filament.admin.resources.products.create', [
                         'store_id' => $record->id
                     ]))
@@ -63,7 +71,8 @@ class ListStores extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->label(__('common.create_store')),
         ];
     }
 }

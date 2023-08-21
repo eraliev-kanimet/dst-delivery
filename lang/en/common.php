@@ -114,4 +114,11 @@ return [
     'password' => 'Password',
     'role' => 'Role',
     'permissions' => 'Permissions',
+    'stores' => 'Stores',
+    'owner' => 'Owner',
+    'create_store' => 'Create store',
+    'edit_store' => 'Edit store',
+    'store_owner' => 'Store Owner',
+    'locales' => 'Languages',
+    'fallback_locale' => 'Default language',
 ];

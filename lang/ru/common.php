@@ -114,4 +114,11 @@ return [
     'password' => 'Пароль',
     'role' => 'Роль',
     'permissions' => 'Разрешении',
+    'stores' => 'Магазины',
+    'owner' => 'Владелец',
+    'create_store' => 'Создать магазин',
+    'edit_store' => 'Редактировать магазин',
+    'store_owner' => 'Владелец магазина',
+    'locales' => 'Языки',
+    'fallback_locale' => 'Язык по умолчанию',
 ];

@@ -13,6 +13,11 @@ class CreateStore extends CreateRecord
 {
     protected static string $resource = StoreResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.create_store');
+    }
+
     public array|Collection $categories = [];
     public array|Collection $users = [];
 
