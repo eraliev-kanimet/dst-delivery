@@ -11,6 +11,11 @@ class EditCustomer extends EditRecord
 {
     protected static string $resource = CustomerResource::class;
 
+    public function getTitle(): string
+    {
+        return __('common.edit_customer');
+    }
+
     /**
      * @throws Exception
      */

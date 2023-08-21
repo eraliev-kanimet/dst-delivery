@@ -11,7 +11,6 @@ use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Unique;
 
@@ -20,6 +19,16 @@ class CustomerResource extends Resource
     protected static ?string $model = Customer::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('common.customers');
+    }
+
+    public static function getPluralLabel(): string
+    {
+        return __('common.customers');
+    }
 
     public static function getEloquentQuery(): Builder
     {
@@ -30,17 +39,20 @@ class CustomerResource extends Resource
     {
         $helper = new FilamentHelper;
 
+        $stores = getEloquentQueryFilament(Store::query())->pluck('name', 'id');
+
         return $form
             ->schema([
                 $helper->select('store_id')
-                    ->label('Store')
-                    ->options(self::getStores())
+                    ->label(__('common.store'))
+                    ->options($stores)
                     ->reactive()
                     ->required(),
                 $helper->input('name')
+                    ->label(__('common.name'))
                     ->required(),
                 $helper->input('phone')
-                    ->label('Phone number')
+                    ->label(__('common.phone_number'))
                     ->regex('/^\+\d{1,}$/')
                     ->hidden(fn(Get $get) => is_null($get('store_id')))
                     ->unique(
@@ -48,22 +60,9 @@ class CustomerResource extends Resource
                         modifyRuleUsing: fn(Unique $rule, Get $get) => $rule->where('store_id', $get('store_id')))
                     ->required(),
                 $helper->toggle('active')
+                    ->label(__('common.active'))
                     ->default(true)
             ])->columns(1);
-    }
-
-    protected static function getStores(): Collection
-    {
-        $user = Auth::user();
-        $query = Store::query();
-
-        if ($user->hasRole('store_manager')) {
-            $query->where('id', $user->permissions);
-        } else if ($user->hasRole('store_owner')) {
-            $query->whereUserId($user->id);
-        }
-
-        return $query->pluck('name', 'id');
     }
 
     public static function canDelete(Model $record): bool

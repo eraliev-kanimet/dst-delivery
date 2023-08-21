@@ -74,4 +74,10 @@ return [
     'description' => 'Description',
     'preview' => 'Preview',
     'images' => 'Images',
+    'updated_at' => 'Date of last modification',
+    'create_customer' => 'Create customer',
+    'edit_customer' => 'Create customer',
+    'customers' => 'Customers',
+    'client_phone_number' => 'Client phone number',
+    'phone_number' => 'Phone number',
 ];
