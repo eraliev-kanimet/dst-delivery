@@ -24,7 +24,7 @@ class EditBanner extends EditRecord
 
     public function mount(int|string $record): void
     {
-        $this->stores = getEloquentQueryFilament(Store::query())->pluck('name', 'id');
+        $this->stores = getQueryFilamentStore(Store::query())->pluck('name', 'id');
 
         parent::mount($record);
     }

@@ -66,7 +66,7 @@ class ListProducts extends ListRecords
      */
     protected function getHeaderActions(): array
     {
-        $stores = getEloquentQueryFilament(Store::query())->get(['id', 'name']);
+        $stores = getQueryFilamentStore(Store::query())->get(['id', 'name']);
 
         $stores = $stores->map(function (Store $store) {
             return Action::make('create_product_' . $store->id)

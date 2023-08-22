@@ -22,7 +22,7 @@ class CreateBanner extends CreateRecord
 
     public function mount(): void
     {
-        $this->stores = getEloquentQueryFilament(Store::query())->pluck('name', 'id');
+        $this->stores = getQueryFilamentStore(Store::query())->pluck('name', 'id');
 
         parent::mount();
     }

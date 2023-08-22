@@ -25,7 +25,7 @@ class ProductResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return getEloquentQueryFilament(parent::getEloquentQuery());
+        return getQueryFilamentQuery(parent::getEloquentQuery());
     }
 
     public static function getPages(): array

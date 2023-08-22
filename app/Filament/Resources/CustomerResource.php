@@ -32,14 +32,14 @@ class CustomerResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return getEloquentQueryFilament(parent::getEloquentQuery());
+        return getQueryFilamentQuery(parent::getEloquentQuery());
     }
 
     public static function form(Form $form): Form
     {
         $helper = new FilamentHelper;
 
-        $stores = getEloquentQueryFilament(Store::query())->pluck('name', 'id');
+        $stores = getQueryFilamentStore(Store::query())->pluck('name', 'id');
 
         return $form
             ->schema([

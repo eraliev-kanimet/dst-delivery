@@ -27,7 +27,7 @@ class OrderResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return getEloquentQueryFilament(parent::getEloquentQuery());
+        return getQueryFilamentQuery(parent::getEloquentQuery());
     }
 
     public static function canDelete(Model $record): bool

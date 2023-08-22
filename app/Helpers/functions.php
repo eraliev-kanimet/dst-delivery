@@ -114,7 +114,7 @@ function dbQueryLog(int $offset = 6): JsonResponse
     ]);
 }
 
-function getEloquentQueryFilament(Builder $builder): Builder
+function getQueryFilamentStore(Builder $builder): Builder
 {
     $user = Auth::user();
 
@@ -122,6 +122,19 @@ function getEloquentQueryFilament(Builder $builder): Builder
         return $builder->whereIn('id', $user->permissions);
     } else if ($user->hasRole('store_owner')) {
         return $builder->where('user_id', $user->id);
+    }
+
+    return $builder;
+}
+
+function getQueryFilamentQuery(Builder $builder): Builder
+{
+    $user = Auth::user();
+
+    if ($user->hasRole('store_manager')) {
+        return $builder->whereIn('store_id', $user->permissions);
+    } else if ($user->hasRole('store_owner')) {
+        return $builder->whereRelation('store','user_id', $user->id);
     }
 
     return $builder;

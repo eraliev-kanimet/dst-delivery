@@ -27,7 +27,7 @@ class StoreResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return getEloquentQueryFilament(parent::getEloquentQuery());
+        return getQueryFilamentStore(parent::getEloquentQuery());
     }
 
     public static function canCreate(): bool
