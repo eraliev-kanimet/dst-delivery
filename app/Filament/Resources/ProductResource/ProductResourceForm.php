@@ -147,12 +147,9 @@ final class ProductResourceForm
                 ->label(__('common.attribute'))
                 ->options($productService->getAttributesName())
                 ->required()
-                ->reactive()
-        ];
-
-        if ($this->edit) {
-            $schema[] = Hidden::make('type');
-            $schema[] = $this->helper->tabsInput('value1', $this->locales, true, __('common.value'))
+                ->reactive(),
+            Hidden::make('type'),
+            $this->helper->tabsInput('value1', $this->locales, true, __('common.value'))
                 ->visible(function (Get $get, Set $set) use ($productService) {
                     if ($productService->isAttributeType1($get('attribute'))) {
                         $set('type', 1);
@@ -161,8 +158,8 @@ final class ProductResourceForm
                     }
 
                     return false;
-                });
-            $schema[] = $this->helper->input('value2')
+                }),
+            $this->helper->input('value2')
                 ->visible(function (Get $get, Set $set) use ($productService) {
                     if ($productService->isAttributeType2($get('attribute'))) {
                         $set('type', 2);
@@ -171,14 +168,8 @@ final class ProductResourceForm
                     }
 
                     return false;
-                })->label(__('common.value'));
-        } else {
-            $schema[] = $this->helper->tabsInput('value1', $this->locales, true, __('common.value'))
-                ->visible(fn(Get $get) => $productService->isAttributeType1($get('attribute')));
-            $schema[] = $this->helper->input('value2')
-                ->visible(fn(Get $get) => $productService->isAttributeType2($get('attribute')))
-                ->label(__('common.value'));
-        }
+                })->label(__('common.value'))
+        ];
 
         return $this->helper->repeater($model, $schema)
             ->label('')

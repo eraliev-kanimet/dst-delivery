@@ -122,6 +122,7 @@ return [
     'locales' => 'Languages',
     'fallback_locale' => 'Default language',
     'create_product' => 'Create product',
+    'edit_product' => 'Edit product',
     'is_available' => 'Is available',
     'selections' => 'Selections',
     'add_selection' => 'Add selection',
