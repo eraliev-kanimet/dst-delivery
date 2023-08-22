@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\Api\Store;
 
 use App\Enums\OrderStatus;
+use App\Events\CustomerOrderIndex;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Store\Order\ItemStoreRequest;
 use App\Http\Requests\Api\Store\Order\ItemUpdateRequest;
 use App\Http\Requests\Api\Store\Order\StoreRequest;
 use App\Http\Requests\Api\Store\Order\UpdateRequest;
 use App\Http\Resources\OrderResource;
+use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\Selection;
 use App\Models\Store;
 use App\Service\ApiOrderService;
 use App\Http\Requests\Api\Store\Order\IndexRequest;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -47,6 +50,11 @@ class OrderController extends Controller
         if ($order->status == OrderStatus::pending_payment->value) {
             $order->update($request->all());
 
+            /** @var Customer $customer */
+            $customer = Auth::user();
+
+            broadcast(new CustomerOrderIndex(Store::current(), $customer));
+
             return new OrderResource($order);
         }
 
@@ -59,6 +67,11 @@ class OrderController extends Controller
 
         if ($order->status == OrderStatus::pending_payment->value) {
             $order->actionCancel();
+
+            /** @var Customer $customer */
+            $customer = Auth::user();
+
+            broadcast(new CustomerOrderIndex(Store::current(), $customer));
 
             return new OrderResource($order);
         }
@@ -87,6 +100,11 @@ class OrderController extends Controller
 
                 $order->actionTotalCostRecalculation();
 
+                /** @var Customer $customer */
+                $customer = Auth::user();
+
+                broadcast(new CustomerOrderIndex(Store::current(), $customer));
+
                 return new OrderResource($order);
             }
 
@@ -109,6 +127,11 @@ class OrderController extends Controller
 
             $order->actionTotalCostRecalculation();
 
+            /** @var Customer $customer */
+            $customer = Auth::user();
+
+            broadcast(new CustomerOrderIndex(Store::current(), $customer));
+
             return new OrderResource($order);
         }
 
@@ -129,6 +152,11 @@ class OrderController extends Controller
             $orderItem->delete();
 
             $order->actionTotalCostRecalculation();
+
+            /** @var Customer $customer */
+            $customer = Auth::user();
+
+            broadcast(new CustomerOrderIndex(Store::current(), $customer));
 
             return new OrderResource($order);
         }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Enums\OrderStatus;
+use App\Events\CustomerOrderIndex;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\OrderResourceForm;
 use App\Models\Order;
@@ -101,6 +102,8 @@ class EditOrder extends EditRecord
         } else {
             $this->record->actionTotalCostRecalculation();
         }
+
+        broadcast(new CustomerOrderIndex($this->record->store, $this->record->customer));
     }
 
     /**
@@ -113,6 +116,8 @@ class EditOrder extends EditRecord
                 ->color('warning')
                 ->action(function () {
                     $this->record->actionCancel();
+
+                    broadcast(new CustomerOrderIndex($this->record->store, $this->record->customer));
                 })
                 ->requiresConfirmation()
                 ->label(__('common.cancel'))
@@ -125,6 +130,8 @@ class EditOrder extends EditRecord
                 ->color('success')
                 ->action(function () {
                     $this->record->actionConfirmed();
+
+                    broadcast(new CustomerOrderIndex($this->record->store, $this->record->customer));
                 })
                 ->requiresConfirmation()
                 ->label(__('common.confirmed'))

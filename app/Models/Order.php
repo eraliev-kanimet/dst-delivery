@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\CustomerOrderIndex;
 use App\Traits\Models\OrderAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,6 +54,19 @@ class Order extends Model
                 $order->delivery_date = now();
                 $order->delivery_address = [];
             }
+        });
+
+        self::created(function (self $order) {
+            broadcast(new CustomerOrderIndex($order->store, $order->customer));
+        });
+
+        self::deleted(function (self $order) {
+            broadcast(
+                new CustomerOrderIndex(
+                    Store::find($order->store_id),
+                    Customer::find($order->customer_id)
+                )
+            );
         });
     }
 

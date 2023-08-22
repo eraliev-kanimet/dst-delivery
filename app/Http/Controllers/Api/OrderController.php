@@ -6,6 +6,7 @@ use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -42,6 +43,14 @@ class OrderController extends Controller
             'statuses' => $statuses,
             'payment_methods' => $payment_methods,
             'delivery_types' => $delivery_types,
+            'websockets' => [
+                'key' => config('broadcasting.connections.pusher.key'),
+                'cluster' => config('broadcasting.connections.pusher.cluster'),
+                'channel_name' => 'customer.' . Auth::id() . '.orders',
+                'events' => [
+                    'orders' => 'customer.orders',
+                ]
+            ],
         ]);
     }
 }
