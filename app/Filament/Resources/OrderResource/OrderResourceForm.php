@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\OrderResource;
 
 use App\Enums\DeliveryType;
-use App\Enums\PaymentType;
+use App\Enums\PaymentMethod;
 use App\Helpers\FilamentHelper;
 use App\Models\Customer;
 use App\Models\Selection;
@@ -90,8 +90,8 @@ class OrderResourceForm
         $array = [
             $this->helper->grid([
                 $this->helper->select('payment_type')
-                    ->label(__('common.payment_type'))
-                    ->options(PaymentType::getSelect())
+                    ->label(__('common.payment_method'))
+                    ->options(PaymentMethod::getSelect())
                     ->required()
                     ->columnSpan($this->edited ? 1 : 2),
                 $this->helper->input('total')

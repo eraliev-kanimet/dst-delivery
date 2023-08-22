@@ -139,10 +139,10 @@ paths:
       tags:
         - Orders
       summary: Get information for orders
-      description: Receive order statuses, payment types and delivery types
+      description: Receive order statuses, payment methods and delivery types
       responses:
         '200':
-          description: Receive order statuses, payment types and delivery types
+          description: Receive order statuses, payment methods and delivery types
           content:
             application/json:
               schema:
@@ -157,7 +157,7 @@ paths:
                           type: integer
                         name:
                           type: string
-                  payment_types:
+                  payment_methods:
                     type: array
                     items:
                       type: object

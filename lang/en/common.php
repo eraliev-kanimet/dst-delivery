@@ -27,7 +27,7 @@ return [
         'bowl_capacity' => 'Bowl Capacity',
         'suction_power' => 'Suction power',
     ],
-    'payment_types' => [
+    'payment_methods' => [
         'card' => 'Card',
     ],
     'delivery_types' => [
@@ -97,7 +97,7 @@ return [
     'basic' => 'Basic',
     'products' => 'Products',
     'add_product' => 'Add product',
-    'payment_type' => 'Payment type',
+    'payment_method' => 'Payment method',
     'delivery_type' => 'Delivery type',
     'delivery_date' => 'Delivery date',
     'first_name' => 'First name',

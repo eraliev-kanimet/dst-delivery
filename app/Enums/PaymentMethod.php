@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum PaymentType: int
+enum PaymentMethod: int
 {
     case card = 1;
 
@@ -11,7 +11,7 @@ enum PaymentType: int
         $array = [];
 
         foreach (self::cases() as $case) {
-            $array[$case->value] = __('common.payment_types.' . $case->name);
+            $array[$case->value] = __('common.payment_methods.' . $case->name);
         }
 
         return $array;

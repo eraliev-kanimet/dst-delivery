@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
-use App\Enums\PaymentType;
+use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 
 class OrderController extends Controller
@@ -20,12 +20,12 @@ class OrderController extends Controller
             ];
         }
 
-        $payment_types = [];
+        $payment_methods = [];
 
-        foreach (PaymentType::cases() as $type) {
-            $payment_types[] = [
+        foreach (PaymentMethod::cases() as $type) {
+            $payment_methods[] = [
                 'key' => $type->value,
-                'name' => __('common.payment_types.' . $type->name)
+                'name' => __('common.payment_methods.' . $type->name)
             ];
         }
 
@@ -40,7 +40,7 @@ class OrderController extends Controller
 
         return response()->json([
             'statuses' => $statuses,
-            'payment_types' => $payment_types,
+            'payment_methods' => $payment_methods,
             'delivery_types' => $delivery_types,
         ]);
     }

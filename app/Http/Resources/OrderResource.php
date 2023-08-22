@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
-use App\Enums\PaymentType;
+use App\Enums\PaymentMethod;
 use App\Models\Order;
 use App\Service\ProductSelectionService;
 use Illuminate\Http\Request;
@@ -27,8 +27,8 @@ class OrderResource extends BaseResource
             'delivery_address' => $this->resource->delivery_address,
             'delivery_type' => $this->resource->delivery_type,
             'delivery_type_name' => __('common.delivery_types.' . DeliveryType::from($this->resource->delivery_type)->name),
-            'payment_type' => $this->resource->payment_type,
-            'payment_type_name' => __('common.payment_types.' . PaymentType::from($this->resource->payment_type)->name),
+            'payment_method' => $this->resource->payment_type,
+            'payment_method_name' => __('common.payment_methods.' . PaymentMethod::from($this->resource->payment_type)->name),
             'items' => $this->getOrderItems(),
         ];
     }
