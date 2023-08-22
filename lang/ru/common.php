@@ -28,6 +28,7 @@ return [
         'suction_power' => 'Мощность всасывания',
     ],
     'payment_methods' => [
+        'cash' => 'Оплата наличными',
         'card' => 'Карточка',
     ],
     'delivery_types' => [
@@ -97,7 +98,7 @@ return [
     'basic' => 'Основные',
     'products' => 'Продукты',
     'add_product' => 'Добавить продукт',
-    'payment_type' => 'Метод оплаты',
+    'payment_method' => 'Метод оплаты',
     'delivery_type' => 'Тип доставки',
     'delivery_date' => 'Дата доставки',
     'first_name' => 'Имя',

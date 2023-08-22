@@ -28,6 +28,7 @@ return [
         'suction_power' => 'Suction power',
     ],
     'payment_methods' => [
+        'cash' => 'Cash',
         'card' => 'Card',
     ],
     'delivery_types' => [
@@ -57,7 +58,7 @@ return [
     'url' => 'URL',
     'product' => 'Product',
     'category' => 'Category',
-    'edit_banner' => 'edit banner',
+    'edit_banner' => 'Edit banner',
     'create_banner' => 'Create banner',
     'sorted' => 'Sorted',
     'store' => 'Store',

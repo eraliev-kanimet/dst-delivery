@@ -48,6 +48,11 @@ class Order extends Model
 
         self::creating(function (self $order) {
             $order->uuid = time();
+
+            if (is_null($order->delivery_date)) {
+                $order->delivery_date = now();
+                $order->delivery_address = [];
+            }
         });
     }
 

@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum PaymentMethod: int
 {
+    case cash = 0;
     case card = 1;
 
     public static function getSelect(): array
