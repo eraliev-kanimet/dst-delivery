@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Api\Store\Order;
 
 use App\Enums\DeliveryType;
-use App\Enums\PaymentType;
+use App\Enums\PaymentMethod;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -12,7 +12,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'delivery_type' => ['bail', 'required', 'in:' . implode(',', DeliveryType::values())],
-            'payment_type' => ['bail', 'required', 'in:' . implode(',', PaymentType::values())],
+            'payment_method' => ['bail', 'required', 'in:' . implode(',', PaymentMethod::values())],
 
             'first_name' => ['bail', 'required'],
             'last_name' => ['bail', 'required'],
@@ -44,7 +44,7 @@ class UpdateRequest extends FormRequest
         $data = $this->passedValidationData();
 
         $data['delivery_type'] = $this->get('delivery_type');
-        $data['payment_type'] = $this->get('payment_type');
+        $data['payment_type'] = $this->get('payment_method');
 
         $this->replace($data);
     }

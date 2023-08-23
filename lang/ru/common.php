@@ -27,7 +27,8 @@ return [
         'bowl_capacity' => 'Вместимость чаши',
         'suction_power' => 'Мощность всасывания',
     ],
-    'payment_types' => [
+    'payment_methods' => [
+        'cash' => 'Оплата наличными',
         'card' => 'Карточка',
     ],
     'delivery_types' => [
@@ -97,7 +98,7 @@ return [
     'basic' => 'Основные',
     'products' => 'Продукты',
     'add_product' => 'Добавить продукт',
-    'payment_type' => 'Тип платежа',
+    'payment_method' => 'Метод оплаты',
     'delivery_type' => 'Тип доставки',
     'delivery_date' => 'Дата доставки',
     'first_name' => 'Имя',

@@ -27,7 +27,8 @@ return [
         'bowl_capacity' => 'Bowl Capacity',
         'suction_power' => 'Suction power',
     ],
-    'payment_types' => [
+    'payment_methods' => [
+        'cash' => 'Cash',
         'card' => 'Card',
     ],
     'delivery_types' => [
@@ -57,7 +58,7 @@ return [
     'url' => 'URL',
     'product' => 'Product',
     'category' => 'Category',
-    'edit_banner' => 'edit banner',
+    'edit_banner' => 'Edit banner',
     'create_banner' => 'Create banner',
     'sorted' => 'Sorted',
     'store' => 'Store',
@@ -97,7 +98,7 @@ return [
     'basic' => 'Basic',
     'products' => 'Products',
     'add_product' => 'Add product',
-    'payment_type' => 'Payment type',
+    'payment_method' => 'Payment method',
     'delivery_type' => 'Delivery type',
     'delivery_date' => 'Delivery date',
     'first_name' => 'First name',

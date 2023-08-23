@@ -3,10 +3,11 @@
 namespace App\Filament\Resources\OrderResource;
 
 use App\Enums\DeliveryType;
-use App\Enums\PaymentType;
+use App\Enums\PaymentMethod;
 use App\Helpers\FilamentHelper;
 use App\Models\Customer;
 use App\Models\Selection;
+use Closure;
 use Filament\Forms\Get;
 use Illuminate\Support\Collection;
 
@@ -90,8 +91,8 @@ class OrderResourceForm
         $array = [
             $this->helper->grid([
                 $this->helper->select('payment_type')
-                    ->label(__('common.payment_type'))
-                    ->options(PaymentType::getSelect())
+                    ->label(__('common.payment_method'))
+                    ->options(PaymentMethod::getSelect())
                     ->required()
                     ->columnSpan($this->edited ? 1 : 2),
                 $this->helper->input('total')
@@ -100,34 +101,44 @@ class OrderResourceForm
                     ->visible($this->edited),
                 $this->helper->select('delivery_type')
                     ->label(__('common.delivery_type'))
-                    ->options(DeliveryType::getSelect()),
+                    ->reactive()
+                    ->options(DeliveryType::getSelect())
+                    ->columnSpan(fn (Get $get) => $get('delivery_type') == DeliveryType::courier->value ? 1 : 2),
                 $this->helper->dateTime('delivery_date')
                     ->label(__('common.delivery_date'))
                     ->minDate(now())
-                    ->required(),
+                    ->required()
+                    ->visible($this->ifTypeDeliveryIsCourier()),
                 $this->helper->input('delivery_address.first_name')
                     ->label(__('common.first_name'))
-                    ->required(),
+                    ->required()
+                    ->visible($this->ifTypeDeliveryIsCourier()),
                 $this->helper->input('delivery_address.last_name')
                     ->label(__('common.last_name'))
-                    ->required(),
+                    ->required()
+                    ->visible($this->ifTypeDeliveryIsCourier()),
                 $this->helper->input('delivery_address.email')
                     ->label(__('common.email'))
                     ->required()
                     ->email()
-                    ->columnSpan(2),
+                    ->columnSpan(2)
+                    ->visible($this->ifTypeDeliveryIsCourier()),
                 $this->helper->input('delivery_address.country')
                     ->label(__('common.country'))
-                    ->required(),
+                    ->required()
+                    ->visible($this->ifTypeDeliveryIsCourier()),
                 $this->helper->input('delivery_address.city')
                     ->label(__('common.city'))
-                    ->required(),
+                    ->required()
+                    ->visible($this->ifTypeDeliveryIsCourier()),
                 $this->helper->input('delivery_address.address')
                     ->label(__('common.address'))
-                    ->required(),
+                    ->required()
+                    ->visible($this->ifTypeDeliveryIsCourier()),
                 $this->helper->input('delivery_address.zip')
                     ->label(__('common.zip'))
-                    ->required(),
+                    ->required()
+                    ->visible($this->ifTypeDeliveryIsCourier()),
             ]),
         ];
 
@@ -157,5 +168,12 @@ class OrderResourceForm
         }
 
         return $array;
+    }
+
+    public function ifTypeDeliveryIsCourier(): Closure
+    {
+        return function (Get $get) {
+            return $get('delivery_type') == DeliveryType::courier->value;
+        };
     }
 }
