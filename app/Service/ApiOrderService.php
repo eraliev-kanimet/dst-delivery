@@ -22,7 +22,7 @@ class ApiOrderService
             'status' => OrderStatus::pending_payment->value,
             'delivery_date' => now()->addDays(10),
             'delivery_type' => $data['delivery_type'],
-            'payment_type' => $data['payment_type'],
+            'payment_type' => $data['payment_method'],
             'delivery_address' => $data['delivery_address'],
         ]);
 
@@ -30,7 +30,9 @@ class ApiOrderService
         foreach ($data['products'] as $product) {
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $product->id,
+                'product' => [
+                    'selection_id' => $product->id
+                ],
                 'quantity' => $product->quantity,
                 'price' => $product->price,
             ]);

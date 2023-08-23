@@ -10,24 +10,32 @@ class UpdateRequest extends FormRequest
 {
     public function rules(): array
     {
-        return [
+        $rules = [
             'delivery_type' => ['bail', 'required', 'in:' . implode(',', DeliveryType::values())],
             'payment_method' => ['bail', 'required', 'in:' . implode(',', PaymentMethod::values())],
-
-            'first_name' => ['bail', 'required'],
-            'last_name' => ['bail', 'required'],
-            'email' => ['bail', 'required', 'email'],
-            'country' => ['bail', 'required'],
-            'city' => ['bail', 'required'],
-            'address' => ['bail', 'required'],
-            'zip' => ['bail', 'required'],
         ];
+
+        if ($this->get('delivery_type', false) != DeliveryType::self_delivery->value) {
+            return array_merge($rules, [
+                'first_name' => ['bail', 'required'],
+                'last_name' => ['bail', 'required'],
+                'email' => ['bail', 'required', 'email'],
+                'country' => ['bail', 'required'],
+                'city' => ['bail', 'required'],
+                'address' => ['bail', 'required'],
+                'zip' => ['bail', 'required'],
+            ]);
+        }
+
+        return $rules;
     }
 
     protected function passedValidationData(): array
     {
-        return [
-            'delivery_address' => [
+        $data = [];
+
+        if ($this->get('delivery_type') != DeliveryType::self_delivery->value) {
+            $data = [
                 'first_name' => $this->get('first_name'),
                 'last_name' => $this->get('last_name'),
                 'email' => $this->get('email'),
@@ -35,7 +43,11 @@ class UpdateRequest extends FormRequest
                 'city' => $this->get('city'),
                 'address' => $this->get('address'),
                 'zip' => $this->get('zip'),
-            ],
+            ];
+        }
+
+        return [
+            'delivery_address' => $data,
         ];
     }
 
@@ -44,7 +56,7 @@ class UpdateRequest extends FormRequest
         $data = $this->passedValidationData();
 
         $data['delivery_type'] = $this->get('delivery_type');
-        $data['payment_type'] = $this->get('payment_method');
+        $data['payment_method'] = $this->get('payment_method');
 
         $this->replace($data);
     }

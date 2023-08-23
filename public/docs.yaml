@@ -142,39 +142,7 @@ paths:
       description: Receive order statuses, payment methods and delivery types
       responses:
         '200':
-          description: Receive order statuses, payment methods and delivery types
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  statuses:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        key:
-                          type: integer
-                        name:
-                          type: string
-                  payment_methods:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        key:
-                          type: integer
-                        name:
-                          type: string
-                  delivery_types:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        key:
-                          type: integer
-                        name:
-                          type: string
+          $ref: '#/components/responses/OrderInfoResponse'
   /api/store/orders:
     get:
       tags:
@@ -201,6 +169,8 @@ paths:
         - $ref: '#/components/parameters/AcceptLanguage'
         - $ref: '#/components/parameters/StoreUuid'
         - $ref: '#/components/parameters/BearerToken'
+      requestBody:
+        $ref: '#/components/requestBodies/OrderCreateOrUpdateRequest'
       responses:
         '200':
           $ref: '#/components/responses/BlankResponse'
@@ -231,6 +201,9 @@ paths:
         - $ref: '#/components/parameters/AcceptLanguage'
         - $ref: '#/components/parameters/StoreUuid'
         - $ref: '#/components/parameters/BearerToken'
+        - $ref: '#/components/parameters/ID'
+      requestBody:
+        $ref: '#/components/requestBodies/OrderCreateOrUpdateRequest'
       responses:
         '200':
           $ref: '#/components/responses/BlankResponse'
@@ -246,6 +219,7 @@ paths:
         - $ref: '#/components/parameters/AcceptLanguage'
         - $ref: '#/components/parameters/StoreUuid'
         - $ref: '#/components/parameters/BearerToken'
+        - $ref: '#/components/parameters/ID'
       responses:
         '200':
           $ref: '#/components/responses/BlankResponse'
@@ -261,6 +235,8 @@ paths:
         - $ref: '#/components/parameters/AcceptLanguage'
         - $ref: '#/components/parameters/StoreUuid'
         - $ref: '#/components/parameters/BearerToken'
+      requestBody:
+        $ref: '#/components/requestBodies/OrderItemsAddRequest'
       responses:
         '200':
           $ref: '#/components/responses/BlankResponse'
@@ -276,6 +252,8 @@ paths:
         - $ref: '#/components/parameters/AcceptLanguage'
         - $ref: '#/components/parameters/StoreUuid'
         - $ref: '#/components/parameters/BearerToken'
+      requestBody:
+        $ref: '#/components/requestBodies/OrderItemsChangeRequest'
       responses:
         '200':
           $ref: '#/components/responses/BlankResponse'
@@ -291,6 +269,7 @@ paths:
         - $ref: '#/components/parameters/AcceptLanguage'
         - $ref: '#/components/parameters/StoreUuid'
         - $ref: '#/components/parameters/BearerToken'
+        - $ref: '#/components/parameters/ID'
       responses:
         '200':
           $ref: '#/components/responses/BlankResponse'
@@ -460,6 +439,97 @@ components:
             required:
               - phone_code
               - phone_number
+    OrderCreateOrUpdateRequest:
+      required: true
+      description: >-
+        Form data example:
+
+          --form 'delivery_type="1"' \
+          --form 'payment_method="1"' \
+          --form 'first_name="first_name"' \
+          --form 'last_name="last_name"' \
+          --form 'email="admin@admin.com"' \
+          --form 'country="country"' \
+          --form 'city="city"' \
+          --form 'address="address"' \
+          --form 'zip="zip"' \
+          --form 'products[selection_id_1]="2"' \
+          --form 'products[selection_id_3]="1"'"
+
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              delivery_type:
+                type: integer
+                description: Delivery type
+              payment_method:
+                type: integer
+                description: Payment method
+              first_name:
+                type: string
+                description: First name customer
+              last_name:
+                type: string
+                description: Last name customer
+              email:
+                type: string
+                description: Email customer
+              country:
+                type: string
+                description: Country customer
+              city:
+                type: string
+                description: City customer
+              address:
+                type: string
+                description: Address customer
+              zip:
+                type: string
+                description: Zip code customer
+              products:
+                type: array
+                description: The key "selection_id_1" is the identifier from the selection of products. And the value is the number of products.
+            required:
+              - delivery_type
+              - payment_method
+    OrderItemsAddRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              order_id:
+                type: string
+                description: Order ID
+              selection_id:
+                type: number
+                description: The identifier from the selection of products.
+              quantity:
+                type: number
+                description: The quantity of products.
+            required:
+              - order_id
+              - selection_id
+              - quantity
+    OrderItemsChangeRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              order_item_id:
+                type: string
+                description: Order Item ID
+              quantity:
+                type: number
+                description: The quantity of products.
+            required:
+              - order_item_id
+              - quantity
   responses:
     BlankResponse:
       description: Unprocessable Entity
@@ -467,7 +537,7 @@ components:
         application/json:
           schema:
             type: array
-            default: []
+            default: [ ]
     UnauthorizedResponse:
       description: Unprocessable Entity
       content:
@@ -614,6 +684,54 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Banner'
+    OrderInfoResponse:
+      description: Receive order statuses, payment methods and delivery types
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statuses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: integer
+                    name:
+                      type: string
+              payment_methods:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: integer
+                    name:
+                      type: string
+              delivery_types:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: integer
+                    name:
+                      type: string
+              websockets:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  key:
+                    type: string
+                  cluster:
+                    type: string
+                  channel:
+                    type: string
+                  events:
+                    type: array
+                    default: [ 'event_alter_name': 'event_name' ]
   parameters:
     AcceptLanguage:
       name: Accept-Language
