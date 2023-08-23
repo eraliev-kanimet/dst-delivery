@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Enums\OrderStatus;
-use App\Events\CustomerOrderIndex;
+use App\Events\CustomerOrder;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\OrderResourceForm;
 use App\Models\Order;
@@ -108,7 +108,7 @@ class EditOrder extends EditRecord
 
     public function callBroadcast(bool $reload = true): void
     {
-        broadcast(new CustomerOrderIndex($this->record->store, $this->record->customer));
+        broadcast(new CustomerOrder($this->record->uuid, $this->record->customer_id));
 
         if ($reload) {
             redirect()->route('filament.admin.resources.orders.edit', ['record' => $this->record->uuid]);
