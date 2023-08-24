@@ -131,4 +131,6 @@ return [
     'add_property' => 'Add property',
     'value' => 'Value',
     'attribute' => 'Attribute',
+    'profile' => 'Profile',
+    'password_confirmation' => 'Password confirmation',
 ];

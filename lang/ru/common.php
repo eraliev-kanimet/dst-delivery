@@ -131,4 +131,6 @@ return [
     'add_property' => 'Добавить свойство',
     'value' => 'Значение',
     'attribute' => 'Атрибут',
+    'profile' => 'Профиль',
+    'password_confirmation' => 'Подтверждение пароля',
 ];
