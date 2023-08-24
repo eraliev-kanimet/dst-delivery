@@ -57,12 +57,17 @@ class Order extends Model
         });
 
         self::created(function (self $order) {
-            broadcast(new CustomerOrder($order->uuid, $order->customer_id));
+            $order->callCustomOrderUpdateEvent();
         });
 
         self::deleted(function (self $order) {
-            broadcast(new CustomerOrder($order->uuid, $order->customer_id));
+            $order->callCustomOrderUpdateEvent();
         });
+    }
+
+    public function callCustomOrderUpdateEvent(): void
+    {
+        CustomerOrder::dispatch($this->uuid, $this->customer_id);
     }
 
     public function getRouteKeyName(): string

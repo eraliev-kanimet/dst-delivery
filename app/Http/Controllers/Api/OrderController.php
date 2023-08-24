@@ -38,20 +38,19 @@ class OrderController extends Controller
             ];
         }
 
-        $pusher_key = config('broadcasting.connections.pusher.key');
-        $pusher_cluster = config('broadcasting.connections.pusher.cluster');
-
         return response()->json([
             'statuses' => $statuses,
             'payment_methods' => $payment_methods,
             'delivery_types' => $delivery_types,
-            'websockets' => [
-                'url' => "wss://ws-$pusher_cluster.pusher.com/app/$pusher_key",
-                'key' => $pusher_key,
-                'cluster' => $pusher_cluster,
-                'channel' => 'customer.{customer_id}.orders',
+            'websocket' => [
+                'url' => config('websocket.url'),
+                'host' => config('websocket.host'),
+                'port' => config('websocket.port'),
                 'events' => [
-                    'orders' => 'customer.orders',
+                    'customer-{customer_id}',
+                ],
+                'query' => [
+                    'customer_id' => 'customer_id',
                 ]
             ],
         ]);

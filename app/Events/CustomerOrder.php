@@ -2,29 +2,19 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Support\Facades\Http;
 
-class CustomerOrder implements ShouldBroadcast
+class CustomerOrder
 {
-    use Dispatchable, InteractsWithSockets;
-
-    public string $current_date_time;
-
-    public function __construct(public int $order_id, protected int $customer_id)
+    public static function dispatch(int $order_id, int $customer_id): void
     {
-        $this->current_date_time = now();
-    }
-
-    public function broadcastOn(): Channel
-    {
-        return new Channel('customer.' . $this->customer_id . '.orders');
-    }
-
-    public function broadcastAs(): string
-    {
-        return 'customer.orders';
+        Http::post(config('websocket.url'), [
+            'command' => 'customer',
+            'customer_id' => $customer_id,
+            'message' => [
+                'order_id' => $order_id,
+                'current_date_time' => now(),
+            ]
+        ]);
     }
 }

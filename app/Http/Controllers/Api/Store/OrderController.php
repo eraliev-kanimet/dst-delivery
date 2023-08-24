@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Store;
 
 use App\Enums\OrderStatus;
-use App\Events\CustomerOrder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Store\Order\ItemStoreRequest;
 use App\Http\Requests\Api\Store\Order\ItemUpdateRequest;
@@ -48,7 +47,7 @@ class OrderController extends Controller
         if ($order->status == OrderStatus::pending_payment->value) {
             $order->update($request->all());
 
-            broadcast(new CustomerOrder($order->uuid, $order->customer_id));
+            $order->callCustomOrderUpdateEvent();
 
             return new OrderResource($order);
         }
@@ -63,7 +62,7 @@ class OrderController extends Controller
         if ($order->status == OrderStatus::pending_payment->value) {
             $order->actionCancel();
 
-            broadcast(new CustomerOrder($order->uuid, $order->customer_id));
+            $order->callCustomOrderUpdateEvent();
 
             return new OrderResource($order);
         }
@@ -92,7 +91,7 @@ class OrderController extends Controller
 
                 $order->actionTotalCostRecalculation();
 
-                broadcast(new CustomerOrder($order->uuid, $order->customer_id));
+                $order->callCustomOrderUpdateEvent();
 
                 return new OrderResource($order);
             }
@@ -116,7 +115,7 @@ class OrderController extends Controller
 
             $order->actionTotalCostRecalculation();
 
-            broadcast(new CustomerOrder($order->uuid, $order->customer_id));
+            $order->callCustomOrderUpdateEvent();
 
             return new OrderResource($order);
         }
@@ -139,7 +138,7 @@ class OrderController extends Controller
 
             $order->actionTotalCostRecalculation();
 
-            broadcast(new CustomerOrder($order->uuid, $order->customer_id));
+            $order->callCustomOrderUpdateEvent();
 
             return new OrderResource($order);
         }

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Enums\OrderStatus;
-use App\Events\CustomerOrder;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\OrderResourceForm;
 use App\Models\Order;
@@ -103,12 +102,12 @@ class EditOrder extends EditRecord
             $this->record->actionTotalCostRecalculation();
         }
 
-        $this->callBroadcast();
+        $this->callCustomOrderUpdateEvent();
     }
 
-    public function callBroadcast(bool $reload = true): void
+    public function callCustomOrderUpdateEvent(bool $reload = true): void
     {
-        broadcast(new CustomerOrder($this->record->uuid, $this->record->customer_id));
+        $this->record->callCustomOrderUpdateEvent();
 
         if ($reload) {
             redirect()->route('filament.admin.resources.orders.edit', ['record' => $this->record->uuid]);
@@ -126,7 +125,7 @@ class EditOrder extends EditRecord
                 ->action(function () {
                     $this->record->actionCancel();
 
-                    $this->callBroadcast();
+                    $this->callCustomOrderUpdateEvent();
                 })
                 ->requiresConfirmation()
                 ->label(__('common.cancel'))
@@ -140,7 +139,7 @@ class EditOrder extends EditRecord
                 ->action(function () {
                     $this->record->actionConfirmed();
 
-                    $this->callBroadcast();
+                    $this->callCustomOrderUpdateEvent();
                 })
                 ->requiresConfirmation()
                 ->label(__('common.confirmed'))

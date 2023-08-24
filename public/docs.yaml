@@ -723,15 +723,13 @@ components:
                 properties:
                   url:
                     type: string
-                  key:
+                  host:
                     type: string
-                  cluster:
-                    type: string
-                  channel:
+                  port:
                     type: string
                   events:
                     type: array
-                    default: [ 'event_alter_name': 'event_name' ]
+                    default: [ 'event_name': 'event_name' ]
   parameters:
     AcceptLanguage:
       name: Accept-Language
