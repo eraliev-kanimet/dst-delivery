@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\PaymentProvider;
 use App\Http\Controllers\Controller;
 
 class OrderController extends Controller
@@ -38,10 +39,20 @@ class OrderController extends Controller
             ];
         }
 
+        $payment_providers = [];
+
+        foreach (PaymentProvider::cases() as $provider) {
+            $payment_providers[] = [
+                'key' => $provider->value,
+                'name' => __('common.' . $provider->value)
+            ];
+        }
+
         return response()->json([
             'statuses' => $statuses,
             'payment_methods' => $payment_methods,
             'delivery_types' => $delivery_types,
+            'payment_providers' => $payment_providers,
             'websocket' => [
                 'url' => config('websocket.url'),
                 'host' => config('websocket.host'),
