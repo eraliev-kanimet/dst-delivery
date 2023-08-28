@@ -133,4 +133,15 @@ return [
     'attribute' => 'Атрибут',
     'profile' => 'Профиль',
     'password_confirmation' => 'Подтверждение пароля',
+    'payment_status' => [
+        'success' => 'Успех',
+        'confirmation_pending' => 'Ожидается подтверждение',
+        'failed' => 'Не удалось',
+    ],
+    'payments' => 'Платежи',
+    'transaction_id' => 'ID транзакции',
+    'amount' => 'Сумма',
+    'provider' => 'Провайдер',
+    'sberbank' => 'Сбербанк',
+    'order' => 'Заказ',
 ];

@@ -133,4 +133,15 @@ return [
     'attribute' => 'Attribute',
     'profile' => 'Profile',
     'password_confirmation' => 'Password confirmation',
+    'payment_status' => [
+        'success' => 'Success',
+        'confirmation_pending' => 'Confirmation pending',
+        'failed' => 'Failed',
+    ],
+    'payments' => 'Payments',
+    'transaction_id' => 'Transaction ID',
+    'amount' => 'Amount',
+    'provider' => 'Provider',
+    'sberbank' => 'Sberbank',
+    'order' => 'Order',
 ];

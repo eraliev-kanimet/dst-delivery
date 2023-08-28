@@ -57,8 +57,7 @@ class ListOrders extends ListRecords
                     ->label(__('common.store_name')),
                 TextColumn::make('customer.phone')
                     ->label(__('common.customer_phone_number'))
-                    ->searchable()
-                    ->copyable(),
+                    ->searchable(),
                 TextColumn::make('total')
                     ->label(__('common.total')),
                 TextColumn::make('status')
