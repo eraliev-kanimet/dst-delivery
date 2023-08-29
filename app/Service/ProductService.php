@@ -9,6 +9,14 @@ use App\Models\Product;
 class ProductService
 {
     protected array $attributes_type1 = [
+        'weight',
+        'ingredients',
+        'calories',
+        'proteins',
+        'fats',
+        'carbohydrates',
+        'volume',
+        'nutritional_and_energy_value',
         'size',
         'country_of_production',
         'neckline',
