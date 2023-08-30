@@ -4,7 +4,6 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\ProductResourceForm;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\Content;
 use Filament\Forms\Form;
@@ -35,10 +34,7 @@ class EditProduct extends EditRecord
 
         $locale = config('app.locale');
 
-        $this->categories = Category::whereIn('store_id', $this->record->store_id)
-            ->get()
-            ->pluck("name.$locale", 'id')
-            ->toArray();
+        $this->categories = $this->record->store->categories()->get(['name', 'id'])->pluck("name.$locale", 'id')->toArray();
 
         if (!in_array($this->record->category->id, array_keys($this->categories))) {
             $this->category_disabled = true;

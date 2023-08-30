@@ -4,7 +4,6 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\ProductResourceForm;
-use App\Models\Category;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\Content;
@@ -45,10 +44,7 @@ class CreateProduct extends CreateRecord
 
                 $locale = config('app.locale');
 
-                $this->categories = Category::whereIn('store_id', $store->id)
-                    ->get()
-                    ->pluck("name.$locale", 'id')
-                    ->toArray();
+                $this->categories = $this->record->store->categories()->get(['name', 'id'])->pluck("name.$locale", 'id')->toArray();
 
                 $this->locales = $store->locales;
             }
