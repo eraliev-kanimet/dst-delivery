@@ -44,6 +44,11 @@ class Store extends Model
         return $this->hasMany(Category::class);
     }
 
+    public function attr(): HasMany
+    {
+        return $this->hasMany(AttrKey::class);
+    }
+
     public static function setCurrent(Store $store): void
     {
         self::$current = $store;

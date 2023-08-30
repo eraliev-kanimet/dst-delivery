@@ -15,6 +15,10 @@ class AttrKey extends Model
         'translatable',
     ];
 
+    protected $casts = [
+        'name' => 'array',
+    ];
+
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);

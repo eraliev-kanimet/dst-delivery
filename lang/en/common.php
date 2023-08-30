@@ -146,4 +146,6 @@ return [
         'store_owner' => 'Store Owner',
         'store_manager' => 'Store Manager',
     ],
+    'attributes_label' => 'Attributes',
+    'translatable' => 'Translatable',
 ];

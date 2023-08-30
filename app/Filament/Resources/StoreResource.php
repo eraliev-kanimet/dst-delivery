@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StoreResource\Pages;
+use App\Filament\Resources\StoreResource\RelationManagers\AttrRelationManager;
 use App\Models\Store;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
@@ -53,6 +54,13 @@ class StoreResource extends Resource
     public static function canDelete(Model $record): bool
     {
         return Auth::user()->hasRole('admin');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            AttrRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
