@@ -38,9 +38,9 @@ class Product extends Model
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function productAttributes(): HasMany
+    public function pAttributes(): HasMany
     {
-        return $this->hasMany(Attribute::class);
+        return $this->hasMany(AttrValue::class);
     }
 
     public function content_en(): HasOne

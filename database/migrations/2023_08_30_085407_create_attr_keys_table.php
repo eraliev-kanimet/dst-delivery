@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->json('permissions')->nullable();
+        Schema::create('attr_keys', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('store_id')->constrained()->cascadeOnDelete();
+            $table->string('slug')->index();
+            $table->json('name');
+            $table->boolean('translatable')->default(false);
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['permissions']);
-        });
+        Schema::dropIfExists('attr_keys');
     }
 };
