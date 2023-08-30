@@ -24,7 +24,7 @@ class CreateStore extends CreateRecord
     public function mount(): void
     {
         $this->categories = Category::all()->pluck('name.' . config('app.locale'), 'id');
-        $this->users = User::where('role_id', 2)->pluck('name', 'id');
+        $this->users = User::whereRoleId(2)->pluck('name', 'id');
 
         parent::mount();
     }

@@ -141,4 +141,9 @@ return [
     'attribute' => 'Attribute',
     'profile' => 'Profile',
     'password_confirmation' => 'Password confirmation',
+    'roles' => [
+        'admin' => 'Administrator',
+        'store_owner' => 'Store Owner',
+        'store_manager' => 'Store Manager',
+    ],
 ];

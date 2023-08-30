@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use App\Enums\Role;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\UserResourceForm;
-use App\Models\Role;
 use App\Models\Store;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
@@ -22,7 +22,7 @@ class CreateUser extends CreateRecord
     }
 
     public array|Collection $stores = [];
-    public array|Collection $roles = [];
+    public array $roles = [];
 
     public function mount(): void
     {
@@ -30,7 +30,7 @@ class CreateUser extends CreateRecord
 
         if ($user->hasRole('admin')) {
             $this->stores = Store::pluck('name', 'id');
-            $this->roles = Role::pluck('name', 'id');
+            $this->roles = Role::getSelect();
         } else {
             $this->stores = Store::whereUserId($user->id)->pluck('name', 'id');
         }

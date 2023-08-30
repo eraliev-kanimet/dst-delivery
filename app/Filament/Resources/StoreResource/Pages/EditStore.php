@@ -36,7 +36,7 @@ class EditStore extends EditRecord
         $this->categories = Category::all()->pluck('name.' . config('app.locale'), 'id');
 
         if (Auth::user()->hasRole('admin')) {
-            $this->users = User::where('role_id', 2)->pluck('name', 'id');
+            $this->users = User::whereRoleId(2)->pluck('name', 'id');
         }
 
         parent::mount($record);

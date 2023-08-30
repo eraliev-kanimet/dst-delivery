@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use App\Enums\Role;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\UserResourceForm;
-use App\Models\Role;
 use App\Models\Store;
 use App\Models\User;
 use Exception;
@@ -31,7 +31,7 @@ class EditUser extends EditRecord
     public string|int|null|Model|User $record;
 
     public array|Collection $stores = [];
-    public array|Collection $roles = [];
+    public array $roles = [];
 
     public function mount(int | string $record): void
     {
@@ -39,7 +39,7 @@ class EditUser extends EditRecord
 
         if ($user->hasRole('admin')) {
             $this->stores = Store::pluck('name', 'id');
-            $this->roles = Role::pluck('name', 'id');
+            $this->roles = Role::getSelect();
         } else {
             $this->stores = Store::whereUserId($user->id)->pluck('name', 'id');
         }
