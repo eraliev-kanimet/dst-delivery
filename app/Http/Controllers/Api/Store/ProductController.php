@@ -24,7 +24,7 @@ class ProductController extends Controller
         $this->apiProductService->setStoreId($store->id);
         $this->apiProductService->setLimit($request->get('limit', 15));
         $this->apiProductService->setCategoryId($request->get('category_id'));
-        $this->apiProductService->setCategories($store->categories);
+        $this->apiProductService->setCategories($store->categories()->pluck('id')->toArray());
 
         return ProductResource::collection($this->apiProductService->all($request, $locale));
     }
