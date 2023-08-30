@@ -13,6 +13,10 @@ class AttrValue extends Model
         'value',
     ];
 
+    protected $casts = [
+        'value' => 'array',
+    ];
+
     public function attrKey(): BelongsTo
     {
         return $this->belongsTo(AttrKey::class);

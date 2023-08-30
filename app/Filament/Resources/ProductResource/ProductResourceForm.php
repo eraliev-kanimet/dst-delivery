@@ -3,16 +3,15 @@
 namespace App\Filament\Resources\ProductResource;
 
 use App\Helpers\FilamentHelper;
-use App\Service\ProductService;
-use Filament\Forms\Components\Hidden;
+use App\Models\AttrKey;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Get;
-use Filament\Forms\Set;
 
 final class ProductResourceForm
 {
     protected array $categories = [];
+    protected array $attributes = [];
     protected array $locales = [];
 
     protected bool $edit = true;
@@ -58,8 +57,12 @@ final class ProductResourceForm
                         ->label(__('common.preview'))->inline()->default(2),
                 ])
             ]),
-            $this->tabAttributes()
+
         ];
+
+        if ($this->edit) {
+            $tabs[] = $this->tabAttributes();
+        }
 
         if ($this->edit) {
             $tabs[] = $this->helper->tab(__('common.selections'), [
@@ -83,7 +86,7 @@ final class ProductResourceForm
                         ->label(__('common.images'))
                         ->multiple()
                         ->imageEditor(),
-                    $this->attributesRepeater('properties'),
+//                    $this->attributesRepeater('properties'),
                 ])
                     ->relationship('selections')
                     ->required()
@@ -112,6 +115,11 @@ final class ProductResourceForm
         $this->categories = $categories;
     }
 
+    public function setAttributes(array $attributes): void
+    {
+        $this->attributes = $attributes;
+    }
+
     public function setLocales(array $locales): void
     {
         $this->locales = $locales;
@@ -132,43 +140,48 @@ final class ProductResourceForm
         $repeater = $this->attributesRepeater();
 
         if ($this->edit) {
-            $repeater->relationship('productAttributes');
+            $repeater->relationship('attr');
         }
 
         return $this->helper->tab(__('common.properties'), [$repeater]);
     }
 
-    protected function attributesRepeater(string $model = 'productAttributes'): Repeater
+    protected function attributesRepeater(string $model = 'attr'): Repeater
     {
-        $productService = ProductService::new();
-
         $schema = [
-            $this->helper->select('attribute')
+            $this->helper->select('attr_key_id')
                 ->label(__('common.attribute'))
-                ->options($productService->getAttributesName())
+                ->options($this->attributes)
                 ->required()
                 ->reactive(),
-            Hidden::make('type'),
-            $this->helper->tabsInput('value1', $this->locales, true, __('common.value'))
-                ->visible(function (Get $get, Set $set) use ($productService) {
-                    if ($productService->isAttributeType1($get('attribute'))) {
-                        $set('type', 1);
+            $this->helper->tabs(function (Get $get) {
+                $attr_key_id = $get('attr_key_id');
 
-                        return true;
+                if ($attr_key_id) {
+                    if (AttrKey::find($attr_key_id)->translatable) {
+                        $tabs = [];
+
+                        foreach (filterAvailableLocales($this->locales) as $locale => $name) {
+                            $tabs[] = $this->helper->tab(__('common.value') . ' ' . $name, [
+                                $this->helper->input("value.$locale")
+                                    ->label('')
+                                    ->required(),
+                            ]);
+                        }
+
+                        return $tabs;
                     }
 
-                    return false;
-                }),
-            $this->helper->input('value2')
-                ->visible(function (Get $get, Set $set) use ($productService) {
-                    if ($productService->isAttributeType2($get('attribute'))) {
-                        $set('type', 2);
+                    return [
+                        $this->helper->input("value.default")
+                            ->required(),
+                    ];
+                }
 
-                        return true;
-                    }
-
-                    return false;
-                })->label(__('common.value'))
+                return [];
+            })
+                ->columnSpan(2)
+                ->hidden(fn(Get $get) => is_null($get('attr_key_id'))),
         ];
 
         return $this->helper->repeater($model, $schema)

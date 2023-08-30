@@ -22,6 +22,7 @@ class EditProduct extends EditRecord
     public string|int|null|Model|Product $record;
 
     public array $categories = [];
+    public array $attr = [];
     public array $locales = [];
 
     public bool $category_disabled = false;
@@ -43,6 +44,14 @@ class EditProduct extends EditRecord
                 $this->record->category->id => $this->record->category->name[$locale],
             ];
         }
+
+        $attributes = [];
+
+        foreach ($this->record->store->attr as $item) {
+            $attributes[$item->id] = $item->name[$locale] ?? $item->name[$this->record->store->fallback_locale];
+        }
+
+        $this->attr = $attributes;
 
         $this->authorizeAccess();
 
@@ -82,6 +91,7 @@ class EditProduct extends EditRecord
 
         $productForm->setCategories($this->categories);
         $productForm->setLocales($this->locales);
+        $productForm->setAttributes($this->attr);
         $productForm->setCategoryDisabled($this->category_disabled);
 
         return parent::form($form->schema($productForm->form()))

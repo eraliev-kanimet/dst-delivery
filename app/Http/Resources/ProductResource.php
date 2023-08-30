@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Attribute;
 use App\Models\Product;
 use App\Models\Content;
 use App\Models\Selection;
@@ -44,7 +43,6 @@ class ProductResource extends BaseResource
         $service = ProductService::new();
         $array = [];
 
-        /** @var Attribute $attribute */
         foreach ($attributes as $attribute) {
             $array[] = [
                 'attribute' => $attribute->attribute,

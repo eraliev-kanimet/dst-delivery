@@ -8,7 +8,6 @@ use App\Models\Image;
 use App\Models\Product;
 use App\Models\Content;
 use App\Models\Store;
-use App\Service\ProductService;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -44,11 +43,15 @@ class CreateProduct extends CreateRecord
 
                 $locale = config('app.locale');
 
-                $this->categories = $this->record->store->categories()->get(['name', 'id'])->pluck("name.$locale", 'id')->toArray();
+                $this->categories = $store->categories()
+                    ->get(['name', 'id'])
+                    ->pluck("name.$locale", 'id')
+                    ->toArray();
 
                 $this->locales = $store->locales;
             }
-        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {}
+        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {
+        }
 
         parent::mount();
     }
@@ -85,8 +88,6 @@ class CreateProduct extends CreateRecord
                 'description' => $data['description'][$locale],
             ]);
         }
-
-        ProductService::new()->createAttributes($data['productAttributes'], $this->record->id);
 
         $this->getCreatedNotification()?->send();
 
