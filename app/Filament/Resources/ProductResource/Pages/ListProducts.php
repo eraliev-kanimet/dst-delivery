@@ -4,7 +4,6 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use App\Models\Product;
-use App\Models\Store;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -66,15 +65,15 @@ class ListProducts extends ListRecords
      */
     protected function getHeaderActions(): array
     {
-        $stores = getQueryFilamentStore(Store::query())->get(['id', 'name']);
+        $stores = [];
 
-        $stores = $stores->map(function (Store $store) {
-            return Action::make('create_product_' . $store->id)
-                ->label($store->name)
+        foreach (getQueryFilamentStore() as $id => $name) {
+            $stores[] = Action::make('create_product_' . $id)
+                ->label($name)
                 ->url(route('filament.admin.resources.products.create', [
-                    'store_id' => $store->id
+                    'store_id' => $id
                 ]));
-        })->toArray();
+        }
 
         return [
             ActionGroup::make($stores)

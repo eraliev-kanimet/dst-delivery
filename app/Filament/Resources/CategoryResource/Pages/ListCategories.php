@@ -45,7 +45,7 @@ class ListCategories extends ListRecords
     protected function getTableQuery(): Builder
     {
         return parent::getTableQuery()
-            ->with(['category'])
+            ->with(['category', 'store'])
             ->where('category_id', $this->category?->id);
     }
 
@@ -65,6 +65,8 @@ class ListCategories extends ListRecords
             ->columns([
                 TextColumn::make("name.$locale")
                     ->label(__('common.name')),
+                TextColumn::make('store.name')
+                    ->label(__('common.store_name')),
             ])
             ->actions([
                 ActionTable::make('view')

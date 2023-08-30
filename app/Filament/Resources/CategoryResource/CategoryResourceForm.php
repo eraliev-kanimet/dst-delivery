@@ -8,7 +8,13 @@ use Illuminate\Support\Collection;
 
 class CategoryResourceForm
 {
-    public static function form(Form $form, array|Collection $categories, ?int $category_id, bool $create = true): Form
+    public static function form(
+        Form $form,
+        array|Collection $categories,
+        array|Collection $stores,
+        ?int $category_id,
+        bool $create = true
+    ): Form
     {
         $helper = new FilamentHelper;
 
@@ -26,22 +32,32 @@ class CategoryResourceForm
             $categorySelect->nullable(is_null($category_id));
         }
 
-        return $form
-            ->schema([
-                $categorySelect,
-                $helper->tabsInput('name', $locales, true, __('common.name')),
-                $helper->tabsTextarea('description', $locales, false, __('common.description')),
-                $helper->radio('preview', [
-                    2 => 'Normal',
-                    1 => 'Large',
-                ])
-                    ->inline()
-                    ->default(2)
-                    ->label(__('common.preview')),
-                $helper->image('images')
-                    ->multiple()
-                    ->imageEditor()
-                    ->label(__('common.images')),
-            ]);
+        $schema = [
+            $categorySelect,
+            $helper->tabsInput('name', $locales, true, __('common.name')),
+            $helper->tabsTextarea('description', $locales, false, __('common.description')),
+            $helper->radio('preview', [
+                2 => 'Normal',
+                1 => 'Large',
+            ])
+                ->inline()
+                ->default(2)
+                ->label(__('common.preview')),
+            $helper->image('images')
+                ->multiple()
+                ->imageEditor()
+                ->label(__('common.images')),
+        ];
+
+        if ($create && is_null($category_id)) {
+            $storeSelect = $helper->select('store_id')
+                ->label(__('common.store'))
+                ->required()
+                ->options($stores);
+
+            array_unshift($schema, $storeSelect);
+        }
+
+        return $form->schema($schema);
     }
 }

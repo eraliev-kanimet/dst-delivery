@@ -35,7 +35,7 @@ class EditProduct extends EditRecord
 
         $locale = config('app.locale');
 
-        $this->categories = Category::whereIn('id', $this->record->store->categories)
+        $this->categories = Category::whereIn('store_id', $this->record->store_id)
             ->get()
             ->pluck("name.$locale", 'id')
             ->toArray();

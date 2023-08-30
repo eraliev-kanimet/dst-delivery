@@ -4,6 +4,7 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
+use App\Models\Store;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
@@ -24,6 +25,7 @@ class EditCategory extends EditRecord
     public int $category_id = 0;
 
     public array|Collection $categories = [];
+    public array|Collection $stores = [];
 
     public function mount(int|string $record): void
     {
@@ -35,6 +37,8 @@ class EditCategory extends EditRecord
             ->whereNot('id', $this->record->id)
             ->get()
             ->pluck("name.$locale", 'id');
+
+        $this->stores = getQueryFilamentQuery(Store::query())->pluck('name', 'id');
 
         $this->category_id = (int)$this->record->category_id ?? 0;
 
@@ -51,6 +55,7 @@ class EditCategory extends EditRecord
             CategoryResource\CategoryResourceForm::form(
                 $form,
                 $this->categories,
+                $this->stores,
                 $this->record->category_id,
                 false
             )
@@ -70,6 +75,10 @@ class EditCategory extends EditRecord
             $this->record->images()->update([
                 'values' => $data['images']
             ]);
+        }
+
+        if (isset($data['category_id'])) {
+            $data['store_id'] = Category::find($data['category_id'])->store_id;
         }
 
         return $data;

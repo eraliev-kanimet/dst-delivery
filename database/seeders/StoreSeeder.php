@@ -32,7 +32,6 @@ class StoreSeeder extends Seeder
             'user_id' => $owner->id,
             'fallback_locale' => 'en',
             'locales' => ['en', 'ru'],
-            'categories' => [1, 2, 3]
         ]);
     }
 }

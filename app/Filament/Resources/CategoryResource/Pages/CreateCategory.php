@@ -5,9 +5,11 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\Image;
+use App\Models\Store;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -18,6 +20,7 @@ class CreateCategory extends CreateRecord
     public ?int $category_id = null;
     public string $category_name = '';
     public array $categories = [];
+    public array|Collection $stores = [];
 
     public null|Model|Category $record;
 
@@ -33,7 +36,9 @@ class CreateCategory extends CreateRecord
         try {
             $category_id = request()->get('category_id');
 
-            if (!is_null($category_id)) {
+            if (is_null($category_id)) {
+                $this->stores = getQueryFilamentQuery(Store::query())->pluck('name', 'id');
+            } else {
                 $category = Category::find($category_id);
 
                 if (is_null($category)) {
@@ -56,7 +61,7 @@ class CreateCategory extends CreateRecord
     public function form(Form $form): Form
     {
         return parent::form(
-            CategoryResource\CategoryResourceForm::form($form, $this->categories, $this->category_id)
+            CategoryResource\CategoryResourceForm::form($form, $this->categories, $this->stores, $this->category_id)
         )->columns(1);
     }
 
@@ -76,6 +81,10 @@ class CreateCategory extends CreateRecord
         $data = $this->form->getState();
 
         $data['category_id'] = $this->category_id;
+
+        if (empty($data['store_id'])) {
+            $data['store_id'] = Category::find($this->category_id)->store_id;
+        }
 
         $this->record = $this->handleRecordCreation($data);
 

@@ -45,7 +45,7 @@ class CreateProduct extends CreateRecord
 
                 $locale = config('app.locale');
 
-                $this->categories = Category::whereIn('id', $store->categories)
+                $this->categories = Category::whereIn('store_id', $store->id)
                     ->get()
                     ->pluck("name.$locale", 'id')
                     ->toArray();

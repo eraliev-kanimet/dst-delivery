@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Store;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -114,17 +116,17 @@ function dbQueryLog(int $offset = 6): JsonResponse
     ]);
 }
 
-function getQueryFilamentStore(Builder $builder): Builder
+function getQueryFilamentStore(): Collection
 {
     $user = Auth::user();
 
     if ($user->hasRole('store_manager')) {
-        return $builder->whereIn('id', $user->permissions);
+        return Store::whereIn('id', $user->permissions)->pluck('name', 'id');
     } else if ($user->hasRole('store_owner')) {
-        return $builder->where('user_id', $user->id);
+        return Store::where('user_id', $user->id)->pluck('name', 'id');
     }
 
-    return $builder;
+    return Store::pluck('name', 'id');
 }
 
 function getQueryFilamentQuery(Builder $builder): Builder

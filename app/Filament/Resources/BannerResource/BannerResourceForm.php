@@ -66,9 +66,7 @@ class BannerResourceForm
                     $store_id = $get('store_id');
 
                     if ($store_id) {
-                        $store = Store::find($store_id);
-
-                        return Category::whereIn('id', $store->categories)
+                        return Category::whereStoreId($store_id)
                             ->get(['id', 'name'])
                             ->pluck('name.' . config('app.locale'), 'id');
                     }

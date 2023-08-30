@@ -5,7 +5,6 @@ namespace App\Filament\Resources\OrderResource\Pages;
 use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
-use App\Models\Store;
 use Exception;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
@@ -30,7 +29,7 @@ class ListOrders extends ListRecords
 
     public function mount(): void
     {
-        $this->stores = getQueryFilamentStore(Store::query())->pluck('name', 'id');
+        $this->stores = getQueryFilamentStore();
 
         parent::mount();
     }

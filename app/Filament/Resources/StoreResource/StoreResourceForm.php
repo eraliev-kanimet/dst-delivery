@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\StoreResource;
 
 use App\Helpers\FilamentHelper;
-use App\Models\Category;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Illuminate\Support\Collection;
@@ -13,7 +12,6 @@ class StoreResourceForm
     protected FilamentHelper $helper;
 
     public function __construct(
-        protected array|Collection $categories = [],
         protected array|Collection $users = [],
         protected array            $locales = [],
         protected bool             $isAdmin = true
@@ -48,12 +46,12 @@ class StoreResourceForm
                 ->multiple();
         }
 
-        $schema[] = $this->helper->grid($this->getLocalesAndCategories(), 1);
+        $schema[] = $this->helper->grid($this->getLocales(), 1);
 
         return $schema;
     }
 
-    protected function getLocalesAndCategories(): array
+    protected function getLocales(): array
     {
         $locales = config('app.locales');
 
@@ -75,22 +73,6 @@ class StoreResourceForm
                     ->inline(),
             ];
         }
-
-        $schema[] = $this->helper->checkbox('categories', $this->categories)
-            ->label(__('common.categories'))
-            ->required()
-            ->columns()
-            ->dehydrateStateUsing(function ($state) {
-                $array = [];
-
-                foreach ($state as $value) {
-                    $array[] = (int)$value;
-                }
-
-                return Category::whereIn('id', $array)
-                    ->pluck('id')
-                    ->toArray();
-            });
 
         return $schema;
     }

@@ -32,6 +32,7 @@ class ProductSeeder extends Seeder
     {
         $categoryData = [
             'name' => $data['name'],
+            'store_id' => $this->store->id,
         ];
 
         if ($parent?->id) {
