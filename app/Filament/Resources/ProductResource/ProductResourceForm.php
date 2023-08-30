@@ -5,7 +5,6 @@ namespace App\Filament\Resources\ProductResource;
 use App\Helpers\FilamentHelper;
 use App\Models\AttrKey;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Get;
 
 final class ProductResourceForm
@@ -51,8 +50,8 @@ final class ProductResourceForm
                         ->label(__('common.is_available'))
                         ->default(true),
                     $this->helper->radio('preview', [
-                        2 => 'Normal',
-                        1 => 'Large'
+                        2 => __('common.normal'),
+                        1 => __('common.large'),
                     ])
                         ->label(__('common.preview'))->inline()->default(2),
                 ])
@@ -61,10 +60,8 @@ final class ProductResourceForm
         ];
 
         if ($this->edit) {
-            $tabs[] = $this->tabAttributes();
-        }
+            $tabs[] = $this->helper->tab(__('common.properties'), [$this->attributesRepeater()]);
 
-        if ($this->edit) {
             $tabs[] = $this->helper->tab(__('common.selections'), [
                 $this->helper->repeater('selections', [
                     $this->helper->grid([
@@ -86,17 +83,12 @@ final class ProductResourceForm
                         ->label(__('common.images'))
                         ->multiple()
                         ->imageEditor(),
-//                    $this->attributesRepeater('properties'),
+                    $this->attributesRepeater(),
                 ])
                     ->relationship('selections')
                     ->required()
                     ->label('')
                     ->addActionLabel(__('common.add_selection'))
-                    ->mutateRelationshipDataBeforeSaveUsing(function ($data) {
-                        $data['properties'] = removeEmptyElements($data['properties']);
-
-                        return $data;
-                    })
             ]);
         }
 
@@ -135,18 +127,7 @@ final class ProductResourceForm
         $this->edit = $edit;
     }
 
-    protected function tabAttributes(): Tabs\Tab
-    {
-        $repeater = $this->attributesRepeater();
-
-        if ($this->edit) {
-            $repeater->relationship('attr');
-        }
-
-        return $this->helper->tab(__('common.properties'), [$repeater]);
-    }
-
-    protected function attributesRepeater(string $model = 'attr'): Repeater
+    protected function attributesRepeater(): Repeater
     {
         $schema = [
             $this->helper->select('attr_key_id')
@@ -172,10 +153,11 @@ final class ProductResourceForm
                         return $tabs;
                     }
 
-                    return [
-                        $this->helper->input("value.default")
-                            ->required(),
-                    ];
+                    return [$this->helper->tab(__('common.value'), [
+                        $this->helper->input('value.default')
+                            ->label('')
+                            ->required()
+                    ])];
                 }
 
                 return [];
@@ -184,7 +166,8 @@ final class ProductResourceForm
                 ->hidden(fn(Get $get) => is_null($get('attr_key_id'))),
         ];
 
-        return $this->helper->repeater($model, $schema)
+        return $this->helper->repeater('attr', $schema)
+            ->relationship('attr')
             ->label('')
             ->required()
             ->addActionLabel(__('common.add_property'));

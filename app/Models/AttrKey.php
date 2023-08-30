@@ -24,9 +24,14 @@ class AttrKey extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function values(): HasMany
+    public function productValues(): HasMany
     {
         return $this->hasMany(AttrValue::class);
+    }
+
+    public function selectionValues(): HasMany
+    {
+        return $this->hasMany(AttrValueSelection::class);
     }
 
     public $timestamps = false;

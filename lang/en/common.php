@@ -148,4 +148,6 @@ return [
     ],
     'attributes_label' => 'Attributes',
     'translatable' => 'Translatable',
+    'normal' => 'Normal',
+    'large' => 'Large',
 ];
