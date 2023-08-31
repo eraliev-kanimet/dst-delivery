@@ -131,6 +131,7 @@ final class ProductResourceForm
     {
         $schema = [
             $this->helper->select('attr_key_id')
+                ->native()
                 ->label(__('common.attribute'))
                 ->options($this->attributes)
                 ->required()
