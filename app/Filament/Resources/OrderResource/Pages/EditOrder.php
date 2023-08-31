@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
-use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\OrderResourceForm;
 use App\Models\Order;
@@ -35,22 +34,12 @@ class EditOrder extends EditRecord
 
     public function afterSave(): void
     {
-        if ($this->record->status == OrderStatus::inactive->value) {
-            $this->record->update([
-                'status' => OrderStatus::pending_payment->value
-            ]);
-        }
-
         $this->callCustomOrderUpdateEvent();
     }
 
-    public function callCustomOrderUpdateEvent(bool $reload = true): void
+    public function callCustomOrderUpdateEvent(): void
     {
         $this->record->callCustomOrderUpdateEvent();
-
-        if ($reload) {
-            redirect()->route('filament.admin.resources.orders.edit', ['record' => $this->record->uuid]);
-        }
     }
 
     /**

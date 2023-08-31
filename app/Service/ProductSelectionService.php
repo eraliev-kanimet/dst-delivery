@@ -153,6 +153,7 @@ class ProductSelectionService
             }
 
             $name .= ': ' . __('common.price') . ' ' . $orderItem->getPrice() . ', ';
+            $name .= __('common.quantity') . ' ' . $selection->quantity . ', ';
 
             if (is_array($product['attributes'])) {
                 foreach ($product['attributes'] as $attribute) {

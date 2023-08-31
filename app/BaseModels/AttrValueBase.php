@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AttrValueBase extends Model
 {
+    protected $fillable = [
+        'attr_key_id',
+        'product_id',
+        'value',
+    ];
+
     protected $casts = [
         'value' => 'array',
     ];

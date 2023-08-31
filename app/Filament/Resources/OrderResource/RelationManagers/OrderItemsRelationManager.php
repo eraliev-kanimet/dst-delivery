@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Enums\OrderStatus;
 use App\Helpers\FilamentHelper;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -25,6 +26,11 @@ class OrderItemsRelationManager extends RelationManager
     public Model|Order $ownerRecord;
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('common.products');
+    }
+
+    public static function getPluralRecordLabel(): string
     {
         return __('common.products');
     }
@@ -107,27 +113,32 @@ class OrderItemsRelationManager extends RelationManager
                     ->label(__('common.price')),
             ])
             ->headerActions([
-                CreateAction::make()->after(function () {
-                    $this->ownerRecord->actionTotalCostRecalculation();
-                }),
+                CreateAction::make()->after(fn() => $this->refreshOwnerRecord()),
             ])
             ->actions([
-                EditAction::make()->after(function () {
-                    $this->ownerRecord->actionTotalCostRecalculation();
-                }),
-                DeleteAction::make()->after(function () {
-                    $this->ownerRecord->actionTotalCostRecalculation();
-                }),
+                EditAction::make()->after(fn() => $this->refreshOwnerRecord()),
+                DeleteAction::make()->after(fn() => $this->refreshOwnerRecord()),
             ])
             ->bulkActions([
-                DeleteBulkAction::make()->after(function () {
-                    $this->ownerRecord->actionTotalCostRecalculation();
-                }),
+                DeleteBulkAction::make()->after(fn() => $this->refreshOwnerRecord()),
             ])
             ->emptyStateActions([
-                CreateAction::make()->after(function () {
-                    $this->ownerRecord->actionTotalCostRecalculation();
-                }),
+                CreateAction::make()->after(fn() => $this->refreshOwnerRecord()),
             ]);
+    }
+
+    protected function refreshOwnerRecord(): void
+    {
+        if ($this->ownerRecord->status == OrderStatus::inactive->value && $this->ownerRecord->orderItems->count()) {
+            $this->ownerRecord->actionTotalCostRecalculation([
+                'status' => OrderStatus::pending_payment->value
+            ]);
+        } else {
+            $this->ownerRecord->actionTotalCostRecalculation();
+        }
+
+        $this->redirect(route('filament.admin.resources.orders.edit', [
+            'record' => $this->ownerRecord->uuid,
+        ]));
     }
 }
