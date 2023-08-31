@@ -40,14 +40,13 @@ class ProductResource extends BaseResource
     public function getAttributes(Collection|array $attributes): array
     {
         $locale = self::$locale;
-        $service = ProductService::new();
         $array = [];
 
         foreach ($attributes as $attribute) {
             $array[] = [
                 'attribute' => $attribute->attribute,
                 'name' => __('common.attributes.' . $attribute->attribute),
-                'value' => $service->getAttributeValue($attribute->type, $attribute->{'value' . $attribute->type}, $locale)
+                'value' => $locale
             ];
         }
 

@@ -7,66 +7,9 @@ use App\Models\Product;
 
 class ProductService
 {
-    protected array $attributes_type1 = [
-        'weight',
-        'ingredients',
-        'calories',
-        'proteins',
-        'fats',
-        'carbohydrates',
-        'volume',
-        'nutritional_and_energy_value',
-        'size',
-        'country_of_production',
-        'neckline',
-        'height_type',
-        'insulation',
-        'collection',
-        'care',
-        'lining_material',
-        'color',
-        'ram',
-        'storage',
-        'display',
-        'memory',
-        'camera',
-        'height',
-        'capacity',
-        'temperature_zones',
-        'max_load',
-        'power',
-        'pump_pressure',
-        'suction_power',
-        'bowl_capacity',
-    ];
-
-    protected array $attributes_type2 = [
-        'size_on_model',
-        'processor',
-    ];
-
     public static function new(): static
     {
         return new self;
-    }
-
-    public function getType(string $attribute): int
-    {
-        if (in_array($attribute, $this->attributes_type1)) {
-            return 1;
-        } elseif (in_array($attribute, $this->attributes_type2)) {
-            return 2;
-        }
-
-        return 0;
-    }
-
-    public function getAttributeValue(int $type, array|string $value, string $locale)
-    {
-        return match ($type) {
-            1 => $value[$locale],
-            default => $value
-        };
     }
 
     public function getSelectProduct(?int $store_id = null): array

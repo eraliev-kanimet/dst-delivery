@@ -16,11 +16,6 @@ class ApiProductService
     protected int $category_id = 0;
     protected array $categories = [];
 
-    public function __construct(
-        protected ProductService $service
-    )
-    {}
-
     public function all(ProductIndexRequest $request, string $locale): LengthAwarePaginator
     {
         $query = Product::query()
@@ -34,29 +29,6 @@ class ApiProductService
             ])->whereHas('selections', function (Builder $query) {
                 $query->where('is_available', true);
             })->whereStoreId($this->store_id);
-
-        if ($request->has('attributes')) {
-            $attributes = $this->getFormattedAttributes($request->get('attributes'));
-
-            foreach ($attributes as $attribute) {
-                if ($attribute['type'] == 1) {
-                    $value = "value1->$locale";
-                } else {
-                    $value = 'value2';
-                }
-
-                if (is_array($attribute['value'])) {
-                    $query->whereHas('productAttributes', function (Builder $query) use ($attribute, $value) {
-                        $query->where('attribute', $attribute['attribute'])->whereIn($value, $attribute['value']);
-                    });
-
-                } else {
-                    $query->whereHas('productAttributes', function (Builder $query) use ($attribute, $value) {
-                        $query->where('attribute', $attribute['attribute'])->where($value, $attribute['value']);
-                    });
-                }
-            }
-        }
 
         if ($request->has('q')) {
             $words = explode(' ', $request->get('q'));
@@ -112,24 +84,5 @@ class ApiProductService
     public function setLimit(int $limit): void
     {
         $this->limit = $limit;
-    }
-
-    protected function getFormattedAttributes(array $attributes): array
-    {
-        $formattedAttributes = [];
-
-        foreach ($attributes as $attribute => $value) {
-            $type = $this->service->getType($attribute);
-
-            if ($type) {
-                $formattedAttributes[] = [
-                    'type' => $type,
-                    'attribute' => $attribute,
-                    'value' => $value
-                ];
-            }
-        }
-
-        return $formattedAttributes;
     }
 }
