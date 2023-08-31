@@ -25,9 +25,7 @@ class ApiProductService
     {
         $locale = $this->locale;
 
-        $this->setFormattedAttributes(
-            $request->has('attributes'), $request->get('attributes', [])
-        );
+        $this->setFormattedAttributes($request->get('attributes', []));
 
         $query = Product::query()
             ->with([
@@ -109,24 +107,26 @@ class ApiProductService
         $this->locale = $locale;
     }
 
-    protected function setFormattedAttributes(bool $exists, array $attributes): void
+    protected function setFormattedAttributes(array $attributes): void
     {
-        if ($exists) {
+        if (count($attributes)) {
             $locale = $this->locale;
 
-            $arr = [];
+            $attr = [];
 
             foreach ($attributes as $attribute => $value) {
                 $attribute = filter_var($attribute, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
 
-                $attribute = AttrKey::whereStoreId($this->store_id)->find($attribute);
+                $attr[$attribute] = $value;
+            }
 
-                if ($attribute) {
-                    $arr[$attribute->id] = [
-                        'key' => $attribute->translatable ? "value->$locale" : 'value->default',
-                        'value' => array_map('trim', explode('@', $value))
-                    ];
-                }
+            $arr = [];
+
+            foreach (AttrKey::whereStoreId($this->store_id)->whereIn('id', array_keys($attr))->get() as $attrKey) {
+                $arr[$attrKey->id] = [
+                    'key' => $attrKey->translatable ? "value->$locale" : 'value->default',
+                    'value' => array_map('trim', explode('@', $attr[$attrKey->id]))
+                ];
             }
 
             $this->attributes = $arr;
