@@ -13,21 +13,18 @@ class CategoryController extends Controller
     {
         $store = Store::current();
 
-        CategoryResource::$locale = config('app.locale');
-        CategoryResource::$fallback_locale = $store->fallback_locale;
-
-        $categories = Category::with(['category', 'categories', 'images'])
-            ->whereIn('id',$store->categories ?? [])
-            ->get();
+        $categories = $store->categories()->with([
+            'category',
+            'categories',
+            'images',
+            'products',
+        ])->get();
 
         return CategoryResource::collection($categories);
     }
 
     public function show(Category $category)
     {
-        CategoryResource::$locale = config('app.locale');
-        CategoryResource::$fallback_locale = Store::current()->fallback_locale;
-
         return new CategoryResource($category);
     }
 }

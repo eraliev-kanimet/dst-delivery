@@ -2,9 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\BaseResource;
 use App\Models\Store;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Symfony\Component\HttpFoundation\Response;
 
 class CurrentStoreMiddleware
@@ -24,6 +26,18 @@ class CurrentStoreMiddleware
         }
 
         Store::setCurrent($store);
+
+        $acceptLanguage = $request->header('Accept-Language');
+
+        $locale = getSupportedLocale($acceptLanguage, $store->locales);
+
+        if (is_null($locale)) {
+            $locale = $store->fallback_locale;
+        }
+
+        App::setLocale($locale);
+
+        BaseResource::$locale = $locale;
 
         return $next($request);
     }

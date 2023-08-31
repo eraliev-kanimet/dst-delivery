@@ -13,27 +13,12 @@ class AcceptLanguageMiddleware
     {
         $acceptLanguage = $request->header('Accept-Language');
 
-        $locale = $this->getSupportedLocale($acceptLanguage, array_keys(config('app.locales')));
+        $locale = getSupportedLocale($acceptLanguage, array_keys(config('app.locales')));
 
         if ($locale) {
             App::setLocale($locale);
         }
 
         return $next($request);
-    }
-
-    private function getSupportedLocale($acceptLanguage, $supportedLocales): bool|string|null
-    {
-        $acceptLanguage = explode(',', $acceptLanguage);
-
-        foreach ($acceptLanguage as $language) {
-            $locale = strtok($language, ';');
-
-            if (in_array($locale, $supportedLocales)) {
-                return $locale;
-            }
-        }
-
-        return null;
     }
 }

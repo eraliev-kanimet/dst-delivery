@@ -47,7 +47,6 @@ class Kernel extends HttpKernel
         'api' => [
             ThrottleRequests::class.':api',
             SubstituteBindings::class,
-            AcceptLanguageMiddleware::class,
         ],
     ];
 
@@ -57,6 +56,7 @@ class Kernel extends HttpKernel
         'precognitive' => HandlePrecognitiveRequests::class,
         'signed' => ValidateSignature::class,
         'throttle' => ThrottleRequests::class,
-        'store' => CurrentStoreMiddleware::class
+        'store' => CurrentStoreMiddleware::class,
+        'language.api' => AcceptLanguageMiddleware::class,
     ];
 }

@@ -3,17 +3,11 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Helpers\FilamentHelper;
-use App\Models\Role;
 use App\Models\User;
-use Exception;
-use Filament\Resources\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
@@ -21,60 +15,52 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    public static function form(Form $form): Form
+    public static function getNavigationLabel(): string
     {
-        $helper = new FilamentHelper();
+        return __('common.users');
+    }
 
-        return $form->schema([
-            $helper->textInput('name')
-                ->required(),
-            $helper->textInput('email')
-                ->required()
-                ->email()
-                ->unique(ignorable: fn(?Model $record): ?Model => $record),
-            $helper->textInput('password')
-                ->required(fn(?Model $record): bool => is_null($record))
-                ->password()
-                ->maxLength(255)
-                ->dehydrateStateUsing(static function ($state) use ($form) {
-                    if (!empty($state)) {
-                        return Hash::make($state);
-                    }
+    public static function getPluralLabel(): string
+    {
+        return __('common.users');
+    }
 
-                    $user = User::find($form->getColumns());
-                    if ($user) {
-                        return $user->password;
-                    }
+    public static function getEloquentQuery(): Builder
+    {
+        $user = Auth::user();
 
-                    return $state;
-                }),
-            $helper->select('role_id')
-                ->options(Role::pluck('name', 'id'))
-                ->label('Role')
-                ->default(2)
-        ])->columns(2);
+        if ($user->hasRole('admin')) {
+            return parent::getEloquentQuery();
+        }
+
+        $stores = $user->stores->pluck('id')->toArray();
+        $users = User::whereRoleId(3)->get(['id', 'permissions']);
+
+        $array = [];
+
+        foreach ($users as $user) {
+            if (is_null($user->permissions)) {
+                continue;
+            }
+
+            if (count(array_intersect($user->permissions, $stores))) {
+                $array[] = $user->id;
+            }
+        }
+
+        return parent::getEloquentQuery()->whereIn('id', $array);
     }
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->hasRole('admin');
+        $user = Auth::user();
+
+        return $user->hasRole('admin') || $user->hasRole('store_owner');
     }
 
-    /**
-     * @throws Exception
-     */
-    public static function table(Table $table): Table
+    public static function canDelete(Model $record): bool
     {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\TextColumn::make('role.name')
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([]);
+        return Auth::user()->hasRole('admin');
     }
 
     public static function getPages(): array

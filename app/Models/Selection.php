@@ -4,23 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ProductSelection extends Model
+class Selection extends Model
 {
     protected $fillable = [
         'product_id',
-        'properties',
+        'images',
         'quantity',
         'price',
         'is_available',
     ];
 
     protected $casts = [
-        'properties' => 'array'
+        'images' => 'array',
     ];
 
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function attr(): HasMany
+    {
+        return $this->hasMany(AttrValueSelection::class);
     }
 }

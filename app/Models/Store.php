@@ -18,12 +18,10 @@ class Store extends Model
         'name',
         'fallback_locale',
         'locales',
-        'categories',
     ];
 
     protected $casts = [
         'locales' => 'array',
-        'categories' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -41,7 +39,17 @@ class Store extends Model
         return $this->hasMany(Customer::class);
     }
 
-    public static function setCurrent($store): void
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function attr(): HasMany
+    {
+        return $this->hasMany(AttrKey::class);
+    }
+
+    public static function setCurrent(Store $store): void
     {
         self::$current = $store;
     }

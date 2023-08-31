@@ -28,7 +28,9 @@ class Customer extends Authenticatable
         parent::boot();
 
         self::creating(function (self $customer) {
-            $customer->name = Str::uuid();
+            if (is_null($customer->name)) {
+                $customer->name = Str::uuid();
+            }
         });
     }
 }

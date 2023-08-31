@@ -5,16 +5,13 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Helpers\FilamentHelper;
 use App\Models\Customer;
-use App\Models\Store;
-use Exception;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Unique;
 
 class CustomerResource extends Resource
 {
@@ -22,16 +19,19 @@ class CustomerResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('common.customers');
+    }
+
+    public static function getPluralLabel(): string
+    {
+        return __('common.customers');
+    }
+
     public static function getEloquentQuery(): Builder
     {
-        $user = Auth::user();
-        $query = parent::getEloquentQuery()->with('store');
-
-        if ($user->hasRole('admin')) {
-            return $query;
-        }
-
-        return $query->whereIn('store_id', $user->stores->pluck('id'));
+        return getQueryFilamentQuery(parent::getEloquentQuery());
     }
 
     public static function form(Form $form): Form
@@ -41,63 +41,32 @@ class CustomerResource extends Resource
         return $form
             ->schema([
                 $helper->select('store_id')
-                    ->label('Store')
-                    ->options(self::getStores())
+                    ->label(__('common.store'))
+                    ->options(getQueryFilamentStore())
+                    ->reactive()
                     ->required(),
-                $helper->textInput('name')
+                $helper->input('name')
+                    ->label(__('common.name'))
                     ->required(),
-                $helper->textInput('phone')
-                    ->label('Phone number')
+                $helper->input('phone')
+                    ->label(__('common.phone_number'))
                     ->regex('/^\+\d{1,}$/')
+                    ->hidden(fn(Get $get) => is_null($get('store_id')))
+                    ->unique(
+                        ignorable: fn(?Model $record) => $record,
+                        modifyRuleUsing: fn(Unique $rule, Get $get) => $rule->where('store_id', $get('store_id')))
                     ->required(),
                 $helper->toggle('active')
+                    ->label(__('common.active'))
                     ->default(true)
             ])->columns(1);
-    }
-
-    protected static function getStores(): Collection
-    {
-        $user = Auth::user();
-        $query = Store::query();
-
-        if (!$user->hasRole('admin')) {
-            $query->whereUserId($user->id);
-        }
-
-        return $query->pluck('name', 'id');
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        $user = Auth::user();
-
-        return $user->hasRole('admin') || $user->id == $record->store->user_id;
     }
 
     public static function canDelete(Model $record): bool
     {
         $user = Auth::user();
 
-        return $user->hasRole('admin') || $user->id == $record->store->user_id;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('store.name'),
-                Tables\Columns\TextColumn::make('Client phone number')
-                    ->formatStateUsing(fn (Model $record) => $record->phone),
-                Tables\Columns\IconColumn::make('active')->boolean(),
-                Tables\Columns\TextColumn::make('updated_at'),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([]);
+        return $user->hasRole('admin') || $user->hasRole('store_owner');
     }
 
     public static function getPages(): array

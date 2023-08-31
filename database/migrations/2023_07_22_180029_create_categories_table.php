@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('store_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained()->cascadeOnDelete();
             $table->json('name');
             $table->json('description')->nullable();
             $table->json('children')->nullable();
+            $table->integer('preview');
         });
     }
 

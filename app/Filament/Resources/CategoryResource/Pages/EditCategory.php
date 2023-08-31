@@ -3,24 +3,31 @@
 namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
-use App\Helpers\FilamentHelper;
 use App\Models\Category;
-use Filament\Resources\Form;
+use App\Models\Store;
+use Filament\Actions\DeleteAction;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class EditCategory extends EditRecord
 {
     protected static string $resource = CategoryResource::class;
 
-    /**
-     * @var Category
-     */
-    public $record;
+    public function getTitle(): string
+    {
+        return __('common.edit_category');
+    }
+
+    public string|int|null|Model|Category $record;
+
+    public int $category_id = 0;
 
     public array|Collection $categories = [];
+    public array|Collection $stores = [];
 
-    public function mount($record): void
+    public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
 
@@ -31,6 +38,10 @@ class EditCategory extends EditRecord
             ->get()
             ->pluck("name.$locale", 'id');
 
+        $this->stores = getQueryFilamentQuery(Store::query())->pluck('name', 'id');
+
+        $this->category_id = (int)$this->record->category_id ?? 0;
+
         $this->authorizeAccess();
 
         $this->fillForm();
@@ -38,23 +49,17 @@ class EditCategory extends EditRecord
         $this->previousUrl = url()->previous();
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
-        $helper = new FilamentHelper;
-
-        $locales = array_keys(config('app.locales'));
-
-        return $form
-            ->schema([
-                $helper->select('category_id')
-                    ->options($this->categories)
-                    ->label('Category')
-                    ->nullable(is_null($this->record->category_id))
-                    ->hidden(is_null($this->record->category_id)),
-                $helper->tabsTextInput('name', $locales),
-                $helper->tabsTextarea('description', $locales),
-                $helper->image('images')->multiple()
-            ])->columns(1);
+        return parent::form(
+            CategoryResource\CategoryResourceForm::form(
+                $form,
+                $this->categories,
+                $this->stores,
+                $this->record->category_id,
+                false
+            )
+        )->columns(1);
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
@@ -72,6 +77,30 @@ class EditCategory extends EditRecord
             ]);
         }
 
+        if (isset($data['category_id'])) {
+            $data['store_id'] = Category::find($data['category_id'])->store_id;
+        }
+
         return $data;
+    }
+
+    public function afterSave(): void
+    {
+        if ($this->record->category) {
+            if ((int)$this->record->category_id != $this->category_id) {
+                $category = Category::find($this->record->category_id);
+
+                $category?->updateChildren();
+            }
+        }
+
+        redirect()->route('filament.admin.resources.categories.edit', ['record' => $this->record->id]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            DeleteAction::make()
+        ];
     }
 }

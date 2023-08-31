@@ -3,36 +3,40 @@
 namespace App\Http\Controllers\Api\Store;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Store\ProductIndexRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\Store;
-use Illuminate\Http\Request;
+use App\Service\ApiProductService;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(
+        protected ApiProductService $apiProductService
+    )
+    {}
+
+    public function index(ProductIndexRequest $request)
     {
         $store = Store::current();
 
-        ProductResource::$locale = config('app.locale');
-        ProductResource::$fallback_locale = $store->fallback_locale;
+        $this->apiProductService->setStoreId($store->id);
+        $this->apiProductService->setLocale(config('app.locale'));
+        $this->apiProductService->setLimit($request->get('limit', 15));
+        $this->apiProductService->setCategoryId($request->get('category_id'));
+        $this->apiProductService->setCategories($store->categories()->pluck('id')->toArray());
 
-        $products = Product::with(['category:id,name,category_id', 'selections', 'store:id', 'images'])
-            ->whereStoreId($store->id)
-            ->whereHas('selections')
-            ->whereIn('category_id', $store->categories)
-            ->orderBy('sorted', 'desc')
-            ->orderBy('category_id', 'desc')
-            ->paginate((int)$request->get('limit', 15));
-
-        return ProductResource::collection($products);
+        return ProductResource::collection($this->apiProductService->all($request));
     }
 
-    public function show(Product $product)
+    public function show(string $id)
     {
-        ProductResource::$locale = config('app.locale');
-        ProductResource::$fallback_locale = Store::current()->fallback_locale;
+        $product = Product::whereId($id)->whereHas('selections')->first();
 
-        return new ProductResource($product);
+        if ($product) {
+            return new ProductResource($product);
+        }
+
+        return response()->json([], 404);
     }
 }

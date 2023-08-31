@@ -3,10 +3,13 @@
 namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
-use App\Helpers\FilamentHelper;
 use App\Models\Category;
-use Filament\Resources\Form;
+use App\Models\Image;
+use App\Models\Store;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -14,13 +17,16 @@ class CreateCategory extends CreateRecord
 {
     protected static string $resource = CategoryResource::class;
 
-    public int $category_id = 0;
+    public ?int $category_id = null;
     public string $category_name = '';
     public array $categories = [];
+    public array|Collection $stores = [];
 
-    protected function getTitle(): string
+    public null|Model|Category $record;
+
+    public function getTitle(): string
     {
-        return $this->category_id ? 'Create a child category "' . truncateStr($this->category_name) . '"' : 'Create main category';
+        return $this->category_id ? __('common.create_a_child_category') . ' "' . truncateStr($this->category_name) . '"' : __('common.create_main_category');
     }
 
     public function mount(): void
@@ -30,7 +36,9 @@ class CreateCategory extends CreateRecord
         try {
             $category_id = request()->get('category_id');
 
-            if (!is_null($category_id)) {
+            if (is_null($category_id)) {
+                $this->stores = getQueryFilamentQuery(Store::query())->pluck('name', 'id');
+            } else {
                 $category = Category::find($category_id);
 
                 if (is_null($category)) {
@@ -43,30 +51,45 @@ class CreateCategory extends CreateRecord
 
                 $this->category_id = $category_id;
                 $this->category_name = $name;
-            } else {
-                $this->category_id = 0;
             }
-        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {}
+        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {
+        }
 
         parent::mount();
     }
 
-    protected function form(Form $form): Form
+    public function form(Form $form): Form
     {
-        $helper = new FilamentHelper;
+        return parent::form(
+            CategoryResource\CategoryResourceForm::form($form, $this->categories, $this->stores, $this->category_id)
+        )->columns(1);
+    }
 
-        $locales = array_keys(config('app.locales'));
+    protected function getFormActions(): array
+    {
+        $actions = parent::getFormActions();
 
-        return $form
-            ->schema([
-                $helper->select('category_id')
-                    ->options($this->categories)
-                    ->visible($this->category_id)
-                    ->default($this->category_id)
-                    ->disabled($this->category_id)
-                    ->label('Category'),
-                $helper->tabsTextInput('name', $locales, true),
-                $helper->tabsTextarea('description', $locales),
-            ])->columns(1);
+        unset($actions[1]);
+
+        return $actions;
+    }
+
+    public function create(bool $another = false): void
+    {
+        $this->authorizeAccess();
+
+        $data = $this->form->getState();
+
+        $data['category_id'] = $this->category_id;
+
+        if (empty($data['store_id'])) {
+            $data['store_id'] = Category::find($this->category_id)->store_id;
+        }
+
+        $this->record = $this->handleRecordCreation($data);
+
+        $this->record->images()->save(new Image(['values' => $data['images']]));
+
+        $this->redirect(route('filament.admin.resources.categories.edit', ['record' => $this->record->id]));
     }
 }
