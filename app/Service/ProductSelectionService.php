@@ -78,21 +78,6 @@ class ProductSelectionService
         return trim($attributes, ', ');
     }
 
-    public function getAttributes(array $properties, string $locale): array
-    {
-        $attributes = [];
-
-        foreach ($properties as $attribute) {
-            $attributes[] = [
-                'attribute' => $attribute['attribute'],
-                'name' => __('common.attributes.' . $attribute['attribute']),
-                'value' => $locale
-            ];
-        }
-
-        return $attributes;
-    }
-
     public function creatingProductForOrder(Selection $selection): array
     {
         $product = $selection->product;
@@ -110,21 +95,23 @@ class ProductSelectionService
 
         $attributes = [];
 
-        foreach ($product->productAttributes as $attribute) {
-            $attributes[$attribute->attribute] = [
-                'attribute' => $attribute->attribute,
-                'type' => $attribute->type,
-                'value1' => $attribute->value1,
-                'value2' => $attribute->value2,
+        foreach ($product->attr as $attribute) {
+            $attributes[$attribute->attr_key_id] = [
+                'attribute' => $attribute->attr_key_id,
+                'attribute_slug' => $attribute->attrKey->slug,
+                'translatable' => $attribute->attrKey->translatable,
+                'name' => $attribute->attrKey->name,
+                'value' => $attribute->value,
             ];
         }
 
-        foreach ($selection->properties as $attribute) {
-            $attributes[$attribute['attribute']] = [
-                'attribute' => $attribute['attribute'],
-                'type' => $attribute['type'],
-                'value1' => $attribute['value1'] ?? [],
-                'value2' => $attribute['value2'] ?? null,
+        foreach ($selection->attr as $attribute) {
+            $attributes[$attribute->attr_key_id] = [
+                'attribute' => $attribute->attr_key_id,
+                'attribute_slug' => $attribute->attrKey->slug,
+                'translatable' => $attribute->attrKey->translatable,
+                'name' => $attribute->attrKey->name,
+                'value' => $attribute->value,
             ];
         }
 

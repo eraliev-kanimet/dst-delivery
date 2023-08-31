@@ -6,7 +6,6 @@ use App\Enums\DeliveryType;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Models\Order;
-use App\Service\ProductSelectionService;
 use Illuminate\Http\Request;
 
 class OrderResource extends BaseResource
@@ -36,7 +35,6 @@ class OrderResource extends BaseResource
     protected function getOrderItems(): array
     {
         $locale = self::$locale;
-        $service = ProductSelectionService::new();
 
         $items = [];
 
@@ -55,7 +53,13 @@ class OrderResource extends BaseResource
                         'name' => $this->getCategoryName($product['category']['name']),
                     ],
                     'images' => getImages($product['images']),
-                    'attributes' => $service->getAttributes($product['attributes'], $locale)
+                    'attributes' => array_map(function ($attr) use ($locale) {
+                        return [
+                            'attribute' => $attr['attribute'],
+                            'name' => $attr['name'][$locale],
+                            'value' => $attr['translatable'] ? $attr['value'][$locale] : $attr['value']['default']
+                        ];
+                    }, $product['attributes']),
                 ],
                 'quantity' => $order->quantity,
                 'price' => $order->price,

@@ -20,12 +20,11 @@ class ApiProductService
     {
         $query = Product::query()
             ->with([
-                'category:id,name,category_id',
-                'selections',
-                'store:id',
+                'category',
+                'selections.attr.attrKey',
                 'images',
                 'content_' . $locale,
-                'productAttributes',
+                'attr.attrKey',
             ])->whereHas('selections', function (Builder $query) {
                 $query->where('is_available', true);
             })->whereStoreId($this->store_id);

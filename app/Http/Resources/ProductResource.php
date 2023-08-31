@@ -5,7 +5,6 @@ namespace App\Http\Resources;
 use App\Models\Product;
 use App\Models\Content;
 use App\Models\Selection;
-use App\Service\ProductSelectionService;
 use App\Service\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -31,33 +30,21 @@ class ProductResource extends BaseResource
             'description' => $content->description,
             'is_available' => (bool)$this->resource->is_available,
             'images' => getImages($this->resource->images->values),
-            'attributes' => $this->getAttributes($this->resource->productAttributes ?? []),
+            'attributes' => $this->resource->attr->map(function ($attr) use ($locale) {
+                return [
+                    'attribute' => $attr->attr_key_id,
+                    'name' => $attr->attrKey->name[$locale],
+                    'value' => $attr->attrKey->translatable ? $attr->value[$locale] : $attr->value['default']
+                ];
+            }),
             'selections' => $this->getSelections($this->resource->selections),
             'preview' => $this->resource->preview,
         ];
     }
 
-    public function getAttributes(Collection|array $attributes): array
-    {
-        $locale = self::$locale;
-        $array = [];
-
-        foreach ($attributes as $attribute) {
-            $array[] = [
-                'attribute' => $attribute->attribute,
-                'name' => __('common.attributes.' . $attribute->attribute),
-                'value' => $locale
-            ];
-        }
-
-        return $array;
-    }
-
     protected function getSelections(Collection $selections): array
     {
         $locale = self::$locale;
-        $service = ProductSelectionService::new();
-
         $array = [];
 
         /** @var Selection $selection */
@@ -68,7 +55,13 @@ class ProductResource extends BaseResource
                 'price' => $selection->price,
                 'is_available' => $selection->is_available,
                 'images' => getImages($selection->images ?? []),
-                'attributes' => $service->getAttributes($selection->properties ?? [], $locale),
+                'attributes' => $selection->attr->map(function ($attr) use ($locale) {
+                    return [
+                        'attribute' => $attr->attr_key_id,
+                        'name' => $attr->attrKey->name[$locale],
+                        'value' => $attr->attrKey->translatable ? $attr->value[$locale] : $attr->value['default']
+                    ];
+                }),
             ];
         }
 
