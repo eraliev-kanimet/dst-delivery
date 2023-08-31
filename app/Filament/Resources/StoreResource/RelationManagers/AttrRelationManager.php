@@ -33,9 +33,6 @@ class AttrRelationManager extends RelationManager
 
         return $form
             ->schema([
-                $helper->input('slug')
-                    ->regex('/^[a-zA-Z]+$/')
-                    ->required(),
                 $helper->tabsInput(
                     'name',
                     $this->ownerRecord->locales,

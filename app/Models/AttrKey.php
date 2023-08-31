@@ -34,5 +34,16 @@ class AttrKey extends Model
         return $this->hasMany(AttrValueSelection::class);
     }
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        self::creating(function (self $key) {
+            if (is_null($key->slug)) {
+                $key->slug = time();
+            }
+        });
+    }
+
     public $timestamps = false;
 }
