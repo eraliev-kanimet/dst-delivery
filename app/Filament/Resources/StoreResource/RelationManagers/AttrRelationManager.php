@@ -22,6 +22,11 @@ class AttrRelationManager extends RelationManager
         return __('common.attributes_label');
     }
 
+    public static function getModelLabel(): ?string
+    {
+        return __('common.attribute');
+    }
+
     public function form(Form $form): Form
     {
         $helper = new FilamentHelper;
