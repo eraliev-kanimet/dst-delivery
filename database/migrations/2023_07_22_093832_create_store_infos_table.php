@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('store_infos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('store_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('store_id')->constrained()->cascadeOnDelete();
             $table->json('images')->nullable();
             $table->json('description')->nullable();
             $table->json('contact')->nullable();

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Http\Requests\Api\Store\ProductIndexRequest;
+use App\Models\AttrKey;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -14,49 +15,28 @@ class ApiProductService
     protected int $store_id = 0;
     protected int $limit = 15;
     protected int $category_id = 0;
+
+    protected string $locale = '';
+
     protected array $categories = [];
+    protected array $attributes = [];
 
-    public function __construct(
-        protected ProductService $service
-    )
-    {}
-
-    public function all(ProductIndexRequest $request, string $locale): LengthAwarePaginator
+    public function all(ProductIndexRequest $request): LengthAwarePaginator
     {
+        $locale = $this->locale;
+
+        $this->setFormattedAttributes($request->get('attributes', []));
+
         $query = Product::query()
             ->with([
-                'category:id,name,category_id',
-                'selections',
-                'store:id',
+                'category.category',
+                'selections.attr.attrKey',
                 'images',
                 'content_' . $locale,
-                'productAttributes',
+                'attr.attrKey',
             ])->whereHas('selections', function (Builder $query) {
                 $query->where('is_available', true);
             })->whereStoreId($this->store_id);
-
-        if ($request->has('attributes')) {
-            $attributes = $this->getFormattedAttributes($request->get('attributes'));
-
-            foreach ($attributes as $attribute) {
-                if ($attribute['type'] == 1) {
-                    $value = "value1->$locale";
-                } else {
-                    $value = 'value2';
-                }
-
-                if (is_array($attribute['value'])) {
-                    $query->whereHas('productAttributes', function (Builder $query) use ($attribute, $value) {
-                        $query->where('attribute', $attribute['attribute'])->whereIn($value, $attribute['value']);
-                    });
-
-                } else {
-                    $query->whereHas('productAttributes', function (Builder $query) use ($attribute, $value) {
-                        $query->where('attribute', $attribute['attribute'])->where($value, $attribute['value']);
-                    });
-                }
-            }
-        }
 
         if ($request->has('q')) {
             $words = explode(' ', $request->get('q'));
@@ -69,6 +49,14 @@ class ApiProductService
             });
         } else {
             $query->whereHas('content_' . $locale);
+        }
+
+        if (count($this->attributes)) {
+            foreach ($this->attributes as $attribute => $value) {
+                $query->whereHas('attr', function (Builder $query) use ($attribute, $value) {
+                    $query->where('attr_key_id', $attribute)->whereIn($value['key'], $value['value']);
+                });
+            }
         }
 
         return $query
@@ -114,22 +102,34 @@ class ApiProductService
         $this->limit = $limit;
     }
 
-    protected function getFormattedAttributes(array $attributes): array
+    public function setLocale(string $locale): void
     {
-        $formattedAttributes = [];
+        $this->locale = $locale;
+    }
 
-        foreach ($attributes as $attribute => $value) {
-            $type = $this->service->getType($attribute);
+    protected function setFormattedAttributes(array $attributes): void
+    {
+        if (count($attributes)) {
+            $locale = $this->locale;
 
-            if ($type) {
-                $formattedAttributes[] = [
-                    'type' => $type,
-                    'attribute' => $attribute,
-                    'value' => $value
+            $attr = [];
+
+            foreach ($attributes as $attribute => $value) {
+                $attribute = filter_var($attribute, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+
+                $attr[$attribute] = $value;
+            }
+
+            $arr = [];
+
+            foreach (AttrKey::whereStoreId($this->store_id)->whereIn('id', array_keys($attr))->get() as $attrKey) {
+                $arr[$attrKey->id] = [
+                    'key' => $attrKey->translatable ? "value->$locale" : 'value->default',
+                    'value' => array_map('trim', explode('@', $attr[$attrKey->id]))
                 ];
             }
-        }
 
-        return $formattedAttributes;
+            $this->attributes = $arr;
+        }
     }
 }

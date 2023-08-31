@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
+use App\Filament\Resources\OrderResource\RelationManagers\OrderItemsRelationManager;
 use App\Models\Order;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,6 +36,13 @@ class OrderResource extends Resource
         $user = Auth::user();
 
         return $user->hasRole('admin') || $user->hasRole('store_owner');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            OrderItemsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

@@ -34,9 +34,7 @@ class UserResource extends Resource
         }
 
         $stores = $user->stores->pluck('id')->toArray();
-        $users = User::whereHas('role', function (Builder $query) {
-            $query->where('slug', 'store_manager');
-        })->get(['id', 'role_id', 'permissions']);
+        $users = User::whereRoleId(3)->get(['id', 'permissions']);
 
         $array = [];
 

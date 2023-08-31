@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\StoreResource\Pages;
 
 use App\Filament\Resources\StoreResource;
-use App\Models\Category;
 use App\Models\User;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
@@ -18,13 +17,11 @@ class CreateStore extends CreateRecord
         return __('common.create_store');
     }
 
-    public array|Collection $categories = [];
     public array|Collection $users = [];
 
     public function mount(): void
     {
-        $this->categories = Category::all()->pluck('name.' . config('app.locale'), 'id');
-        $this->users = User::where('role_id', 2)->pluck('name', 'id');
+        $this->users = User::whereRoleId(2)->pluck('name', 'id');
 
         parent::mount();
     }
@@ -32,7 +29,6 @@ class CreateStore extends CreateRecord
     public function form(Form $form): Form
     {
         $resourceForm = new StoreResource\StoreResourceForm(
-            $this->categories,
             $this->users,
         );
 

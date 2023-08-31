@@ -4,7 +4,6 @@ namespace App\Filament\Resources\BannerResource\Pages;
 
 use App\Filament\Resources\BannerResource;
 use App\Filament\Resources\BannerResource\BannerResourceForm;
-use App\Models\Store;
 use Exception;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Form;
@@ -24,7 +23,7 @@ class EditBanner extends EditRecord
 
     public function mount(int|string $record): void
     {
-        $this->stores = getQueryFilamentStore(Store::query())->pluck('name', 'id');
+        $this->stores = getQueryFilamentStore();
 
         parent::mount($record);
     }

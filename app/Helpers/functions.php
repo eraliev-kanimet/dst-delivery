@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Store;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -26,28 +28,6 @@ function truncateStr($string, $maxLength = 13)
     }
 
     return $string;
-}
-
-function removeEmptyElements($array): array
-{
-    $keysToRemove = [];
-
-    foreach ($array as $key => $value) {
-        if (is_array($value)) {
-            $keysToRemove = array_merge($keysToRemove, array_keys($value, null, true));
-            $keysToRemove = array_merge($keysToRemove, array_keys($value, ''));
-        }
-
-        if ($value === null || $value === '' || $key === null || $key === '') {
-            $keysToRemove[] = $key;
-        }
-    }
-
-    foreach ($keysToRemove as $key) {
-        unset($array[$key]);
-    }
-
-    return $array;
 }
 
 function getSupportedLocale($acceptLanguage, $supportedLocales): bool|string|null
@@ -114,17 +94,17 @@ function dbQueryLog(int $offset = 6): JsonResponse
     ]);
 }
 
-function getQueryFilamentStore(Builder $builder): Builder
+function getQueryFilamentStore(): Collection
 {
     $user = Auth::user();
 
     if ($user->hasRole('store_manager')) {
-        return $builder->whereIn('id', $user->permissions);
+        return Store::whereIn('id', $user->permissions)->pluck('name', 'id');
     } else if ($user->hasRole('store_owner')) {
-        return $builder->where('user_id', $user->id);
+        return Store::where('user_id', $user->id)->pluck('name', 'id');
     }
 
-    return $builder;
+    return Store::pluck('name', 'id');
 }
 
 function getQueryFilamentQuery(Builder $builder): Builder

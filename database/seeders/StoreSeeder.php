@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
 use App\Models\Store;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -18,7 +17,7 @@ class StoreSeeder extends Seeder
             'email' => $email,
         ], [
             'email' => $email,
-            'role_id' => Role::whereSlug('store_owner')->first()->id,
+            'role_id' => 2,
             'name' => fake()->userName,
             'password' => Hash::make('password')
         ]);
@@ -33,7 +32,6 @@ class StoreSeeder extends Seeder
             'user_id' => $owner->id,
             'fallback_locale' => 'en',
             'locales' => ['en', 'ru'],
-            'categories' => [1, 2, 3]
         ]);
     }
 }

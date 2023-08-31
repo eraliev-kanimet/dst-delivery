@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class Category extends Model
 {
     protected $fillable = [
+        'store_id',
         'category_id',
         'name',
         'description',
@@ -22,6 +23,11 @@ class Category extends Model
         'description' => 'array',
         'children' => 'array',
     ];
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
+    }
 
     public function category(): BelongsTo
     {

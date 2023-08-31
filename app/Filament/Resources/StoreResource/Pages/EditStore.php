@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\StoreResource\Pages;
 
 use App\Filament\Resources\StoreResource;
-use App\Models\Category;
 use App\Models\Store;
 use App\Models\User;
 use Exception;
@@ -23,7 +22,6 @@ class EditStore extends EditRecord
         return __('common.edit_store');
     }
 
-    public array|Collection $categories = [];
     public array|Collection $users = [];
 
     /**
@@ -33,10 +31,8 @@ class EditStore extends EditRecord
 
     public function mount(int|string $record): void
     {
-        $this->categories = Category::all()->pluck('name.' . config('app.locale'), 'id');
-
         if (Auth::user()->hasRole('admin')) {
-            $this->users = User::where('role_id', 2)->pluck('name', 'id');
+            $this->users = User::whereRoleId(2)->pluck('name', 'id');
         }
 
         parent::mount($record);
@@ -47,7 +43,6 @@ class EditStore extends EditRecord
         $isAdmin = Auth::user()->hasRole('admin');
 
         $resourceForm = new StoreResource\StoreResourceForm(
-            $this->categories,
             $this->users,
             $this->record->locales,
             $isAdmin

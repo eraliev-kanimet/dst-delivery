@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Helpers\FilamentHelper;
 use App\Models\Customer;
-use App\Models\Store;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
@@ -39,13 +38,11 @@ class CustomerResource extends Resource
     {
         $helper = new FilamentHelper;
 
-        $stores = getQueryFilamentStore(Store::query())->pluck('name', 'id');
-
         return $form
             ->schema([
                 $helper->select('store_id')
                     ->label(__('common.store'))
-                    ->options($stores)
+                    ->options(getQueryFilamentStore())
                     ->reactive()
                     ->required(),
                 $helper->input('name')

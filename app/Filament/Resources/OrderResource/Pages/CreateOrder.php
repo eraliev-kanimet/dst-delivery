@@ -4,7 +4,6 @@ namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\OrderResourceForm;
-use App\Models\Store;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Collection;
@@ -22,7 +21,7 @@ class CreateOrder extends CreateRecord
 
     public function mount(): void
     {
-        $this->stores = getQueryFilamentStore(Store::query())->pluck('name', 'id');
+        $this->stores = getQueryFilamentStore();
 
         parent::mount();
     }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StoreResource\Pages;
+use App\Filament\Resources\StoreResource\RelationManagers\AttrRelationManager;
 use App\Models\Store;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,7 +28,15 @@ class StoreResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return getQueryFilamentStore(parent::getEloquentQuery());
+        $user = Auth::user();
+
+        if ($user->hasRole('store_manager')) {
+            return parent::getEloquentQuery()->whereIn('id', $user->permissions);
+        } else if ($user->hasRole('store_owner')) {
+            return parent::getEloquentQuery()->where('user_id', $user->id);
+        }
+
+        return parent::getEloquentQuery();
     }
 
     public static function canCreate(): bool
@@ -45,6 +54,13 @@ class StoreResource extends Resource
     public static function canDelete(Model $record): bool
     {
         return Auth::user()->hasRole('admin');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            AttrRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

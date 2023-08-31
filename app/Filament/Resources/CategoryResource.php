@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class CategoryResource extends Resource
@@ -23,9 +25,16 @@ class CategoryResource extends Resource
         return __('common.categories');
     }
 
-    public static function canViewAny(): bool
+    public static function getEloquentQuery(): Builder
     {
-        return Auth::user()->hasRole('admin');
+        return getQueryFilamentQuery(parent::getEloquentQuery());
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        $user = Auth::user();
+
+        return $user->hasRole('admin') || $user->hasRole('store_owner');
     }
 
     public static function getPages(): array

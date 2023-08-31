@@ -19,14 +19,14 @@ class ProductController extends Controller
     public function index(ProductIndexRequest $request)
     {
         $store = Store::current();
-        $locale = config('app.locale');
 
         $this->apiProductService->setStoreId($store->id);
+        $this->apiProductService->setLocale(config('app.locale'));
         $this->apiProductService->setLimit($request->get('limit', 15));
         $this->apiProductService->setCategoryId($request->get('category_id'));
-        $this->apiProductService->setCategories($store->categories);
+        $this->apiProductService->setCategories($store->categories()->pluck('id')->toArray());
 
-        return ProductResource::collection($this->apiProductService->all($request, $locale));
+        return ProductResource::collection($this->apiProductService->all($request));
     }
 
     public function show(string $id)

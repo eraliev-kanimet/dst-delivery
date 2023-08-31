@@ -4,7 +4,6 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\ProductResource\ProductResourceForm;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\Content;
 use Filament\Forms\Form;
@@ -23,6 +22,7 @@ class EditProduct extends EditRecord
     public string|int|null|Model|Product $record;
 
     public array $categories = [];
+    public array $attr = [];
     public array $locales = [];
 
     public bool $category_disabled = false;
@@ -35,10 +35,7 @@ class EditProduct extends EditRecord
 
         $locale = config('app.locale');
 
-        $this->categories = Category::whereIn('id', $this->record->store->categories)
-            ->get()
-            ->pluck("name.$locale", 'id')
-            ->toArray();
+        $this->categories = $this->record->store->categories()->get(['name', 'id'])->pluck("name.$locale", 'id')->toArray();
 
         if (!in_array($this->record->category->id, array_keys($this->categories))) {
             $this->category_disabled = true;
@@ -47,6 +44,14 @@ class EditProduct extends EditRecord
                 $this->record->category->id => $this->record->category->name[$locale],
             ];
         }
+
+        $attributes = [];
+
+        foreach ($this->record->store->attr as $item) {
+            $attributes[$item->id] = $item->name[$locale] ?? $item->name[$this->record->store->fallback_locale];
+        }
+
+        $this->attr = $attributes;
 
         $this->authorizeAccess();
 
@@ -86,6 +91,7 @@ class EditProduct extends EditRecord
 
         $productForm->setCategories($this->categories);
         $productForm->setLocales($this->locales);
+        $productForm->setAttributes($this->attr);
         $productForm->setCategoryDisabled($this->category_disabled);
 
         return parent::form($form->schema($productForm->form()))

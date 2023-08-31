@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Store;
 
+use App\Rules\Order\ProductAttrArray;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductIndexRequest extends FormRequest
@@ -9,10 +10,11 @@ class ProductIndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'q' => ['nullable', 'string'],
-            'category_id' => ['nullable', 'numeric'],
-            'limit' => ['nullable', 'numeric'],
-            'attributes' => ['nullable', 'array'],
+            'q' => ['bail', 'nullable', 'string'],
+            'category_id' => ['bail', 'nullable', 'numeric'],
+            'limit' => ['bail', 'nullable', 'numeric'],
+            'attributes' => ['bail', 'nullable', new ProductAttrArray],
+            'attributes.*' => ['bail', 'nullable', 'string']
         ];
     }
 }

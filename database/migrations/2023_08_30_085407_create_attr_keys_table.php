@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('attributes', function (Blueprint $table) {
+        Schema::create('attr_keys', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->integer('type');
-            $table->string('attribute');
-            $table->string('value1')->nullable();
-            $table->string('value2')->nullable();
+            $table->foreignId('store_id')->constrained()->cascadeOnDelete();
+            $table->string('slug')->index();
+            $table->json('name');
+            $table->boolean('translatable')->default(false);
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attributes');
+        Schema::dropIfExists('attr_keys');
     }
 };

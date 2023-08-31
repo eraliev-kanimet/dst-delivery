@@ -6,7 +6,6 @@ use App\Enums\DeliveryType;
 use App\Enums\PaymentMethod;
 use App\Helpers\FilamentHelper;
 use App\Models\Customer;
-use App\Models\Selection;
 use Closure;
 use Filament\Forms\Get;
 use Illuminate\Support\Collection;
@@ -18,8 +17,6 @@ class OrderResourceForm
     public function __construct(
         protected bool             $edited = false,
         protected array|Collection $stores = [],
-        protected array            $products = [],
-        protected array            $deleted_products = [],
     )
     {
         $this->helper = new FilamentHelper;
@@ -27,63 +24,7 @@ class OrderResourceForm
 
     public function form(): array
     {
-        $tabs = [
-            $this->helper->tab(__('common.basic'), $this->basic()),
-        ];
-
-        if ($this->edited) {
-            $tabs[] = $this->helper->tab(__('common.products'), [
-                $this->helper->repeater('orderItems', [
-                    $this->helper->hidden('product'),
-                    $this->helper->select('product.selection_id')
-                        ->options(function (Get $get) {
-                            if (isset($this->deleted_products[$get('product.selection_id')])) {
-                                return $this->deleted_products;
-                            }
-
-                            return $this->products;
-                        })
-                        ->label(__('common.product'))
-                        ->required()
-                        ->reactive()
-                        ->disabled(function (Get $get) {
-                            return isset($this->deleted_products[$get('product.selection_id')]);
-                        })
-                        ->searchable(),
-                    $this->helper->input('quantity')
-                        ->label(__('common.quantity'))
-                        ->numeric()
-                        ->default(1)
-                        ->minValue(1)
-                        ->maxValue(function (Get $get) {
-                            $selection_id = $get('product.selection_id');
-
-                            if (is_null($selection_id)) {
-                                return 1;
-                            }
-
-                            $selection = Selection::find($selection_id);
-
-                            if ($selection) {
-                                return $selection->quantity;
-                            }
-
-                            return 1;
-                        })
-                        ->disabled(function (Get $get) {
-                            return isset($this->deleted_products[$get('product.selection_id')]);
-                        })
-                        ->required()
-                ])->relationship()
-                    ->label('')
-                    ->addActionLabel(__('common.add_product'))
-                    ->required()
-            ]);
-        } else {
-            return $this->basic();
-        }
-
-        return [$this->helper->tabs($tabs)];
+        return $this->basic();
     }
 
     protected function basic(): array
@@ -103,7 +44,7 @@ class OrderResourceForm
                     ->label(__('common.delivery_type'))
                     ->reactive()
                     ->options(DeliveryType::getSelect())
-                    ->columnSpan(fn (Get $get) => $get('delivery_type') == DeliveryType::courier->value ? 1 : 2),
+                    ->columnSpan(fn(Get $get) => $get('delivery_type') == DeliveryType::courier->value ? 1 : 2),
                 $this->helper->dateTime('delivery_date')
                     ->label(__('common.delivery_date'))
                     ->minDate(now())

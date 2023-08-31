@@ -12,7 +12,7 @@ class UserResourceForm
 {
     public static function form(
         array|Collection $stores,
-        array|Collection $roles,
+        array $roles,
         bool $isAdmin = true
     ): array
     {

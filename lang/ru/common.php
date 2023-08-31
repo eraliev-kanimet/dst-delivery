@@ -141,4 +141,13 @@ return [
     'attribute' => 'Атрибут',
     'profile' => 'Профиль',
     'password_confirmation' => 'Подтверждение пароля',
+    'roles' => [
+        'admin' => 'Администратор',
+        'store_owner' => 'Владелец магазина',
+        'store_manager' => 'Менеджер магазина',
+    ],
+    'attributes_label' => 'Атрибуты',
+    'translatable' => 'Переводимый',
+    'normal' => 'Нормальный',
+    'large' => 'Большой',
 ];

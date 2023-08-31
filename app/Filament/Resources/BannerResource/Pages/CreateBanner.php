@@ -4,7 +4,6 @@ namespace App\Filament\Resources\BannerResource\Pages;
 
 use App\Filament\Resources\BannerResource;
 use App\Filament\Resources\BannerResource\BannerResourceForm;
-use App\Models\Store;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Collection;
@@ -22,7 +21,7 @@ class CreateBanner extends CreateRecord
 
     public function mount(): void
     {
-        $this->stores = getQueryFilamentStore(Store::query())->pluck('name', 'id');
+        $this->stores = getQueryFilamentStore();
 
         parent::mount();
     }

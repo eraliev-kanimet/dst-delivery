@@ -2,14 +2,15 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use App\Enums\Role;
 use App\Filament\Resources\UserResource;
+use App\Models\User;
 use Exception;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Builder;
 
 class ListUsers extends ListRecords
 {
@@ -18,11 +19,6 @@ class ListUsers extends ListRecords
     public function getTitle(): string
     {
         return __('common.users');
-    }
-
-    protected function getTableQuery(): Builder
-    {
-        return parent::getTableQuery()->with('role');
     }
 
     /**
@@ -36,7 +32,8 @@ class ListUsers extends ListRecords
                     ->label(__('common.name')),
                 TextColumn::make('email')
                     ->label(__('common.email')),
-                TextColumn::make('role.name')
+                TextColumn::make('role_id')
+                    ->formatStateUsing(fn(User $user) => __('common.roles.' . Role::from($user->role_id)->name))
                     ->label(__('common.role'))
             ])
             ->actions([

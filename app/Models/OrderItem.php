@@ -49,4 +49,18 @@ class OrderItem extends Model
             $this->price = $selection->price;
         }
     }
+
+    public function getProduct(?string $key = null): mixed
+    {
+        if ($key) {
+            return $this->product[$key];
+        }
+
+        return $this->product;
+    }
+
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
 }
