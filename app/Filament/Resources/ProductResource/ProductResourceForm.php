@@ -98,9 +98,9 @@ final class ProductResourceForm
         $this->edit = $edit;
     }
 
-    public function attributesRepeater(): Repeater
+    public function attributesRepeater(bool $required = true): Repeater
     {
-        $schema = [
+        return $this->helper->repeater('attr', [
             $this->helper->select('attr_key_id')
                 ->native()
                 ->label(__('common.attribute'))
@@ -136,12 +136,10 @@ final class ProductResourceForm
             })
                 ->columnSpan(2)
                 ->hidden(fn(Get $get) => is_null($get('attr_key_id'))),
-        ];
-
-        return $this->helper->repeater('attr', $schema)
+        ])
             ->relationship('attr')
             ->label('')
-            ->required()
+            ->required($required)
             ->addActionLabel(__('common.add_property'));
     }
 }

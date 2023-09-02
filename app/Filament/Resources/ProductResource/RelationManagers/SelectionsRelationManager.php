@@ -35,7 +35,7 @@ class SelectionsRelationManager extends RelationManager
 
     public static function getModelLabel(): ?string
     {
-        return __('common.selections');
+        return __('common.selection');
     }
 
     public array $attr = [];
@@ -84,7 +84,8 @@ class SelectionsRelationManager extends RelationManager
                         ->default(true),
                 ]),
                 $helper->tab(__('common.properties'), [
-                    $resourceForm->attributesRepeater(),
+                    $resourceForm->attributesRepeater(false)
+                        ->defaultItems(0),
                 ]),
                 $helper->tab(__('common.images'), [
                     $helper->image('images')
@@ -120,7 +121,11 @@ class SelectionsRelationManager extends RelationManager
                             $string .= $key . ': ' . $value . ', ';
                         }
 
-                        return trim($string, ', ');
+                        if ($string) {
+                            return trim($string, ', ');
+                        }
+
+                        return __('common.no_properties');
                     }),
                 TextColumn::make('price')
                     ->label(__('common.price')),
@@ -140,6 +145,8 @@ class SelectionsRelationManager extends RelationManager
             ->bulkActions([
                 DeleteBulkAction::make(),
             ])
+            ->emptyStateHeading(__('common.selections_not_found.header'))
+            ->emptyStateDescription(__('common.selections_not_found.description'))
             ->emptyStateActions([
                 CreateAction::make()->modalWidth('6xl'),
             ]);

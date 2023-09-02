@@ -134,6 +134,7 @@ return [
     'edit_product' => 'Edit product',
     'is_available' => 'Is available',
     'selections' => 'Selections',
+    'selection' => 'Selection',
     'add_selection' => 'Add selection',
     'properties' => 'Properties',
     'add_property' => 'Add property',
@@ -150,4 +151,13 @@ return [
     'translatable' => 'Translatable',
     'normal' => 'Normal',
     'large' => 'Large',
+    'selections_not_found' => [
+        'header' => 'No product selections found',
+        'description' => 'There is no product selection available. Please add a product selection to view in the store.',
+    ],
+    'order_items_not_found' => [
+        'header' => 'Order products not found',
+        'description' => 'There are no products missing from the order. Please add products for checkout.',
+    ],
+    'no_properties' => 'Without properties',
 ];
