@@ -4,21 +4,33 @@ namespace App\Service;
 
 use App\Enums\OrderStatus;
 use App\Http\Resources\OrderResource;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Selection;
 use App\Models\Store;
+use App\Service\Admin\NotificationService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ApiOrderService
 {
+    public function __construct(
+        public NotificationService $notificationService,
+    )
+    {}
+
     public function create(array $data): OrderResource
     {
+        $store = Store::current();
+
+        /** @var Customer $customer */
+        $customer = Auth::user();
+
         $order = Order::create([
-            'store_id' => Store::current()->id,
-            'customer_id' => Auth::user()->id,
+            'store_id' => $store->id,
+            'customer_id' => $customer->id,
             'status' => OrderStatus::pending_payment->value,
             'delivery_date' => now()->addDays(10),
             'delivery_type' => $data['delivery_type'],
@@ -39,6 +51,14 @@ class ApiOrderService
         }
 
         $order->actionTotalCostRecalculation();
+
+        $this->notificationService->send($store, __('notifications.orders.new1', [
+            'order_id' => "#$order->uuid", 'customer' => $customer->phone,
+        ]));
+
+        $this->notificationService->sendToOwner($store, __('notifications.orders.new1', [
+            'order_id' => "#$order->uuid", 'customer' => $customer->phone,
+        ]));
 
         return new OrderResource($order);
     }
