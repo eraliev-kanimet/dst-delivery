@@ -131,8 +131,7 @@ class ProductSelectionService
                 $name = $product->{"content_$fallback_locale"}->name;
             }
 
-            $name .= ': ' . __('common.price') . ' ' . $selection->price;
-            $name .= ', ' . __('common.quantity') . ' ' . $selection->quantity . ', ';
+            $name .= ' - ';
 
             foreach ($selection->attr->slice(0, 10) as $attribute) {
                 $key = $attribute->attrKey->name[$locale] ?? $attribute->attrKey->name[$fallback_locale];
@@ -152,8 +151,7 @@ class ProductSelectionService
                 $name = $product["content_$fallback_locale"]['name'];
             }
 
-            $name .= ': ' . __('common.price') . ' ' . $orderItem->getPrice() . ', ';
-            $name .= __('common.quantity') . ' ' . $selection->quantity . ', ';
+            $name .= ' - ';
 
             if (is_array($product['attributes'])) {
                 foreach ($product['attributes'] as $attribute) {
