@@ -36,7 +36,9 @@ class ListOrders extends ListRecords
 
     protected function getTableQuery(): Builder
     {
-        return parent::getTableQuery()->with(['store', 'customer']);
+        return parent::getTableQuery()
+            ->with(['store', 'customer'])
+            ->orderBy('updated_at', 'desc');
     }
 
     /**
@@ -47,6 +49,7 @@ class ListOrders extends ListRecords
         $statuses = OrderStatus::getSelect();
 
         return $table
+            ->poll('30s')
             ->columns([
                 TextColumn::make('uuid')
                     ->label('ID')

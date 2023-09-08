@@ -12,15 +12,18 @@ use App\Http\Resources\OrderResource;
 use App\Models\OrderItem;
 use App\Models\Selection;
 use App\Models\Store;
+use App\Service\Admin\NotificationService;
 use App\Service\ApiOrderService;
 use App\Http\Requests\Api\Store\Order\IndexRequest;
 
 class OrderController extends Controller
 {
     public function __construct(
-        protected ApiOrderService $service
+        protected ApiOrderService     $service,
+        protected NotificationService $notificationService,
     )
-    {}
+    {
+    }
 
     public function index(IndexRequest $request)
     {
@@ -63,6 +66,16 @@ class OrderController extends Controller
             $order->actionCancel();
 
             $order->callCustomOrderUpdateEvent();
+
+            $store = Store::current();
+
+            $this->notificationService->sendToOwner($store, __('notifications.orders.cancel', [
+                'order_id' => $order->uuid,
+            ]));
+
+            $this->notificationService->send($store, __('notifications.orders.cancel', [
+                'order_id' => $order->uuid,
+            ]));
 
             return new OrderResource($order);
         }
