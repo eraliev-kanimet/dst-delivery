@@ -61,35 +61,6 @@ final class ProductResourceForm
 
         if ($this->edit) {
             $tabs[] = $this->helper->tab(__('common.properties'), [$this->attributesRepeater()]);
-
-            $tabs[] = $this->helper->tab(__('common.selections'), [
-                $this->helper->repeater('selections', [
-                    $this->helper->grid([
-                        $this->helper->input('quantity')
-                            ->label(__('common.quantity'))
-                            ->minValue(0)
-                            ->required()
-                            ->numeric(),
-                        $this->helper->input('price')
-                            ->label(__('common.price'))
-                            ->minValue(0)
-                            ->required()
-                            ->numeric(),
-                        $this->helper->toggle('is_available')
-                            ->label(__('common.is_available'))
-                            ->default(true),
-                    ]),
-                    $this->helper->image('images')
-                        ->label(__('common.images'))
-                        ->multiple()
-                        ->imageEditor(),
-                    $this->attributesRepeater(),
-                ])
-                    ->relationship('selections')
-                    ->required()
-                    ->label('')
-                    ->addActionLabel(__('common.add_selection'))
-            ]);
         }
 
         $tabs[] = $this->helper->tab(__('common.images'), [
@@ -127,9 +98,9 @@ final class ProductResourceForm
         $this->edit = $edit;
     }
 
-    protected function attributesRepeater(): Repeater
+    public function attributesRepeater(bool $required = true): Repeater
     {
-        $schema = [
+        return $this->helper->repeater('attr', [
             $this->helper->select('attr_key_id')
                 ->native()
                 ->label(__('common.attribute'))
@@ -165,12 +136,10 @@ final class ProductResourceForm
             })
                 ->columnSpan(2)
                 ->hidden(fn(Get $get) => is_null($get('attr_key_id'))),
-        ];
-
-        return $this->helper->repeater('attr', $schema)
+        ])
             ->relationship('attr')
             ->label('')
-            ->required()
+            ->required($required)
             ->addActionLabel(__('common.add_property'));
     }
 }

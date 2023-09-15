@@ -125,7 +125,5 @@ class EditProduct extends EditRecord
                 ]));
             }
         }
-
-        redirect()->route('filament.admin.resources.products.edit', ['record' => $this->record->id]);
     }
 }

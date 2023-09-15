@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
+use App\Filament\Resources\ProductResource\RelationManagers\SelectionsRelationManager;
 use App\Models\Product;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,6 +27,13 @@ class ProductResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return getQueryFilamentQuery(parent::getEloquentQuery());
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            SelectionsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

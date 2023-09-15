@@ -113,7 +113,9 @@ class OrderItemsRelationManager extends RelationManager
                     ->label(__('common.price')),
             ])
             ->headerActions([
-                CreateAction::make()->after(fn() => $this->refreshOwnerRecord()),
+                CreateAction::make()
+                    ->label(__('common.add_product'))
+                    ->after(fn() => $this->refreshOwnerRecord()),
             ])
             ->actions([
                 EditAction::make()->after(fn() => $this->refreshOwnerRecord()),
@@ -122,8 +124,12 @@ class OrderItemsRelationManager extends RelationManager
             ->bulkActions([
                 DeleteBulkAction::make()->after(fn() => $this->refreshOwnerRecord()),
             ])
+            ->emptyStateHeading(__('common.order_items_not_found.header'))
+            ->emptyStateDescription(__('common.order_items_not_found.description'))
             ->emptyStateActions([
-                CreateAction::make()->after(fn() => $this->refreshOwnerRecord()),
+                CreateAction::make()
+                    ->label(__('common.add_product'))
+                    ->after(fn() => $this->refreshOwnerRecord()),
             ]);
     }
 
